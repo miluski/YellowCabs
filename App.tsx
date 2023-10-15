@@ -13,7 +13,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'blue',
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center' 
   }, 
   map: {
     width: '100%',
