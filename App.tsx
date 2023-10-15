@@ -3,6 +3,7 @@ import MapView from 'react-native-maps';
 import { View, StyleSheet } from 'react-native';
 import { config } from '@gluestack-ui/config';
 import { GluestackUIProvider, Image } from '@gluestack-ui/themed';
+import MapViewDirections from 'react-native-maps-directions';
 function App() {
   return <GluestackUIProvider config={config}>
     <Background />
@@ -20,10 +21,25 @@ const styles = StyleSheet.create({
     height: '100%',
   },
 });
+const origin = {latitude: 37.3318456, longitude: -122.0296002};
+const destination = {latitude: 37.771707, longitude: -122.4053769};
 const Background = () => {
   return <View style={styles.back}>
     <Logo/>
-    <MapView style={styles.map} />
+    <MapView style={styles.map} initialRegion={{
+          latitude: 37.3318456,
+          longitude: -122.0296002,
+          latitudeDelta: 0.0922,
+          longitudeDelta: 0.0421,
+        }}>
+      <MapViewDirections
+      origin={origin}
+      destination={destination}
+      apikey={"AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ"}
+      strokeWidth={3}
+      strokeColor="hotpink"
+    />
+    </MapView>
   </View>;
 };
 const Logo = () => {
@@ -34,3 +50,4 @@ const Logo = () => {
   />;
 };
 export default App;
+
