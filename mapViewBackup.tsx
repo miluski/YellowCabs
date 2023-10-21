@@ -4,7 +4,7 @@ import { View, StyleSheet } from 'react-native';
 import { config } from '@gluestack-ui/config';
 import { GluestackUIProvider, Image } from '@gluestack-ui/themed';
 import MapViewDirections from 'react-native-maps-directions';
-function App() {
+function Panel() {
   return <GluestackUIProvider config={config}>
     <Background />
   </GluestackUIProvider>;
@@ -49,5 +49,5 @@ const Logo = () => {
   alt = "Logo"
   />;
 };
-export default App;
+export default Panel;
 
