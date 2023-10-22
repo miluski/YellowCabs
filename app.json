@@ -15,13 +15,15 @@
       "assets/fonts/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yellowcabs"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "package": "com.yellowcabs"
     },
     "web": {
       "favicon": "./assets/favicon.png"
