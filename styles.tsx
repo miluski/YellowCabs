@@ -13,14 +13,14 @@ const styles = StyleSheet.create({
     fontSize: 45
   },
   logo: {
-    alignSelf: 'center'
+    alignSelf: 'center',
+    alignContent: 'center',
   },
   hintsView: {
     paddingTop: 20,
-    paddingLeft: 30
+    alignSelf: 'center'
   },
   dataForm: {
-    paddingLeft: 20
   },
   phoneText: {
     fontFamily: 'DejaVuSans',
