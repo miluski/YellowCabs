@@ -1,31 +1,13 @@
 import * as Font from "expo-font";
 import firebaseConfig from "./firebaseConfig";
 import styles from "./styles";
-import DriverRegisterPanel from "./DriverRegisterPanel";
-import PassengerRegisterPanel from "./PassengerRegisterPanel";
-import PasswordNotRemember from "./PasswordNotRemember";
 import { config } from "@gluestack-ui/config";
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
 import React, { useState } from "react";
 import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
 import { View, Vibration, Alert } from "react-native";
 import { GluestackUIProvider, ButtonGroup, Image, Text, Input} from "@gluestack-ui/themed";
 import { Box, FormControl, FormControlError, FormControlErrorText} from "@gluestack-ui/themed";
 import { Button, FormControlLabel, FormControlLabelText, InputField, ButtonText} from "@gluestack-ui/themed";
-const Stack = createStackNavigator();
-function LoginPanelNavigation() {
-  return (
-    <NavigationContainer>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="LoginPanel" component={LoginPanel} />
-            <Stack.Screen name="DriverRegisterPanel" component={DriverRegisterPanel} />
-            <Stack.Screen name="PassengerRegisterPanel" component={PassengerRegisterPanel} />
-            <Stack.Screen name="PasswordNotRemember" component={PasswordNotRemember} />
-        </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
 function LoginPanel({ navigation } : { navigation: any }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const loadCustomFont = async () => {
@@ -82,7 +64,7 @@ const DataForm = (props: { navigation: any }) => {
   const [isInvalidPhone, setIsInvalidPhone] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
   return (
-    <Box style={styles.dataForm}>
+    <Box>
       <PhoneInput
         phoneNumber={phoneNumber}
         isInvalid={isInvalidPhone}
@@ -93,7 +75,7 @@ const DataForm = (props: { navigation: any }) => {
         isInvalid={isInvalidPassword}
         setPassword={setPassword}
       />
-      <NotRememberPasswordHint />
+      <NotRememberPasswordHint navigation={props.navigation} />
       <LoginAsText />
       <SwitchableButtons setRank={setRank} />
       <LoginYourSelfButton
@@ -132,7 +114,7 @@ const PhoneInput = (props: {
         <InputField
           type="text"
           value={props.phoneNumber}
-          placeholder="123 123 123"
+          placeholder="123123123"
           onChangeText={(actualPhoneNumber) => {
             props.setPhoneNumber(actualPhoneNumber);
           }}
@@ -209,7 +191,7 @@ const PasswordBadInput = () => {
     </FormControlError>
   );
 };
-const NotRememberPasswordHint = () => {
+const NotRememberPasswordHint = (props: {navigation: any}) => {
   return (
     <Button
       action={"secondary"}
@@ -218,7 +200,7 @@ const NotRememberPasswordHint = () => {
       isDisabled={false}
       style={styles.passwordHint}
       onPress={() => {
-        ShowAlert("Błąd", "Not implemented yet!");
+        props.navigation.navigate('PasswordNotRemember');
       }}
     >
       <ButtonText style={styles.notRememberPasswordText}>
@@ -346,4 +328,4 @@ function ShowAlert(title: string, message: string) {
     },
   ]);
 }
-export default LoginPanelNavigation;
+export default LoginPanel;

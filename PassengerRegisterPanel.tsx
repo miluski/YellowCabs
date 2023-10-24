@@ -60,7 +60,7 @@ const MainView = (props: { navigation: any }) => {
 };
 const DataForm = (props: { navigation: any }) => {
   return (
-    <Box style={styles.dataForm}>
+    <Box>
      
     </Box>
   );

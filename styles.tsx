@@ -20,8 +20,6 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     alignSelf: 'center'
   },
-  dataForm: {
-  },
   phoneText: {
     fontFamily: 'DejaVuSans',
     fontSize: 18
@@ -61,6 +59,19 @@ const styles = StyleSheet.create({
   errors: {
     fontFamily: 'DejaVuSans',
     fontSize: 15
+  },
+  recoverPassword: {
+    alignSelf: 'center',
+    fontFamily: 'DejaVuSans',
+    fontSize: 18, 
+    paddingBottom: 50
+  },
+  recoverPasswordButton: {
+    borderRadius: 10,
+    borderColor: 'black',
+    borderWidth: 1,
+    marginTop: 75,
+    width: 275
   }
 });
 export default styles;
