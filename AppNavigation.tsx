@@ -1,6 +1,6 @@
 import React from "react";
 import LoginPanel from "./LoginPanel";
-import RegisterPanel from "./RegisterPanel";
+import RegisterPanel from "./DriverRegisterPanel";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 

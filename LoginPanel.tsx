@@ -1,40 +1,27 @@
 import * as Font from "expo-font";
 import firebaseConfig from "./firebaseConfig";
 import styles from "./styles";
+import DriverRegisterPanel from "./DriverRegisterPanel";
+import PassengerRegisterPanel from "./PassengerRegisterPanel";
+import PasswordNotRemember from "./PasswordNotRemember";
 import { config } from "@gluestack-ui/config";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import React, { useState } from "react";
 import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
 import { View, Vibration, Alert } from "react-native";
-import {
-  GluestackUIProvider,
-  ButtonGroup,
-  Image,
-  Text,
-  Input,
-} from "@gluestack-ui/themed";
-import {
-  Box,
-  FormControl,
-  FormControlError,
-  FormControlErrorText,
-} from "@gluestack-ui/themed";
-import {
-  Button,
-  FormControlLabel,
-  FormControlLabelText,
-  InputField,
-  ButtonText,
-} from "@gluestack-ui/themed";
-import RegisterPanel from "./RegisterPanel";
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { GluestackUIProvider, ButtonGroup, Image, Text, Input} from "@gluestack-ui/themed";
+import { Box, FormControl, FormControlError, FormControlErrorText} from "@gluestack-ui/themed";
+import { Button, FormControlLabel, FormControlLabelText, InputField, ButtonText} from "@gluestack-ui/themed";
 const Stack = createStackNavigator();
 function LoginPanelNavigation() {
   return (
     <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="LoginPanel" component={LoginPanel} />
-            <Stack.Screen name="RegisterPanel" component={RegisterPanel} />
+            <Stack.Screen name="DriverRegisterPanel" component={DriverRegisterPanel} />
+            <Stack.Screen name="PassengerRegisterPanel" component={PassengerRegisterPanel} />
+            <Stack.Screen name="PasswordNotRemember" component={PasswordNotRemember} />
         </Stack.Navigator>
     </NavigationContainer>
   );
@@ -91,7 +78,7 @@ const MainView = (props: { navigation: any }) => {
 const DataForm = (props: { navigation: any }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [rank, setRank] = useState("");
+  const [rank, setRank] = useState("driver");
   const [isInvalidPhone, setIsInvalidPhone] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
   return (
@@ -291,7 +278,8 @@ function HandleLoginButtonPress(
   role: string,
   navigation: any
 ) {
-  GetUserRequest(phone, password, role, navigation);
+  const parsedPhoneNumber = parseInt(phone);
+  GetUserRequest(parsedPhoneNumber, password, role, navigation);
 }
 function validatePhone(phone: string) {
   return phone.length == 9;
@@ -300,12 +288,11 @@ function validatePassword(password: string) {
   return password.length >= 8;
 }
 async function GetUserRequest(
-  phone: string,
+  phone: number,
   password: string,
   role: string,
   navigation: any
 ) {
-  const parsePhoneNumber = parseInt(phone);
   const database = getDatabase(firebaseConfig);
   const usersLocation = ref(database, "users");
   const userQuery = query(usersLocation, orderByChild("phone"));
@@ -313,29 +300,41 @@ async function GetUserRequest(
   if (snapshot.exists()) {
     const users = snapshot.val();
     const user = Object.values(users).find((userData: any) => {
-      return userData.phone === parsePhoneNumber;
+      return userData.phone === phone;
     });
     if (user) {
       const validate = Object.values(users).find((userData: any) => {
         if (userData.role != "driver")
           return (
-            userData.phone === parsePhoneNumber &&
+            userData.phone === phone &&
             userData.password === password &&
             userData.role === role
           );
         else
           return (
-            userData.phone === parsePhoneNumber &&
+            userData.phone === phone &&
             userData.password === password
           );
       });
       if (validate) ShowAlert("Sukces", "Pomyślnie zalogowano!");
-      else ShowAlert("Błąd", "Wprowadzono błędne dane logowania!");
+      else {
+        ShowAlert("Błąd", "Wprowadzono błędne dane logowania!");
+      }
     } else {
-      navigation.navigate("RegisterPanel");
+      HandleRegistration(role, navigation);
     }
   } else {
-    navigation.navigate("RegisterPanel");
+    HandleRegistration(role, navigation);
+  }
+}
+function HandleRegistration(role: string, navigation: any) {
+  switch(role) {
+    case 'driver':
+      navigation.navigate("DriverRegisterPanel");
+    break;
+    case 'passenger':
+      navigation.navigate("PassengerRegisterPanel");
+    break;
   }
 }
 function ShowAlert(title: string, message: string) {

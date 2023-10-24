@@ -5,29 +5,11 @@ import { config } from "@gluestack-ui/config";
 import React, { useState } from "react";
 import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
 import { View, Vibration, Alert } from "react-native";
-import {
-  GluestackUIProvider,
-  ButtonGroup,
-  Image,
-  Text,
-  Input,
-} from "@gluestack-ui/themed";
-import {
-  Box,
-  FormControl,
-  FormControlError,
-  FormControlErrorText,
-} from "@gluestack-ui/themed";
-import {
-  Button,
-  FormControlLabel,
-  FormControlLabelText,
-  InputField,
-  ButtonText,
-} from "@gluestack-ui/themed";
+import { GluestackUIProvider, Image, Text } from "@gluestack-ui/themed";
+import { Box} from "@gluestack-ui/themed";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-function RegisterPanel({ navigation } : { navigation: any }) {
+function DriverRegisterPanel({ navigation } : { navigation: any }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const loadCustomFont = async () => {
     await Font.loadAsync({
@@ -83,4 +65,4 @@ const DataForm = (props: { navigation: any }) => {
     </Box>
   );
 };
-export default RegisterPanel;
+export default DriverRegisterPanel;
