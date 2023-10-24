@@ -1,14 +1,45 @@
-import * as Font from 'expo-font';
-import firebaseConfig from './firebaseConfig';
-import styles from './styles';
-import { config } from '@gluestack-ui/config';
-import React, { useState } from 'react';
-import { get, getDatabase, orderByChild, query, ref } from 'firebase/database';
-import { View, Vibration, Alert } from 'react-native';
-import { GluestackUIProvider, ButtonGroup, Image, Text, Input } from '@gluestack-ui/themed';
-import { Box, FormControl, FormControlError, FormControlErrorText } from '@gluestack-ui/themed';
-import { Button, FormControlLabel, FormControlLabelText, InputField, ButtonText } from '@gluestack-ui/themed';
-function LoginPanel() {
+import * as Font from "expo-font";
+import firebaseConfig from "./firebaseConfig";
+import styles from "./styles";
+import { config } from "@gluestack-ui/config";
+import React, { useState } from "react";
+import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
+import { View, Vibration, Alert } from "react-native";
+import {
+  GluestackUIProvider,
+  ButtonGroup,
+  Image,
+  Text,
+  Input,
+} from "@gluestack-ui/themed";
+import {
+  Box,
+  FormControl,
+  FormControlError,
+  FormControlErrorText,
+} from "@gluestack-ui/themed";
+import {
+  Button,
+  FormControlLabel,
+  FormControlLabelText,
+  InputField,
+  ButtonText,
+} from "@gluestack-ui/themed";
+import RegisterPanel from "./RegisterPanel";
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+const Stack = createStackNavigator();
+function LoginPanelNavigation() {
+  return (
+    <NavigationContainer>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="LoginPanel" component={LoginPanel} />
+            <Stack.Screen name="RegisterPanel" component={RegisterPanel} />
+        </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
+function LoginPanel({ navigation } : { navigation: any }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const loadCustomFont = async () => {
     await Font.loadAsync({
@@ -20,193 +51,300 @@ function LoginPanel() {
   loadCustomFont().then(() => {
     setIsLoaded(true);
   });
-  if (isLoaded) {
+  if (!isLoaded) {
+    return null;
+  }
+  else{ 
     return <GluestackUIProvider config={config}>
-      <Background />
+        <Background navigation={navigation} />
     </GluestackUIProvider>;
   }
 }
-const Background = () => {
-  return <View style={styles.background}>
-    <Logo />
-    <Text style={styles.yellowcabs}>YellowCabs</Text>
-    <MainView />
-  </View>;
+const Background = (props: { navigation: any }) => {
+  return (
+    <View style={styles.background}>
+      <Logo />
+      <Text style={styles.yellowcabs}>YellowCabs</Text>
+      <MainView navigation={props.navigation} />
+    </View>
+  );
 };
 const Logo = () => {
-  return <Image size="xl" source={{
-    uri: "https://i.ibb.co/hLT13mG/Zrzut-ekranu-2023-10-19-234035.png"
-  }} style={styles.logo} alt="Logo" />;
+  return (
+    <Image
+      size="xl"
+      source={{
+        uri: "https://i.ibb.co/hLT13mG/Zrzut-ekranu-2023-10-19-234035.png",
+      }}
+      style={styles.logo}
+      alt="Logo"
+    />
+  );
 };
-const MainView = () => {
-  return <View style={styles.hintsView}>
-    <DataForm />
-  </View>;
+const MainView = (props: { navigation: any }) => {
+  return (
+    <View style={styles.hintsView}>
+      <DataForm navigation={props.navigation} />
+    </View>
+  );
 };
-const DataForm = () => {
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [password, setPassword] = useState('');
-  const [rank, setRank] = useState('');
+const DataForm = (props: { navigation: any }) => {
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [password, setPassword] = useState("");
+  const [rank, setRank] = useState("");
   const [isInvalidPhone, setIsInvalidPhone] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
-  return <Box style={styles.dataForm}>
-    <PhoneInput phoneNumber={phoneNumber} isInvalid={isInvalidPhone} setPhoneNumber={setPhoneNumber} />
-    <PasswordInput password={password} isInvalid={isInvalidPassword} setPassword={setPassword} />
-    <NotRememberPasswordHint />
-    <LoginAsText />
-    <SwitchableButtons setRank={setRank} />
-    <LoginYourSelfButton onPress={() => {
-      var isValidPhone = validatePhone(phoneNumber);
-      var isValidPassword = validatePassword(password);
-      setIsInvalidPhone(!isValidPhone);
-      setIsInvalidPassword(!isValidPassword);
-      if (isValidPhone && isValidPassword) HandleLoginButtonPress(phoneNumber, password, rank);
-    }} />
-  </Box>;
+  return (
+    <Box style={styles.dataForm}>
+      <PhoneInput
+        phoneNumber={phoneNumber}
+        isInvalid={isInvalidPhone}
+        setPhoneNumber={setPhoneNumber}
+      />
+      <PasswordInput
+        password={password}
+        isInvalid={isInvalidPassword}
+        setPassword={setPassword}
+      />
+      <NotRememberPasswordHint />
+      <LoginAsText />
+      <SwitchableButtons setRank={setRank} />
+      <LoginYourSelfButton
+        onPress={() => {
+          var isValidPhone = validatePhone(phoneNumber);
+          var isValidPassword = validatePassword(password);
+          setIsInvalidPhone(!isValidPhone);
+          setIsInvalidPassword(!isValidPassword);
+          if (isValidPhone && isValidPassword)
+            HandleLoginButtonPress(
+              phoneNumber,
+              password,
+              rank,
+              props.navigation
+            );
+        }}
+      />
+    </Box>
+  );
 };
 const PhoneInput = (props: {
   phoneNumber: string | undefined;
   isInvalid: boolean | undefined;
   setPhoneNumber: (arg0: string) => void;
 }) => {
-  return <FormControl size="lg" isDisabled={false} isInvalid={props.isInvalid} isReadOnly={false} isRequired={false}>
-    <PhoneLabel />
-    <Input style={styles.inputFields}>
-      <InputField type="text" value={props.phoneNumber} placeholder="+48 123 123 123" onChangeText={actualPhoneNumber => {
-        props.setPhoneNumber(actualPhoneNumber);
-      }} selectionColor={'black'} keyboardType="numeric" />
-    </Input>
-    <PhoneBadInput />
-  </FormControl>;
+  return (
+    <FormControl
+      size="lg"
+      isDisabled={false}
+      isInvalid={props.isInvalid}
+      isReadOnly={false}
+      isRequired={false}
+    >
+      <PhoneLabel />
+      <Input style={styles.inputFields}>
+        <InputField
+          type="text"
+          value={props.phoneNumber}
+          placeholder="123 123 123"
+          onChangeText={(actualPhoneNumber) => {
+            props.setPhoneNumber(actualPhoneNumber);
+          }}
+          selectionColor={"black"}
+          keyboardType="numeric"
+        />
+      </Input>
+      <PhoneBadInput />
+    </FormControl>
+  );
 };
 const PhoneLabel = () => {
-  return <FormControlLabel mb="$1">
-    <FormControlLabelText style={styles.phoneText}>Telefon</FormControlLabelText>
-  </FormControlLabel>;
+  return (
+    <FormControlLabel mb="$1">
+      <FormControlLabelText style={styles.phoneText}>
+        Telefon
+      </FormControlLabelText>
+    </FormControlLabel>
+  );
 };
 const PhoneBadInput = () => {
-  return <FormControlError>
-    <FormControlErrorText style={styles.errors}>
-      Telefon musi mieć 9 cyfr!
-    </FormControlErrorText>
-  </FormControlError>;
+  return (
+    <FormControlError>
+      <FormControlErrorText style={styles.errors}>
+        Telefon musi mieć 9 cyfr!
+      </FormControlErrorText>
+    </FormControlError>
+  );
 };
 const PasswordInput = (props: {
   password: string | undefined;
   isInvalid: boolean | undefined;
   setPassword: (arg0: string) => void;
 }) => {
-  return <FormControl size="lg" isDisabled={false} isInvalid={props.isInvalid} isReadOnly={false} isRequired={false}>
-    <PasswordLabel />
-    <Input style={styles.inputFields}>
-      <InputField type="password" placeholder="********" value={props.password} onChangeText={actualPassword => {
-        props.setPassword(actualPassword);
-      }} selectionColor={'black'} />
-    </Input>
-    <PasswordBadInput />
-  </FormControl>;
+  return (
+    <FormControl
+      size="lg"
+      isDisabled={false}
+      isInvalid={props.isInvalid}
+      isReadOnly={false}
+      isRequired={false}
+    >
+      <PasswordLabel />
+      <Input style={styles.inputFields}>
+        <InputField
+          type="password"
+          placeholder="********"
+          value={props.password}
+          onChangeText={(actualPassword) => {
+            props.setPassword(actualPassword);
+          }}
+          selectionColor={"black"}
+        />
+      </Input>
+      <PasswordBadInput />
+    </FormControl>
+  );
 };
 const PasswordLabel = () => {
-  return <FormControlLabel mb="$1">
-    <FormControlLabelText style={styles.passwordText}>Hasło</FormControlLabelText>
-  </FormControlLabel>;
+  return (
+    <FormControlLabel mb="$1">
+      <FormControlLabelText style={styles.passwordText}>
+        Hasło
+      </FormControlLabelText>
+    </FormControlLabel>
+  );
 };
 const PasswordBadInput = () => {
-  return <FormControlError>
-    <FormControlErrorText style={styles.errors}>
-      Hasło musi mieć 8 znaków!
-    </FormControlErrorText>
-  </FormControlError>;
+  return (
+    <FormControlError>
+      <FormControlErrorText style={styles.errors}>
+        Hasło musi mieć 8 znaków!
+      </FormControlErrorText>
+    </FormControlError>
+  );
 };
 const NotRememberPasswordHint = () => {
-  return <Button action={"secondary"} variant={"link"} size={"xs"} isDisabled={false} style={styles.passwordHint} onPress={() => {
-    ShowAlert("Błąd", "Not implemented yet!");
-  }}>
-    <ButtonText style={styles.notRememberPasswordText}>
-      Nie pamiętasz hasła?
-    </ButtonText>
-  </Button>;
+  return (
+    <Button
+      action={"secondary"}
+      variant={"link"}
+      size={"xs"}
+      isDisabled={false}
+      style={styles.passwordHint}
+      onPress={() => {
+        ShowAlert("Błąd", "Not implemented yet!");
+      }}
+    >
+      <ButtonText style={styles.notRememberPasswordText}>
+        Nie pamiętasz hasła?
+      </ButtonText>
+    </Button>
+  );
 };
 const LoginAsText = () => {
-  return <Text style={styles.loginAs}>
-    Zaloguj się jako
-  </Text>;
+  return <Text style={styles.loginAs}>Zaloguj się jako</Text>;
 };
-const SwitchableButtons = (props: {
-  setRank: (arg0: string) => void;
-}) => {
-  const [driverButtonColor, setDriverButtonColor] = useState('#FFB700');
-  const [passengerButtonColor, setPassengerButtonColor] = useState('white');
-  return <ButtonGroup style={{
-    paddingTop: 10,
-    paddingBottom: 30
-  }}>
-    <Button bgColor={driverButtonColor} style={styles.buttons} onPress={() => {
-      props.setRank('driver');
-      setDriverButtonColor('#FFB700');
-      setPassengerButtonColor('white');
-    }}>
-      <ButtonText style={styles.buttonText}>Kierowca</ButtonText>
-    </Button>
-    <Button bgColor={passengerButtonColor} style={styles.buttons} onPress={() => {
-      props.setRank('passenger');
-      setDriverButtonColor('white');
-      setPassengerButtonColor('#FFB700');
-    }}>
-      <ButtonText style={styles.buttonText}>Pasażer</ButtonText>
-    </Button>
-  </ButtonGroup>;
+const SwitchableButtons = (props: { setRank: (arg0: string) => void }) => {
+  const [driverButtonColor, setDriverButtonColor] = useState("#FFB700");
+  const [passengerButtonColor, setPassengerButtonColor] = useState("white");
+  return (
+    <ButtonGroup
+      style={{
+        paddingTop: 10,
+        paddingBottom: 30,
+      }}
+    >
+      <Button
+        bgColor={driverButtonColor}
+        style={styles.buttons}
+        onPress={() => {
+          props.setRank("driver");
+          setDriverButtonColor("#FFB700");
+          setPassengerButtonColor("white");
+        }}
+      >
+        <ButtonText style={styles.buttonText}>Kierowca</ButtonText>
+      </Button>
+      <Button
+        bgColor={passengerButtonColor}
+        style={styles.buttons}
+        onPress={() => {
+          props.setRank("passenger");
+          setDriverButtonColor("white");
+          setPassengerButtonColor("#FFB700");
+        }}
+      >
+        <ButtonText style={styles.buttonText}>Pasażer</ButtonText>
+      </Button>
+    </ButtonGroup>
+  );
 };
 const LoginYourSelfButton = (props: any) => {
-  return <Button bgColor='#FFB700' style={styles.buttons} onPress={props.onPress}>
-    <ButtonText style={styles.buttonText}>Zaloguj</ButtonText>
-  </Button>;
+  return (
+    <Button bgColor="#FFB700" style={styles.buttons} onPress={props.onPress}>
+      <ButtonText style={styles.buttonText}>Zaloguj</ButtonText>
+    </Button>
+  );
 };
-function HandleLoginButtonPress(phone: string, password: string, role: string) {
-  GetUserRequest(phone, password, role);
+function HandleLoginButtonPress(
+  phone: string,
+  password: string,
+  role: string,
+  navigation: any
+) {
+  GetUserRequest(phone, password, role, navigation);
 }
 function validatePhone(phone: string) {
-  return phone.length >= 9;
+  return phone.length == 9;
 }
 function validatePassword(password: string) {
   return password.length >= 8;
 }
-async function GetUserRequest(phone: string, password: string, role: string) {
+async function GetUserRequest(
+  phone: string,
+  password: string,
+  role: string,
+  navigation: any
+) {
   const parsePhoneNumber = parseInt(phone);
   const database = getDatabase(firebaseConfig);
-  const usersLocation = ref(database, 'users');
-  const userQuery = query(usersLocation, orderByChild('phone'));
+  const usersLocation = ref(database, "users");
+  const userQuery = query(usersLocation, orderByChild("phone"));
   const snapshot = await get(userQuery);
   if (snapshot.exists()) {
     const users = snapshot.val();
     const user = Object.values(users).find((userData: any) => {
       return userData.phone === parsePhoneNumber;
     });
-    if(user) {
+    if (user) {
       const validate = Object.values(users).find((userData: any) => {
-        if(userData.role!='driver')
-          return userData.phone === parsePhoneNumber && userData.password === password && userData.role === role;
+        if (userData.role != "driver")
+          return (
+            userData.phone === parsePhoneNumber &&
+            userData.password === password &&
+            userData.role === role
+          );
         else
-          return userData.phone === parsePhoneNumber && userData.password === password;
+          return (
+            userData.phone === parsePhoneNumber &&
+            userData.password === password
+          );
       });
-      if(validate)
-        ShowAlert("Sukces", "Pomyślnie zalogowano!");
-      else
-        ShowAlert("Błąd", "Wprowadzono błędne dane logowania!");
+      if (validate) ShowAlert("Sukces", "Pomyślnie zalogowano!");
+      else ShowAlert("Błąd", "Wprowadzono błędne dane logowania!");
+    } else {
+      navigation.navigate("RegisterPanel");
     }
-    else;
-      //rejestracja
   } else {
-    //rejestracja
+    navigation.navigate("RegisterPanel");
   }
 }
-function ShowAlert(title:string, message: string) {
+function ShowAlert(title: string, message: string) {
   Vibration.vibrate(500);
-  Alert.alert(title, message,[
+  Alert.alert(title, message, [
     {
-      text: 'Ok',
-      style: 'cancel'
+      text: "Ok",
+      style: "cancel",
     },
-  ])
+  ]);
 }
-export default LoginPanel;
+export default LoginPanelNavigation;
