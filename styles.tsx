@@ -71,7 +71,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderWidth: 1,
     marginTop: 75,
-    width: 275
+    width: 275,
+    alignSelf: 'center'
   }
 });
 export default styles;

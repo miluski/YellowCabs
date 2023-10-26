@@ -1,14 +1,9 @@
 import * as Font from "expo-font";
-import firebaseConfig from "./firebaseConfig";
 import styles from "./styles";
-import { config } from "@gluestack-ui/config";
 import React, { useState } from "react";
-import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
-import { View, Vibration, Alert } from "react-native";
-import { GluestackUIProvider, Image, Text } from "@gluestack-ui/themed";
-import { Box} from "@gluestack-ui/themed";
-import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { config } from "@gluestack-ui/config";
+import { View } from "react-native";
+import { GluestackUIProvider, Image, Text, Box } from "@gluestack-ui/themed";
 function DriverRegisterPanel({ navigation } : { navigation: any }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const loadCustomFont = async () => {

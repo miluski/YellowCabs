@@ -1,9 +1,7 @@
 import * as Font from "expo-font";
-import firebaseConfig from "./firebaseConfig";
 import styles from "./styles";
 import { config } from "@gluestack-ui/config";
 import React, { useState } from "react";
-import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
 import { View, Vibration, Alert } from "react-native";
 import { GluestackUIProvider, ButtonGroup, Image, Text, Input} from "@gluestack-ui/themed";
 import { Box, FormControl, FormControlError, FormControlErrorText} from "@gluestack-ui/themed";
@@ -79,18 +77,19 @@ const DataForm = (props: { navigation: any }) => {
       <LoginAsText />
       <SwitchableButtons setRank={setRank} />
       <LoginYourSelfButton
-        onPress={() => {
+        onPress={async () => {
+          const providedData = {
+            phone: phoneNumber,
+            password: password,
+            role: rank,
+            navigation: props.navigation
+          };
           var isValidPhone = validatePhone(phoneNumber);
           var isValidPassword = validatePassword(password);
           setIsInvalidPhone(!isValidPhone);
           setIsInvalidPassword(!isValidPassword);
           if (isValidPhone && isValidPassword)
-            HandleLoginButtonPress(
-              phoneNumber,
-              password,
-              rank,
-              props.navigation
-            );
+            await HandleLoginButtonPress(providedData);
         }}
       />
     </Box>
@@ -254,60 +253,52 @@ const LoginYourSelfButton = (props: any) => {
     </Button>
   );
 };
-function HandleLoginButtonPress(
-  phone: string,
-  password: string,
-  role: string,
-  navigation: any
-) {
-  const parsedPhoneNumber = parseInt(phone);
-  GetUserRequest(parsedPhoneNumber, password, role, navigation);
-}
 function validatePhone(phone: string) {
   return phone.length == 9;
 }
 function validatePassword(password: string) {
   return password.length >= 8;
 }
-async function GetUserRequest(
-  phone: number,
-  password: string,
-  role: string,
-  navigation: any
-) {
-  const database = getDatabase(firebaseConfig);
-  const usersLocation = ref(database, "users");
-  const userQuery = query(usersLocation, orderByChild("phone"));
-  const snapshot = await get(userQuery);
-  if (snapshot.exists()) {
-    const users = snapshot.val();
-    const user = Object.values(users).find((userData: any) => {
-      return userData.phone === phone;
-    });
-    if (user) {
-      const validate = Object.values(users).find((userData: any) => {
-        if (userData.role != "driver")
-          return (
-            userData.phone === phone &&
-            userData.password === password &&
-            userData.role === role
-          );
-        else
-          return (
-            userData.phone === phone &&
-            userData.password === password
-          );
-      });
-      if (validate) ShowAlert("Sukces", "Pomyślnie zalogowano!");
-      else {
-        ShowAlert("Błąd", "Wprowadzono błędne dane logowania!");
-      }
-    } else {
-      HandleRegistration(role, navigation);
+async function HandleLoginButtonPress(providedData: any) {
+  const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
+  const databasePath = '/users.json'; 
+  const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
+  const getRequestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
+  fetch(getRequestURL)
+  .then(response => {
+      return response.json();
+  })
+  .then(async data => {
+    await HandleRetrievedData(data, providedData);
+  })
+  .catch(error => {
+    console.log(error);
+  });
+}
+async function HandleRetrievedData(data: any, providedData: any) {
+  const parsedPhone = parseInt(providedData.phone);
+  var isUserFounded = false;
+  for(const userKey in data) {
+    const user = data[userKey];
+    if(IsUserFounded(user.phone, parsedPhone)) {
+      isUserFounded = true;
+      if(checkPassword(user.password, providedData.password) && checkRole(user.role, providedData.role))
+        ShowAlert("Sukces", "Pomyślnie zalogowano!");
+      else
+        ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
     }
-  } else {
-    HandleRegistration(role, navigation);
   }
+  if(!isUserFounded)
+    HandleRegistration(providedData.role, providedData.navigation);
+}
+function IsUserFounded(phone: number, providedPhone: number) {
+  return phone===providedPhone;
+}
+function checkPassword(password: string, providedPassword: string) {
+  return password===providedPassword;
+}
+function checkRole(role: string, checkedRole: string) {
+  return role==='driver' || role===checkedRole;
 }
 function HandleRegistration(role: string, navigation: any) {
   switch(role) {

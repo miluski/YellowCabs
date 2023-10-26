@@ -1,9 +1,7 @@
 import * as Font from 'expo-font';
-import firebaseConfig from "./firebaseConfig";
 import styles from "./styles";
 import { config } from "@gluestack-ui/config";
 import React, { useState } from "react";
-import { get, getDatabase, orderByChild, query, ref } from "firebase/database";
 import { View, Vibration, Alert } from "react-native";
 import { GluestackUIProvider, Text, Input } from "@gluestack-ui/themed";
 import { Box, FormControl, FormControlError, FormControlErrorText } from "@gluestack-ui/themed";
@@ -32,14 +30,14 @@ function PasswordNotRemember({
         <Text style={styles.recoverPassword}>Przywracanie hasła</Text>
           <View style={styles.hintsView}>
             <Box>
-              <DataForm />
+              <DataForm navigation={navigation}/>
             </Box>
           </View>
         </View>
     </GluestackUIProvider>;
   }
 }
-const DataForm = () => {
+const DataForm = (props: {navigation: any}) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [secretPassword, setSecretPassword] = useState("");
   const [password, setPassword] = useState("");
@@ -54,16 +52,17 @@ const DataForm = () => {
     <PasswordInput password={password} hintText={"Nowe Hasło"} isInvalid={isInvalidPassword} setPassword={setPassword} />
     <PasswordInput password={repeatedPassword} hintText={"Powtórz nowe Hasło"} isInvalid={isInvalidRepeatedPassword} setPassword={setRepeatedPassword} />
     <RecoverPasswordButton onPress={()=>{
-      var isValidPhone = validatePhone(phoneNumber);
+      var isValidPhone = async() => {validatePhone(phoneNumber)};
+      console.log(isValidPhone);
+      var isValidSecretPassword = validateSecretPassword(secretPassword);
       var isValidPassword = validatePassword(password);
       var isValidRepeatedPassword = validateRepeatedPassword(password, repeatedPassword) && validatePassword(repeatedPassword);
-      var isValidSecretPassword = validateSecretPassword(secretPassword);
       setIsInvalidPhone(!isValidPhone);
       setIsInvalidPassword(!isValidPassword);
       setIsInvalidRepeatedPassword(!isValidRepeatedPassword);
       setIsInvalidSecretPassword(!isValidSecretPassword);
-      if(isValidPhone && isValidPassword && isValidRepeatedPassword && isValidSecretPassword){
-          Vibration.vibrate(500);
+      if(isValidPhone && isValidSecretPassword && isValidPassword && isValidRepeatedPassword){
+          HandlePasswordRecovery(parseInt(phoneNumber), password, props.navigation);
     }}}
      />
   </Box>;
@@ -93,7 +92,7 @@ const PhoneLabel = () => {
 const PhoneBadInput = () => {
   return <FormControlError>
     <FormControlErrorText style={styles.errors}>
-      Telefon musi mieć 9 cyfr!
+      Wprowadzony telefon jest nieprawidłowy!
     </FormControlErrorText>
   </FormControlError>;
 };
@@ -139,7 +138,7 @@ const SecretPasswordBadInput = () => {
   return (
     <FormControlError>
       <FormControlErrorText style={styles.errors}>
-        Hasło musi mieć 8 znaków!
+        Wprowadzony sekret jest nieprawidłowy!
       </FormControlErrorText>
     </FormControlError>
   );
@@ -187,7 +186,7 @@ const PasswordBadInput = () => {
   return (
     <FormControlError>
       <FormControlErrorText style={styles.errors}>
-        Wprowadzone hasła różnią się!
+        Wprowadzone hasło jest nieprawidłowe!
       </FormControlErrorText>
     </FormControlError>
   );
@@ -200,18 +199,59 @@ const RecoverPasswordButton = (props: any) => {
   );
 };
 function validatePhone(phone: string) {
-  return phone.length==9;
+  async () => {
+    console.log(phone.length==9 && await getDataFromDatabase('phone', parseInt(phone)));
+    return phone.length==9 && await getDataFromDatabase('phone', parseInt(phone));
+  }
+  return false;
+}
+async function validateSecretPassword(secretPassword: string) {
+  return secretPassword.length==8 && await getDataFromDatabase('secretPassword', secretPassword);
 }
 function validatePassword(password: string) {
   return password.length>=8;
 }
 function validateRepeatedPassword(password: string, repeatedPassword: string) {
-  console.log(repeatedPassword===password);
   return repeatedPassword===password;
 }
-function validateSecretPassword(secretPassword: string) {
-  //todo: get z bazy
-  return true;
+function HandlePasswordRecovery(phone: number, newPassword: string, navigation: any) {
+  ShowAlert("Sukces", "Pomyślnie odzyskano hasło!");
+  navigation.navigate('LoginPanel');
+}
+async function getDataFromDatabase(dataType: any, providedData: any) {
+  const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
+  const databasePath = '/users.json'; 
+  const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
+  const getRequestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
+  fetch(getRequestURL) 
+  .then(response => {
+    return response.json();
+  })
+  .then(data => {
+    return HandleRetrievedData(data, providedData, dataType);
+  })
+  .catch(error => {
+    console.log(error);
+  });
+}
+function HandleRetrievedData(data: any, providedData: any, dataType: string) : boolean {
+  let isValid = false;
+  for(const userKey in data) {
+    const user = data[userKey];
+    switch(dataType) {
+      case 'phone':
+        isValid = providedData == user.phone;
+        if(isValid)
+          break;
+      break;
+      case 'secretPassword':
+        isValid = providedData == user.secretPassword;
+        if(isValid)
+          break;
+      break;
+    }
+  }
+  return isValid;
 }
 function ShowAlert(title: string, message: string) {
   Vibration.vibrate(500);
