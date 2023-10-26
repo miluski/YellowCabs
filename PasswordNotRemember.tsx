@@ -51,19 +51,18 @@ const DataForm = (props: {navigation: any}) => {
     <SecretPasswordInput secretPassword={secretPassword} isInvalid={isInvalidSecretPassword} setSecretPassword={setSecretPassword} />
     <PasswordInput password={password} hintText={"Nowe Hasło"} isInvalid={isInvalidPassword} setPassword={setPassword} />
     <PasswordInput password={repeatedPassword} hintText={"Powtórz nowe Hasło"} isInvalid={isInvalidRepeatedPassword} setPassword={setRepeatedPassword} />
-    <RecoverPasswordButton onPress={()=>{
-      var isValidPhone = async() => {validatePhone(phoneNumber)};
-      console.log(isValidPhone);
-      var isValidSecretPassword = validateSecretPassword(secretPassword);
-      var isValidPassword = validatePassword(password);
-      var isValidRepeatedPassword = validateRepeatedPassword(password, repeatedPassword) && validatePassword(repeatedPassword);
+    <RecoverPasswordButton onPress={async ()=>{
+      const isValidPhone = await validatePhone(phoneNumber);
+      const isValidSecretPassword = await validateSecretPassword(secretPassword, phoneNumber);
+      const isValidPassword = validatePassword(password);
+      const isValidRepeatedPassword = validateRepeatedPassword(password, repeatedPassword) && validatePassword(repeatedPassword);
       setIsInvalidPhone(!isValidPhone);
       setIsInvalidPassword(!isValidPassword);
       setIsInvalidRepeatedPassword(!isValidRepeatedPassword);
       setIsInvalidSecretPassword(!isValidSecretPassword);
-      if(isValidPhone && isValidSecretPassword && isValidPassword && isValidRepeatedPassword){
-          HandlePasswordRecovery(parseInt(phoneNumber), password, props.navigation);
-    }}}
+      if(isValidPhone && isValidSecretPassword && isValidPassword && isValidRepeatedPassword)
+        await HandlePasswordRecovery(parseInt(phoneNumber), password, props.navigation);
+    }}
      />
   </Box>;
 };
@@ -198,15 +197,25 @@ const RecoverPasswordButton = (props: any) => {
     </Button>
   );
 };
-function validatePhone(phone: string) {
-  async () => {
-    console.log(phone.length==9 && await getDataFromDatabase('phone', parseInt(phone)));
-    return phone.length==9 && await getDataFromDatabase('phone', parseInt(phone));
+async function validatePhone(phone: string) {
+  try {
+    let dataArray: string[] = [phone, ""];
+    const result = await getDataFromDatabase('phone', dataArray);
+    return phone.length == 9 && result;
+  } catch (error) {
+    console.error(error);
+    return false;
   }
-  return false;
 }
-async function validateSecretPassword(secretPassword: string) {
-  return secretPassword.length==8 && await getDataFromDatabase('secretPassword', secretPassword);
+async function validateSecretPassword(secretPassword: string, phone: string) {
+  try {
+    let dataArray: string[] = [secretPassword, phone];
+    const result = await getDataFromDatabase('secretPassword', dataArray);
+    return secretPassword.length == 8 && result;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }
 function validatePassword(password: string) {
   return password.length>=8;
@@ -214,44 +223,83 @@ function validatePassword(password: string) {
 function validateRepeatedPassword(password: string, repeatedPassword: string) {
   return repeatedPassword===password;
 }
-function HandlePasswordRecovery(phone: number, newPassword: string, navigation: any) {
-  ShowAlert("Sukces", "Pomyślnie odzyskano hasło!");
-  navigation.navigate('LoginPanel');
-}
-async function getDataFromDatabase(dataType: any, providedData: any) {
+async function getDataFromDatabase(dataType: any, providedData: any[]) {
   const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
   const databasePath = '/users.json'; 
   const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
   const getRequestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
-  fetch(getRequestURL) 
-  .then(response => {
-    return response.json();
-  })
-  .then(data => {
+  try {
+    const response = await fetch(getRequestURL);
+    const data = await response.json();
     return HandleRetrievedData(data, providedData, dataType);
-  })
-  .catch(error => {
-    console.log(error);
-  });
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
 }
-function HandleRetrievedData(data: any, providedData: any, dataType: string) : boolean {
+function HandleRetrievedData(data: any, providedData: any[], dataType: string) : any {
   let isValid = false;
   for(const userKey in data) {
     const user = data[userKey];
     switch(dataType) {
       case 'phone':
-        isValid = providedData == user.phone;
+        isValid = parseInt(providedData[0]) == user.phone;
         if(isValid)
-          break;
+          return isValid;
       break;
       case 'secretPassword':
-        isValid = providedData == user.secretPassword;
+        isValid = providedData[0] == user.secretPassword && parseInt(providedData[1]) == user.phone;
         if(isValid)
-          break;
+          return isValid;
+      break;
+      case 'userKey':
+        isValid = parseInt(providedData[0]) == user.phone;
+        if(isValid)
+          return userKey;
       break;
     }
   }
   return isValid;
+}
+async function HandlePasswordRecovery(phone: number, newPassword: string, navigation: any) {
+  const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
+  const databasePath = '/users.json'; 
+  const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
+  const requestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
+  const generatedSecret = getSecret(8);
+  let dataArray: number[] = [phone, 0];
+  try {
+    const response = await fetch(requestURL);
+    const data = await response.json();
+    const userKey = HandleRetrievedData(data, dataArray, 'userKey');
+    data[userKey].password = newPassword;
+    data[userKey].secretPassword = generatedSecret;
+    const putResponse = await fetch(requestURL, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data), 
+    });
+    if (putResponse.ok) {
+      ShowAlert("Sukces", "Pomyślnie odzyskano hasło!\nTwój nowy sekret to: " + generatedSecret +"\nZapisz go w bezpiecznym miejscu!");
+      navigation.navigate('LoginPanel');
+    }
+    else
+      ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
+function getSecret(length: number) {
+  let result = '';
+  const characters =
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i++) 
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  return result;
 }
 function ShowAlert(title: string, message: string) {
   Vibration.vibrate(500);
