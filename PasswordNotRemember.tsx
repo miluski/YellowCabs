@@ -127,7 +127,7 @@ const SecretPasswordInput = (props: {
 const SecretPasswordLabel = () => {
   return (
     <FormControlLabel mb="$1">
-      <FormControlLabelText style={styles.passwordText}>
+      <FormControlLabelText style={styles.labelText}>
         Sekretne Hasło
       </FormControlLabelText>
     </FormControlLabel>
@@ -175,7 +175,7 @@ const PasswordInput = (props: {
 const PasswordLabel = (props: {hintText: string}) => {
   return (
     <FormControlLabel mb="$1">
-      <FormControlLabelText style={styles.passwordText}>
+      <FormControlLabelText style={styles.labelText}>
         <Text>{props.hintText}</Text>
       </FormControlLabelText>
     </FormControlLabel>
@@ -192,7 +192,7 @@ const PasswordBadInput = () => {
 };
 const RecoverPasswordButton = (props: any) => {
   return (
-    <Button bgColor="#FFB700" style={styles.recoverPasswordButton} onPress={props.onPress}>
+    <Button bgColor="#FFB700" style={styles.functionButton} onPress={props.onPress}>
       <ButtonText style={styles.buttonText}>Przywróć hasło</ButtonText>
     </Button>
   );
@@ -218,7 +218,8 @@ async function validateSecretPassword(secretPassword: string, phone: string) {
   }
 }
 function validatePassword(password: string) {
-  return password.length>=8;
+  var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+  return password.length>=8 && passPattern.test(password);
 }
 function validateRepeatedPassword(password: string, repeatedPassword: string) {
   return repeatedPassword===password;
