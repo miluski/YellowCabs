@@ -21,7 +21,8 @@ const styles = StyleSheet.create({
   },
   hintsView: {
     paddingTop: 20,
-    alignSelf: 'center'
+    alignSelf: 'center',
+    alignItems: 'center'
   },
   phoneText: {
     fontFamily: 'DejaVuSans',
@@ -53,7 +54,8 @@ const styles = StyleSheet.create({
   buttons: {
     borderRadius: 10,
     borderColor: 'black',
-    borderWidth: 1
+    borderWidth: 1,
+    marginTop: 20
   },
   buttonText: {
     fontFamily: 'DejaVuSans',

@@ -3,10 +3,10 @@ import styles from "./styles";
 import React, { useState } from "react";
 import { config } from "@gluestack-ui/config";
 import { Alert, Vibration, View } from "react-native";
-import { Button, GluestackUIProvider, Text, Box, FormControl, FormControlError } from "@gluestack-ui/themed";
+import { Button, GluestackUIProvider, Text, Box, FormControl, FormControlError, ButtonGroup } from "@gluestack-ui/themed";
 import { FormControlErrorText, FormControlLabel, FormControlLabelText, Input} from "@gluestack-ui/themed";
 import { InputField, ButtonText, RadioGroup, CircleIcon, Radio, RadioIcon, RadioIndicator, RadioLabel, ScrollView, HStack } from "@gluestack-ui/themed";
-function PassengerRegisterPanel({ navigation } : { navigation: any }) {
+function RegisterPanel({ navigation } : { navigation: any }) {
   const [isLoaded, setIsLoaded] = useState(false);
   const loadCustomFont = async () => {
     await Font.loadAsync({
@@ -38,17 +38,23 @@ const Background = (props: { navigation: any }) => {
   );
 };
 const MainView = (props: { navigation: any }) => {
+  const [rank, setRank] = useState("passenger");
+  const [isDriver, setIsDriver] = useState(false);
   return (
     <View style={styles.hintsView}>
-      <DataForm navigation={props.navigation} />       
+      <Label hintText="Wybierz typ konta"/>
+      <SwitchableButtons setRank={setRank} setIsDriver={setIsDriver}/>
+      <DataForm navigation={props.navigation} isDriver={isDriver}/>       
     </View>
   );
 };
-const DataForm = (props: { navigation: any }) => {
+const DataForm = (props: { navigation: any, isDriver: boolean }) => {
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [voivodeship, setVoivodeship] = useState("");
+  const [driverlicense, setDriverlicense] = useState("");
+  const [cardid, setCardid] = useState("");
   const [password, setPassword] = useState("");
   const [phoneErrorMessage, setPhoneErrorMessage] = useState("Wprowadzony numer telefonu jest nieprawidłowy!");
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("Wprowadzone hasło jest nieprawidłowe!");
@@ -57,16 +63,23 @@ const DataForm = (props: { navigation: any }) => {
   const [isInvalidSurname, setIsInvalidSurname] = useState(false);
   const [isInvalidPhone, setIsInvalidPhone] = useState(false);
   const [isInvalidVoivodeship, setIsInvalidVoivodeship] = useState(false);
+  const [isInvalidDriverlicense, setIsInvalidDriverlicense] = useState(false);
+  const [isInvalidCardid, setIsInvalidCardid] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
   const [isInvalidRepeatedPassword, setIsInvalidRepeatedPassword] = useState(false);
   const [isAgreementNotChecked, setIsAgreementNotChecked] = useState(true);
-  const generatedSecret = getSecret(8);
   return (
     <Box style={{paddingHorizontal: 30}}>
       <NameInput name={name} isInvalid={isInvalidName} setName={setName} />
       <SurnameInput surname={surname} isInvalid={isInvalidSurname} setSurname={setSurname} />
       <PhoneInput phoneNumber={phoneNumber} errorMessage={phoneErrorMessage} isInvalid={isInvalidPhone} setPhoneNumber={setPhoneNumber} />
       <VoivodeshipInput voivodeship={voivodeship} isInvalid={isInvalidVoivodeship} setVoivodeship={setVoivodeship} />
+      {props.isDriver&&(
+      <>
+        <DriverLicenseInput driverlicense={driverlicense} isInvalid={isInvalidDriverlicense} setDriverlicense={setDriverlicense} />
+        <CardIdInput cardid={cardid} isInvalid={isInvalidCardid} setCardid={setCardid} />
+      </>)
+      }
       <PasswordInput password={password} errorText={passwordErrorMessage} hintText={"Hasło"} isInvalid={isInvalidPassword} setPassword={setPassword} />
       <PasswordInput password={repeatedPassword} errorText={passwordErrorMessage} hintText={"Powtórz hasło"} isInvalid={isInvalidRepeatedPassword} setPassword={setRepeatedPassword} />
       <AgreementRadioButton isAgreementNotChecked={isAgreementNotChecked} setIsAgreementNotChecked={setIsAgreementNotChecked} />
@@ -78,9 +91,12 @@ const DataForm = (props: { navigation: any }) => {
         const isValidSurname = validateData(surname);
         const isValidPhone = validatePhone(phoneNumber);
         const isValidVoivodeship = validateVoivodeship(voivodeship);
+        const isValidDriverLicense = validateDriverLicense(driverlicense);
+        const isValidCardid = validateCardId(cardid);
         const isValidPassword = validatePassword(password);
         const isValidRepeatedPassword = validateRepeatedPassword(password, repeatedPassword) && validatePassword(repeatedPassword);
         const isPasswordSecure = validateSecureOfPassword(password);
+        const generatedSecret = getSecret(8);
         if(!isPasswordSecure && isValidPassword)
           setPasswordErrorMessage("Hasło musi mieć 1 znak specjalny\ncyfrę i dużą literę!");
         if(!isValidRepeatedPassword && isValidPassword)
@@ -89,9 +105,26 @@ const DataForm = (props: { navigation: any }) => {
         setIsInvalidSurname(!isValidSurname);
         setIsInvalidPhone(!isValidPhone || isPhoneExists);
         setIsInvalidVoivodeship(!isValidVoivodeship);
+        setIsInvalidDriverlicense(!isValidDriverLicense);
+        setIsInvalidCardid(!isValidCardid);
         setIsInvalidPassword(!isValidPassword || !isPasswordSecure);
         setIsInvalidRepeatedPassword(!isValidRepeatedPassword || !isPasswordSecure);
-        if(!isPhoneExists && isValidName && isValidSurname && isValidPhone && isValidVoivodeship && isValidPassword && isValidRepeatedPassword && isPasswordSecure && !isAgreementNotChecked) {
+        if(!isPhoneExists && isValidName && isValidSurname && isValidPhone && isValidVoivodeship && isValidDriverLicense && isValidCardid && isValidPassword && isValidRepeatedPassword && isPasswordSecure && !isAgreementNotChecked && props.isDriver) {
+          const dataObject = {
+            name: name,
+            surname: surname,
+            phone: parseInt(phoneNumber),
+            voivodeship: voivodeship,
+            driverlicense: driverlicense.toUpperCase(),
+            cardid: cardid.toUpperCase(), 
+            password: password,
+            agreement: !isAgreementNotChecked,
+            role: 'driver',
+            secretPassword: generatedSecret
+          };
+          await registerUser(dataObject, props.navigation, generatedSecret);
+        }
+        else if(!isPhoneExists && isValidName && isValidSurname && isValidPhone && isValidVoivodeship && isValidPassword && isValidRepeatedPassword && isPasswordSecure && !isAgreementNotChecked && !props.isDriver) {
           const dataObject = {
             name: name,
             surname: surname,
@@ -109,6 +142,34 @@ const DataForm = (props: { navigation: any }) => {
       <BottomInformation navigation={props.navigation} />
     </Box>
   );
+};
+const SwitchableButtons = (props: {
+  setRank: (arg0: string) => void;
+  setIsDriver: (arg0: boolean) => void;
+}) => {
+  const [driverButtonColor, setDriverButtonColor] = useState("white");
+  const [passengerButtonColor, setPassengerButtonColor] = useState("#FFB700");
+  return <ButtonGroup style={{
+    paddingTop: 10,
+    paddingBottom: 30
+  }}>
+    <Button bgColor={passengerButtonColor} style={styles.buttons} onPress={() => {
+      props.setRank("passenger");
+      setDriverButtonColor("white");
+      setPassengerButtonColor("#FFB700");
+      props.setIsDriver(false);
+    }}>
+      <ButtonText style={styles.buttonText}>Pasażer</ButtonText>
+    </Button>
+    <Button bgColor={driverButtonColor} style={styles.buttons} onPress={() => {
+      props.setRank("driver");
+      setDriverButtonColor("#FFB700");
+      setPassengerButtonColor("white");
+      props.setIsDriver(true);
+    }}>
+      <ButtonText style={styles.buttonText}>Kierowca</ButtonText>
+    </Button>
+  </ButtonGroup>;
 };
 const NameInput = (props: {
   name: string | undefined;
@@ -174,6 +235,40 @@ const VoivodeshipInput = (props: {
         }} selectionColor={"black"} />
       </Input>
       <BadInput hintText="Wprowadzone województwo jest nieprawidłowe!" />
+    </FormControl>
+  );
+};
+const DriverLicenseInput = (props: {
+  driverlicense: string | undefined;
+  isInvalid: boolean | undefined;
+  setDriverlicense: (arg0: string) => void;
+}) => {
+  return (
+    <FormControl size="lg" isDisabled={false} isInvalid={props.isInvalid} isReadOnly={false} isRequired={false}>
+      <Label hintText="Numer prawa jazdy"/>
+      <Input style={styles.inputFields}>
+        <InputField type="text" value={props.driverlicense} placeholder="C1234567" onChangeText={actualDriverlicense => {
+          props.setDriverlicense(actualDriverlicense);
+        }} selectionColor={"black"} />
+      </Input>
+      <BadInput hintText="Wprowadzone prawo jazdy jest nieprawidłowe!" />
+    </FormControl>
+  );
+};
+const CardIdInput = (props: {
+  cardid: string | undefined;
+  isInvalid: boolean | undefined;
+  setCardid: (arg0: string) => void;
+}) => {
+  return (
+    <FormControl size="lg" isDisabled={false} isInvalid={props.isInvalid} isReadOnly={false} isRequired={false}>
+      <Label hintText="Numer dowodu osobistego"/>
+      <Input style={styles.inputFields}>
+        <InputField type="text" value={props.cardid} placeholder="COS 224422" onChangeText={actualCardid => {
+          props.setCardid(actualCardid);
+        }} selectionColor={"black"} />
+      </Input>
+      <BadInput hintText="Wprowadzony dowód osobisty jest nieprawidłowy!" />
     </FormControl>
   );
 };
@@ -360,4 +455,12 @@ function validateSecureOfPassword(password: string) {
   var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
   return passPattern.test(password);
 }
-export default PassengerRegisterPanel;
+function validateDriverLicense(driverLicense: string) {
+  const driverLicensePattern = /^[a-zA-Z]{1}\d{7}$/;
+  return driverLicense.length === 8 && driverLicensePattern.test(driverLicense);
+}
+function validateCardId(cardId: string) {
+  const cardIdPattern = /^[a-zA-Z]{3}\s\d{6}$/;
+  return cardId.length === 10 && cardIdPattern.test(cardId);
+}
+export default RegisterPanel;

@@ -1,7 +1,6 @@
 import React from "react";
 import LoginPanel from "./LoginPanel";
-import DriverRegisterPanel from "./DriverRegisterPanel";
-import PassengerRegisterPanel from "./PassengerRegisterPanel";
+import RegisterPanel from "./RegisterPanel";
 import PasswordNotRemember from "./PasswordNotRemember";
 import TermsAndConditions from "./TermsAndConditions";
 import PrivacyPolicy from "./PrivacyPolicy";
@@ -13,8 +12,7 @@ export default function AppNavigation() {
     <NavigationContainer>
         <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="LoginPanel" component={LoginPanel} />
-            <Stack.Screen name="DriverRegisterPanel" component={DriverRegisterPanel} />
-            <Stack.Screen name="PassengerRegisterPanel" component={PassengerRegisterPanel} />
+            <Stack.Screen name="RegisterPanel" component={RegisterPanel} />
             <Stack.Screen name="PasswordNotRemember" component={PasswordNotRemember} />
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
             <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />

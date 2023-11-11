@@ -56,7 +56,6 @@ const DataForm = (props: {
 }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [password, setPassword] = useState("");
-  const [rank, setRank] = useState("driver");
   const [errorText, setErrorText] = useState("Hasło musi mieć 8 znaków!");
   const [isInvalidPhone, setIsInvalidPhone] = useState(false);
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
@@ -64,13 +63,10 @@ const DataForm = (props: {
     <PhoneInput phoneNumber={phoneNumber} isInvalid={isInvalidPhone} setPhoneNumber={setPhoneNumber} />
     <PasswordInput password={password} isInvalid={isInvalidPassword} errorText={errorText} setPassword={setPassword} />
     <NotRememberPasswordHint navigation={props.navigation} />
-    <LoginAsText />
-    <SwitchableButtons setRank={setRank} />
     <LoginYourSelfButton onPress={async () => {
       const providedData = {
         phone: phoneNumber,
         password: password,
-        role: rank,
         navigation: props.navigation
       };
       var isValidPhone = validatePhone(phoneNumber);
@@ -82,6 +78,7 @@ const DataForm = (props: {
       setIsInvalidPassword(!isValidPassword || !isPasswordSecure);
       if (isValidPhone && isValidPassword && isPasswordSecure) await HandleLoginButtonPress(providedData);
     }} />
+    <RegisterYourSelfButton navigation={props.navigation}/>
   </Box>;
 };
 const PhoneInput = (props: {
@@ -142,39 +139,18 @@ const NotRememberPasswordHint = (props: {
     </ButtonText>
   </Button>;
 };
-const LoginAsText = () => {
-  return <Text style={styles.loginAs}>Zaloguj się jako</Text>;
-};
-const SwitchableButtons = (props: {
-  setRank: (arg0: string) => void;
-}) => {
-  const [driverButtonColor, setDriverButtonColor] = useState("#FFB700");
-  const [passengerButtonColor, setPassengerButtonColor] = useState("white");
-  return <ButtonGroup style={{
-    paddingTop: 10,
-    paddingBottom: 30
-  }}>
-    <Button bgColor={driverButtonColor} style={styles.buttons} onPress={() => {
-      props.setRank("driver");
-      setDriverButtonColor("#FFB700");
-      setPassengerButtonColor("white");
-    }}>
-      <ButtonText style={styles.buttonText}>Kierowca</ButtonText>
-    </Button>
-    <Button bgColor={passengerButtonColor} style={styles.buttons} onPress={() => {
-      props.setRank("passenger");
-      setDriverButtonColor("white");
-      setPassengerButtonColor("#FFB700");
-    }}>
-      <ButtonText style={styles.buttonText}>Pasażer</ButtonText>
-    </Button>
-  </ButtonGroup>;
-};
 const LoginYourSelfButton = (props: any) => {
   return <Button bgColor="#FFB700" style={styles.buttons} onPress={props.onPress}>
     <ButtonText style={styles.buttonText}>Zaloguj</ButtonText>
   </Button>;
 };
+const RegisterYourSelfButton = (props: {
+  navigation: any;
+}) => {
+  return <Button bgColor="#FFB700" style={styles.buttons} onPress={() => {props.navigation.navigate('RegisterPanel')}}>
+    <ButtonText style={styles.buttonText}>Zarejestruj się</ButtonText>
+  </Button>;
+}
 function validatePhone(phone: string) {
   var phonePattern = /^[0-9]{9}$/;
   return phone.length == 9 && phonePattern.test(phone);
@@ -206,29 +182,16 @@ async function HandleRetrievedData(data: any, providedData: any) {
     const user = data[userKey];
     if (IsUserFounded(user.phone, parsedPhone)) {
       isUserFounded = true;
-      if (checkPassword(user.password, providedData.password) && checkRole(user.role, providedData.role)) ShowAlert("Sukces", "Pomyślnie zalogowano!"); else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
+      if (checkPassword(user.password, providedData.password)) ShowAlert("Sukces", "Pomyślnie zalogowano!"); else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
     }
   }
-  if (!isUserFounded) HandleRegistration(providedData.role, providedData.navigation);
+  if (!isUserFounded) providedData.navigation.navigate('RegisterPanel');
 }
 function IsUserFounded(phone: number, providedPhone: number) {
   return phone === providedPhone;
 }
 function checkPassword(password: string, providedPassword: string) {
   return password === providedPassword;
-}
-function checkRole(role: string, checkedRole: string) {
-  return role === 'driver' || role === checkedRole;
-}
-function HandleRegistration(role: string, navigation: any) {
-  switch (role) {
-    case 'driver':
-      navigation.navigate("DriverRegisterPanel");
-      break;
-    case 'passenger':
-      navigation.navigate("PassengerRegisterPanel");
-      break;
-  }
 }
 function ShowAlert(title: string, message: string) {
   Vibration.vibrate(500);
