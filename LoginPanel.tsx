@@ -76,7 +76,7 @@ const DataForm = (props: {
       else if (!isPasswordSecure) setErrorText("Hasło musi mieć 1 znak specjalny\ncyfrę i dużą literę!");
       setIsInvalidPhone(!isValidPhone);
       setIsInvalidPassword(!isValidPassword || !isPasswordSecure);
-      if (isValidPhone && isValidPassword && isPasswordSecure) await HandleLoginButtonPress(providedData);
+      if (isValidPhone && isValidPassword && isPasswordSecure) await HandleLoginButtonPress(providedData, props.navigation);
     }} />
     <RegisterYourSelfButton navigation={props.navigation}/>
   </Box>;
@@ -162,7 +162,7 @@ function validateSecureOfPassword(password: string) {
   var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
   return passPattern.test(password);
 }
-async function HandleLoginButtonPress(providedData: any) {
+async function HandleLoginButtonPress(providedData: any, navigation: any) {
   const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
   const databasePath = '/users.json';
   const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
@@ -170,19 +170,23 @@ async function HandleLoginButtonPress(providedData: any) {
   fetch(getRequestURL).then(response => {
     return response.json();
   }).then(async data => {
-    await HandleRetrievedData(data, providedData);
+    await HandleRetrievedData(data, providedData, navigation);
   }).catch(error => {
     console.log(error);
   });
 }
-async function HandleRetrievedData(data: any, providedData: any) {
+async function HandleRetrievedData(data: any, providedData: any, navigation: any) {
   const parsedPhone = parseInt(providedData.phone);
   var isUserFounded = false;
   for (const userKey in data) {
     const user = data[userKey];
     if (IsUserFounded(user.phone, parsedPhone)) {
       isUserFounded = true;
-      if (checkPassword(user.password, providedData.password)) ShowAlert("Sukces", "Pomyślnie zalogowano!"); else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
+      if (checkPassword(user.password, providedData.password)) 
+        navigation.navigate("MainPanel", {
+          userRank: user.rank
+      });
+      else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
     }
   }
   if (!isUserFounded) providedData.navigation.navigate('RegisterPanel');
