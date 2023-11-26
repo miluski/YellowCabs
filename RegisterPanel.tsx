@@ -30,7 +30,7 @@ function RegisterPanel({ navigation } : { navigation: any }) {
 const Background = (props: { navigation: any }) => {
   return (
     <ScrollView style={styles.registerScrollView}>
-      <Text style={styles.registerText}>Zarejestruj się</Text>
+      <Text style={styles.topCenterText}>Zarejestruj się</Text>
       <Text style={styles.invitationTexts}>Nie masz jeszcze konta?</Text>
       <Text style={styles.invitationTexts}>Utwórz je za darmo</Text>
       <MainView navigation={props.navigation} />

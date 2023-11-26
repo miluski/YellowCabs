@@ -184,7 +184,7 @@ async function HandleRetrievedData(data: any, providedData: any, navigation: any
       isUserFounded = true;
       if (checkPassword(user.password, providedData.password)) 
         navigation.navigate("MainPanel", {
-          userRank: user.rank
+          rank: user.role
       });
       else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
     }

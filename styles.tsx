@@ -89,7 +89,7 @@ const styles = StyleSheet.create({
     width: 275,
     alignSelf: 'center'
   },
-  registerText: {
+  topCenterText: {
     fontFamily: 'DejaVuSans',
     fontSize: 32,
     alignSelf: 'center',
@@ -142,6 +142,18 @@ const styles = StyleSheet.create({
     height: 10, 
     color: 'black',
     borderColor: 'black'
+  },
+  scrollView: {
+    flex: 1,
+    color: 'white'
+  },
+  contract: {
+    borderRadius: 20,
+    borderColor: 'black',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'center'
   }
 });
 export default styles;
