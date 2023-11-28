@@ -8,7 +8,7 @@ interface RouteParams {
     rank?: string;
 }
 
-function Home(navigation: {navigation: any}) {
+function Home() {
     const route = useRoute();
     const { rank } = route.params as RouteParams;
     if(rank=='driver')

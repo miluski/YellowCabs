@@ -1,21 +1,25 @@
 import Home from "./Home"
 import Wallet from './Wallet';
 import Map from "./Map";
-import Account from './Account';
 import * as React from 'react';
 import { AntDesign, FontAwesome5, FontAwesome, Fontisto } from '@expo/vector-icons';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useRoute } from '@react-navigation/native';
+import UserProfile from "./UserProfile";
 
 const Tab = createBottomTabNavigator();
 
 interface RouteParams {
     rank?: string;
+    name?: string;
+    surname?: string;
+    id?: number;
+    avatarLink?: string;
 }
 
 function BottomTabs() {
     const route = useRoute();
-    const { rank } = route.params as RouteParams;
+    const { rank, name, surname, id, avatarLink } = route.params as RouteParams;
     return (
         <Tab.Navigator 
             initialRouteName="Główna" 
@@ -47,7 +51,7 @@ function BottomTabs() {
                         <AntDesign name="home" color={color} size={35} />
                     )
                 }}
-                initialParams={{ rank }}
+                initialParams={{ rank, id }}
             />
             <Tab.Screen 
                 name="Portfel" 
@@ -69,12 +73,13 @@ function BottomTabs() {
             />
             <Tab.Screen 
                 name="Konto"
-                component={Account}
+                component={UserProfile}
                 options={{
                     tabBarIcon: ({ color }) => (
                         <FontAwesome name="user" color={color} size={35} />
                     )
                 }}
+                initialParams={{ rank, name, surname, id, avatarLink }}
             />
         </Tab.Navigator>
     );

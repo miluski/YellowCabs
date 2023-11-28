@@ -4,9 +4,9 @@ import RegisterPanel from "./RegisterPanel";
 import PasswordNotRemember from "./PasswordNotRemember";
 import TermsAndConditions from "./TermsAndConditions";
 import PrivacyPolicy from "./PrivacyPolicy";
-import BottomTabs from "./AppBottomNavigation";
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import AccountNavigation from "./AccountStackNavigation";
 const Stack = createStackNavigator();
 export default function AppNavigation() {
   return (
@@ -17,7 +17,7 @@ export default function AppNavigation() {
             <Stack.Screen name="PasswordNotRemember" component={PasswordNotRemember} />
             <Stack.Screen name="PrivacyPolicy" component={PrivacyPolicy} />
             <Stack.Screen name="TermsAndConditions" component={TermsAndConditions} />
-            <Stack.Screen name="MainPanel" component={BottomTabs} />
+            <Stack.Screen name="MainPanel" component={AccountNavigation} />
         </Stack.Navigator>
     </NavigationContainer>
   );

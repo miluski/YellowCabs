@@ -264,6 +264,65 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     marginBottom: 10,
     marginTop: 10
+  },
+  allContainer: {
+    alignItems: 'center'
+  },
+  profileInfo:{
+    marginTop: 100,
+    paddingBottom: 40,
+    flexDirection: 'row',
+    justifyContent: "center",
+    alignItems: 'center',
+    borderBottomWidth: 2,
+  },
+  image:{
+    width: 100,
+    height: 100,
+    resizeMode: 'cover',
+    borderRadius: 50,
+    marginBottom: 10
+  },
+  namebox:{
+    width: 200,
+  },
+  tools:{
+    paddingTop: 20,
+    height: 350
+  },
+   toolsContainer:{
+    marginTop: 20,
+    flex: 1,
+    flexDirection: 'row', 
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  leftIcon:{
+    paddingRight: 30,
+  },
+  content:{
+    fontWeight: 'normal',
+    fontSize: 20,
+    paddingRight: 30,
+  },
+  logoutIcon:{
+    fontWeight: 'normal',
+    fontSize: 20,
+    flex: 1,
+  },
+  accountSettings: {
+    alignSelf: 'center',
+    fontFamily: 'DejaVuSans',
+    fontSize: 25,
+    paddingTop: 20,
+    marginBottom: 25
+  },
+  changeAccountPhoto: {
+    borderColor: '#FFB700',
+    borderRadius: 10,
+    borderWidth: 2,
+    backgroundColor: 'white',
+    marginTop: 25
   }
 });
 export default styles;

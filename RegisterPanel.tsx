@@ -133,7 +133,10 @@ const DataForm = (props: { navigation: any, isDriver: boolean }) => {
             password: password,
             agreement: !isAgreementNotChecked,
             role: 'passenger',
-            secretPassword: generatedSecret
+            secretPassword: generatedSecret,
+            vibrations: 'yes',
+            notifications: 'yes',
+            avatarLink: 'https://st3.depositphotos.com/1767687/17621/v/450/depositphotos_176214104-stock-illustration-default-avatar-profile-icon.jpg'
           };
           await registerUser(dataObject, props.navigation, generatedSecret);
         }
