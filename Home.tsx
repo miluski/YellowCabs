@@ -1,7 +1,8 @@
 import React from "react";
-import { ScrollView, Text } from "@gluestack-ui/themed";
+import { ScrollView, Text, View } from "@gluestack-ui/themed";
 import { useRoute } from '@react-navigation/native';
 import styles from "./styles";
+import { Contract } from "./Contract";
 
 interface RouteParams {
     rank?: string;
@@ -18,8 +19,11 @@ function Home(navigation: {navigation: any}) {
 
 const DriverHome = () => {
     return (
-        <ScrollView style={styles.scrollView}>
-            <Text style={styles.topCenterText}>Moje zlecenia</Text>
+        <ScrollView>
+            <View style={styles.contractsScrollView}>
+                <Text style={styles.topCenterText}>Moje zlecenia</Text>
+                <Contract></Contract>
+            </View>
         </ScrollView>
     )
 }

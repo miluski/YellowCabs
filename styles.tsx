@@ -154,6 +154,116 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     alignSelf: 'center'
+  },
+  map: {
+    width: '100%',
+    height: '100%',
+  },
+  header: {
+    fontFamily: 'DejaVuSans',
+    paddingTop: 90,
+    fontSize: 45,
+    textAlign: "center"
+  },
+  normalText: {
+    fontFamily: 'DejaVuSans',
+    fontSize: 25
+  },
+  boldText: {
+    fontFamily: 'DejaVuSans',
+    fontSize: 18,
+    fontWeight: 'bold'
+  },
+  yborder: {
+    marginTop: 40,
+    margin: 20,
+    fontSize: 20,
+    padding: 10,
+    paddingTop: 30,
+    paddingBottom: 30,
+    heigth: 200,
+    borderRadius: 25,
+    borderWidth: 5,
+    borderColor: '#FFB700',
+    flexDirection: 'row', 
+    justifyContent: 'space-between',
+    paddingVertical: 20,
+  },
+  box1: {
+    width: 200,
+    height: 100,
+    alignItems: "center",
+    justifyContent: 'center',
+  },
+  box2: {
+    width: 100,
+    height: 100,
+    marginRight: 15,
+    alignItems: "center",
+    justifyContent: 'center',
+  },
+  topupAccount:{
+    paddingLeft: 20,
+    paddingRight: 20
+  },
+  scanContainer:{
+    marginTop: 10,
+    flexDirection: 'row', 
+    alignItems: "center",
+  },
+  cameraIcon:{
+    paddingRight: 70
+  },
+  scanQR:{
+    fontWeight: 'normal',
+    fontSize: 20,
+    paddingRight: 70,
+  },
+  operationsContainer: {
+    paddingLeft: 20,
+    marginTop: 10,
+  },
+  singleOperation: {
+    fontWeight: 'normal',
+    fontSize: 20,
+    paddingTop: 7,
+    color: 'red'
+  },
+  contractsScrollView: {
+    marginRight: windowWidth/14,
+    marginLeft: windowWidth/14,
+    flex: 1
+  },
+  singleContract: {
+    borderColor: 'black',
+    borderRadius: 10,
+    borderWidth: 2.5,
+    marginBottom: 25,
+    alignContent: 'center',
+    alignItems: 'center'
+  },
+  contractRefuseButton: {
+    borderColor: 'black',
+    borderRadius: 10,
+    borderWidth: 1,
+    minWidth: 130,
+    maxWidth: 130,
+    backgroundColor: 'white',
+    marginRight: 5
+  },
+  contractAcceptButton: {
+    borderColor: '#FFB700',
+    borderRadius: 10,
+    borderWidth: 1,
+    minWidth: 130,
+    maxWidth: 130,
+    backgroundColor: 'white',
+    marginLeft: 5
+  },
+  contractButtons: {
+    flexDirection: 'row',
+    marginBottom: 10,
+    marginTop: 10
   }
 });
 export default styles;
