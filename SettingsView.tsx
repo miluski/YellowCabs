@@ -36,10 +36,9 @@ export default function SettingsView() {
                     <View>  
                         <Text style={{fontFamily: 'DejaVuSans', fontSize: 18, fontWeight: 'bold'}}>{name} {surname}</Text>
                         <Text style={{fontFamily: 'DejaVuSans', fontSize: 15, marginLeft: 25}}>{finalRank}</Text>
-                    </View>
-                    <View style={{borderBottomWidth: 2}}>
                         <Image source={{ uri: avatarLink }} style={styles.image} alt="User Avatar"/>
                     </View>
+                    <View style={{borderBottomWidth: 2, width: 300}}/>
                 </View>
                 <View flexDirection="row" style={{alignItems:'center'}}>
                     <Text>Powiadomienia</Text>
@@ -62,7 +61,7 @@ export default function SettingsView() {
                     />
                 </View>
                 <Button 
-                    style={styles.changeAccountPhoto}
+                    style={styles.settingsButtons}
                     onPress={() => {
                     }}
                 >
@@ -179,8 +178,12 @@ const NameInput = (props: {
   };
   const ConfirmButton = (props: any) => {
     return (
-      <Button bgColor="#FFB700" style={styles.registerButton} onPress={props.onPress}>
-        <ButtonText style={styles.buttonText}>Zatwierdź</ButtonText>
+      <Button bgColor="#FFB700" style={styles.settingsButtons} onPress={props.onPress}>
+        <ButtonText style={{
+                        color: 'black', 
+                        fontFamily: 'DejaVuSans', 
+                        fontSize: 12
+                    }}>Zatwierdź</ButtonText>
       </Button>
     );
   };

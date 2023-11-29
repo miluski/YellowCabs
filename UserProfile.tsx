@@ -24,8 +24,8 @@ function UserProfile(props:{navigation: any}) {
     return <View style={styles.allContainer}>
       <View style={styles.profileInfo}>
         <View style={styles.namebox}>  
-          <Text style={styles.normalText}>{name} {surname}</Text>
-          <Text style={styles.boldText}>{finalRank}</Text>
+          <Text style={styles.boldText}>{name} {surname}</Text>
+          <Text style={styles.normalText}>{finalRank}</Text>
         </View>
         <View>
           <Image source={{ uri: avatarLink }} style={styles.image} alt="User Avatar"/>
@@ -62,10 +62,10 @@ function UserProfile(props:{navigation: any}) {
                 <Octicons name="history" size={35} color="black" />
               </View>
               <View> 
-                <Text style={styles.content} onPress={()=>{handleTravelHistory(props.navigation)}}> Historia Podróży </Text>
+                <Text style={styles.bottomContent} onPress={()=>{handleTravelHistory(props.navigation)}}> Historia Podróży </Text>
               </View>
               <View> 
-                <FontAwesome name="angle-right" size={45} color="black" onPress={()=>{handleTravelHistory(props.navigation)}} />
+                  <FontAwesome name="angle-right" size={45} color="black" onPress={()=>{handleTravelHistory(props.navigation)}}/>
               </View>
             </View>
 
@@ -74,7 +74,7 @@ function UserProfile(props:{navigation: any}) {
                 <AntDesign name="logout" size={33} color="black" />
               </View>
               <View style={styles.logoutIcon}> 
-                <Text style={styles.content} onPress={()=>{handleLogout(props.navigation)}}> Wyloguj </Text>
+                <Text style={styles.bottomContent} onPress={()=>{handleLogout(props.navigation)}}> Wyloguj </Text>
               </View>
             </View>
 

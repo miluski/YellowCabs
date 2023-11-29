@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start'
   },
   buttons: {
-    borderRadius: 10,
+    borderRadius: 20,
     borderColor: 'black',
     borderWidth: 1,
     marginTop: 20
@@ -167,12 +167,14 @@ const styles = StyleSheet.create({
   },
   normalText: {
     fontFamily: 'DejaVuSans',
-    fontSize: 25
+    fontSize: 16,
+    padding: 10
   },
   boldText: {
     fontFamily: 'DejaVuSans',
-    fontSize: 18,
-    fontWeight: 'bold'
+    fontSize: 20,
+    fontWeight: 'bold',
+    padding: 10
   },
   yborder: {
     marginTop: 40,
@@ -281,10 +283,12 @@ const styles = StyleSheet.create({
     height: 100,
     resizeMode: 'cover',
     borderRadius: 50,
-    marginBottom: 10
+    marginBottom: 10,
+    marginTop: 10,
+    alignSelf: 'center'
   },
   namebox:{
-    width: 200,
+    width: 200
   },
   tools:{
     paddingTop: 20,
@@ -304,6 +308,13 @@ const styles = StyleSheet.create({
     fontWeight: 'normal',
     fontSize: 20,
     paddingRight: 30,
+    marginLeft: -20
+  },
+  bottomContent:{
+    fontWeight: 'normal',
+    fontSize: 20,
+    paddingRight: 30,
+    marginLeft: 15
   },
   logoutIcon:{
     fontWeight: 'normal',
@@ -317,9 +328,12 @@ const styles = StyleSheet.create({
     paddingTop: 20,
     marginBottom: 25
   },
-  changeAccountPhoto: {
+  settingsButtons: {
+    marginBottom: 25,
+    width: 275,
+    alignSelf: 'center',
     borderColor: '#FFB700',
-    borderRadius: 10,
+    borderRadius: 20,
     borderWidth: 2,
     backgroundColor: 'white',
     marginTop: 25
