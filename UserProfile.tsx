@@ -11,13 +11,13 @@ interface RouteParams {
   rank?: string;
   name?: string;
   surname?: string;
-  id?: number;
+  phone?: number;
   avatarLink?: string;
 }
 
 function UserProfile(props:{navigation: any}) {
     const route = useRoute();
-    const { rank, name, surname, id, avatarLink } = route.params as RouteParams;
+    const { rank, name, surname, phone, avatarLink } = route.params as RouteParams;
     let finalRank = 'Pasażer';
     if(rank=='driver')
       finalRank = 'Kierowca';
@@ -38,7 +38,7 @@ function UserProfile(props:{navigation: any}) {
                 <FontAwesome name="star-half-empty" size={35} color="black" />
               </View>
               <View> 
-                <Text style={styles.content}> Moje Oceny </Text>
+                <Text style={styles.content} onPress={()=>{handleMyRatings(props.navigation)}}> Moje Oceny </Text>
               </View>
               <View> 
                 <FontAwesome name="angle-right" size={45} color="black" onPress={()=>{handleMyRatings(props.navigation)}} />
@@ -50,7 +50,7 @@ function UserProfile(props:{navigation: any}) {
                 <Ionicons name="settings-outline" size={35} color="black" />
               </View>
               <View> 
-                <Text style={styles.content}> Ustawienia </Text>
+                <Text style={styles.content} onPress={()=>{handleSettings(props.navigation)}}> Ustawienia </Text>
               </View>
               <View> 
                 <FontAwesome name="angle-right" size={45} color="black" onPress={()=>{handleSettings(props.navigation)}} />
@@ -62,7 +62,7 @@ function UserProfile(props:{navigation: any}) {
                 <Octicons name="history" size={35} color="black" />
               </View>
               <View> 
-                <Text style={styles.content}> Historia Podróży </Text>
+                <Text style={styles.content} onPress={()=>{handleTravelHistory(props.navigation)}}> Historia Podróży </Text>
               </View>
               <View> 
                 <FontAwesome name="angle-right" size={45} color="black" onPress={()=>{handleTravelHistory(props.navigation)}} />

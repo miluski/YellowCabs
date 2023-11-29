@@ -189,14 +189,13 @@ async function HandleRetrievedData(data: any, providedData: any, navigation: any
           rank: user.role,
           name: user.name,
           surname: user.surname,
-          id: user.id,
+          phoneNumber: user.phone,
           avatarLink: user.avatarLink
       });
     }
       else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
     }
   }
-  if (!isUserFounded) providedData.navigation.navigate('RegisterPanel');
 }
 function IsUserFounded(phone: number, providedPhone: number) {
   return phone === providedPhone;

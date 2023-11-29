@@ -26,7 +26,7 @@ function Wallet() {
                 <AntDesign name="camerao" size={35} color="black" />
               </View>
               <View> 
-                <Text style={styles.scanQR}> Skanuj kod QR </Text>
+                <Text style={styles.scanQR} onPress={handlePress}> Skanuj kod QR </Text>
               </View>
               <View> 
                 <FontAwesome name="angle-right" size={45} color="black" onPress={handlePress} />
