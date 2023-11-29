@@ -5,6 +5,7 @@ import { Button, Text, Box, FormControl, FormControlError, ButtonGroup, Switch }
 import { FormControlErrorText, FormControlLabel, FormControlLabelText, Input} from "@gluestack-ui/themed";
 import { InputField, ButtonText, ScrollView, View, Image } from "@gluestack-ui/themed";
 import { useRoute } from '@react-navigation/native';
+import { Feather } from '@expo/vector-icons';
 import { isEnabled } from "react-native/Libraries/Performance/Systrace";
 
 interface RouteParams {
@@ -33,16 +34,18 @@ export default function SettingsView() {
             <Text style={styles.accountSettings}>Ustawienia konta</Text>
             <View style={styles.allContainer}>
                 <View style={{alignItems:'center'}}>
-                    <View>  
-                        <Text style={{fontFamily: 'DejaVuSans', fontSize: 18, fontWeight: 'bold'}}>{name} {surname}</Text>
-                        <Text style={{fontFamily: 'DejaVuSans', fontSize: 15, marginLeft: 25}}>{finalRank}</Text>
+                    <View alignItems="center">  
+                        <Text style={{fontFamily: 'DejaVuSans', fontSize: 22, fontWeight: 'bold'}}>{name} {surname}</Text>
+                        <Text style={{fontFamily: 'DejaVuSans', fontSize: 15}}>{finalRank}</Text>
+                    </View>
+                    <View style={{borderBottomWidth: 2, paddingTop: 10, paddingBottom: 10}}>
                         <Image source={{ uri: avatarLink }} style={styles.image} alt="User Avatar"/>
                     </View>
                     <View style={{borderBottomWidth: 2, width: 300}}/>
                 </View>
-                <View flexDirection="row" style={{alignItems:'center'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: 200 , alignItems: 'center'}}>
                     <Text>Powiadomienia</Text>
-                    <Switch 
+                    <Switch style={styles.switchStyle}
                         trackColor={{false: '#767577', true: '#33cc00'}}
                         thumbColor={isEnabled() ? '#f5dd4b' : '#f4f3f4'}
                         isDisabled={false}
@@ -50,9 +53,9 @@ export default function SettingsView() {
                         size="md"
                     />
                 </View>
-                <View flexDirection="row" style={{alignItems:'center'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', width: 200 , alignItems: 'center'}}>
                     <Text>Wibracje</Text>
-                    <Switch 
+                    <Switch style={styles.switchStyle} 
                         trackColor={{false: '#767577', true: '#33cc00'}}
                         thumbColor={isEnabled() ? '#f5dd4b' : '#f4f3f4'}
                         isDisabled={false}
@@ -65,19 +68,22 @@ export default function SettingsView() {
                     onPress={() => {
                     }}
                 >
+                    <Feather name="upload-cloud" size={24} color="black" />
                     <ButtonText 
                     style={{
-                        color: 'black', 
-                        fontFamily: 'DejaVuSans', 
-                        fontSize: 12
+                      color: 'black', 
+                      fontFamily: 'DejaVuSans', 
+                      fontSize: 12,
+                      width: 200,
+                      textAlign: "center",
                     }}
                     >
                     Zmień zdjęcie profilowe
                     </ButtonText>
                 </Button>
-                <View flexDirection="row" style={{alignItems:'center'}}>
+                <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center'}}>
                     <Text>Zaktualizuj dane osobowe</Text>
-                    <Switch 
+                    <Switch style={styles.switchStyle}
                         trackColor={{false: '#767577', true: '#33cc00'}}
                         thumbColor={isEnabled() ? '#f5dd4b' : '#f4f3f4'}
                         isDisabled={false}
