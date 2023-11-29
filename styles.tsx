@@ -167,7 +167,7 @@ const styles = StyleSheet.create({
   },
   normalText: {
     fontFamily: 'DejaVuSans',
-    fontSize: 25
+    fontSize: 22
   },
   boldText: {
     fontFamily: 'DejaVuSans',
@@ -322,7 +322,10 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     borderWidth: 2,
     backgroundColor: 'white',
-    marginTop: 25
+    marginTop: 10
+  },
+  switchStyle:{
+    marginLeft: 20
   }
 });
 export default styles;
