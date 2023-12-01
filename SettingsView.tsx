@@ -12,15 +12,14 @@ interface RouteParams {
     rank?: string;
     name?: string;
     surname?: string;
-    phone?: number;
+    phoneNumber?: string;
     avatarLink?: string;
   }
 
 export default function SettingsView() {
     const route = useRoute();
-    const { rank, name, surname, phone, avatarLink } = route.params as RouteParams;
-    console.log(phone);
-    const [phoneNumber, setPhoneNumber] = useState(phone);
+    const { rank, name, surname, phoneNumber, avatarLink } = route.params as RouteParams;
+    const [phone, setPhone] = useState(phoneNumber);
     const [newName, setName] = useState(name);
     const [newSurname, setSurname] = useState(surname);
     const [password, setPassword] = useState("");
@@ -38,7 +37,7 @@ export default function SettingsView() {
                         <Text style={{fontFamily: 'DejaVuSans', fontSize: 22, fontWeight: 'bold'}}>{name} {surname}</Text>
                         <Text style={{fontFamily: 'DejaVuSans', fontSize: 15}}>{finalRank}</Text>
                     </View>
-                    <View style={{borderBottomWidth: 2, paddingTop: 10, paddingBottom: 10}}>
+                    <View style={{paddingTop: 10, paddingBottom: 10}}>
                         <Image source={{ uri: avatarLink }} style={styles.image} alt="User Avatar"/>
                     </View>
                     <View style={{borderBottomWidth: 2, width: 300}}/>
@@ -98,10 +97,10 @@ export default function SettingsView() {
                   <Box style={{paddingHorizontal: 30}}>
                     <NameInput name={name} setName={setName} />
                     <SurnameInput surname={surname} setSurname={setSurname} />
-                    <PhoneInput phoneNumber={phoneNumber} setPhoneNumber={setPhoneNumber} />
+                    <PhoneInput phoneNumber={phone} setPhoneNumber={setPhone} />
                     <PasswordInput password={password} hintText={"Hasło"} setPassword={setPassword} />
                     <PasswordInput password={repeatedPassword} hintText={"Powtórz hasło"} setPassword={setRepeatedPassword} />
-                    <ConfirmButton onPress={console.log('test')} />
+                    <ConfirmButton onPress={()=>{}} />
                   </Box>
                   :
                   <></>
@@ -143,14 +142,14 @@ const NameInput = (props: {
     );
   };
   const PhoneInput = (props: {
-    phoneNumber: number | undefined;
-    setPhoneNumber: (arg0: number) => void;
+    phoneNumber: string | undefined;
+    setPhoneNumber: (arg0: string) => void;
   }) => {
     return <FormControl size="lg" isDisabled={false} isReadOnly={false} isRequired={false}>
       <Label hintText="Numer telefonu" />
       <Input style={styles.inputFields}>
         <InputField type="text" value={String(props.phoneNumber)} placeholder="123123123" onChangeText={actualPhoneNumber => {
-          props.setPhoneNumber(Number(actualPhoneNumber));
+          props.setPhoneNumber(String(actualPhoneNumber));
         }} selectionColor={"black"} keyboardType="numeric" />
       </Input>
     </FormControl>;
@@ -186,10 +185,12 @@ const NameInput = (props: {
     return (
       <Button bgColor="#FFB700" style={styles.settingsButtons} onPress={props.onPress}>
         <ButtonText style={{
-                        color: 'black', 
-                        fontFamily: 'DejaVuSans', 
-                        fontSize: 12
-                    }}>Zatwierdź</ButtonText>
+            color: 'black', 
+            fontFamily: 'DejaVuSans', 
+            fontSize: 12
+        }}>
+          Zatwierdź
+        </ButtonText>
       </Button>
     );
   };

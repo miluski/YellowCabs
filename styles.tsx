@@ -167,13 +167,13 @@ const styles = StyleSheet.create({
   },
   normalText: {
     fontFamily: 'DejaVuSans',
-    fontSize: 22
+    fontSize: 18
   },
   boldText: {
     fontFamily: 'DejaVuSans',
     fontSize: 20,
     fontWeight: 'bold',
-    padding: 10
+    marginBottom: 10
   },
   yborder: {
     marginTop: 40,
@@ -322,8 +322,8 @@ const styles = StyleSheet.create({
   },
   accountSettings: {
     alignSelf: 'center',
-    fontFamily: 'DejaVuSans',
-    fontSize: 25,
+    fontFamily: 'DejaVuSans-ExtraLight',
+    fontSize: 35,
     paddingTop: 20,
     marginBottom: 25
   },

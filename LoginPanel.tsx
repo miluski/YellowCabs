@@ -3,7 +3,7 @@ import styles from "./styles";
 import { config } from "@gluestack-ui/config";
 import React, { useState } from "react";
 import { View, Vibration, Alert } from "react-native";
-import { GluestackUIProvider, ButtonGroup, Image, Text, Input } from "@gluestack-ui/themed";
+import { GluestackUIProvider, Image, Text, Input } from "@gluestack-ui/themed";
 import { Box, FormControl, FormControlError, FormControlErrorText } from "@gluestack-ui/themed";
 import { Button, FormControlLabel, FormControlLabelText, InputField, ButtonText } from "@gluestack-ui/themed";
 function LoginPanel({
@@ -177,11 +177,9 @@ async function HandleLoginButtonPress(providedData: any, navigation: any, setPho
 }
 async function HandleRetrievedData(data: any, providedData: any, navigation: any, setPhoneNumber: any, setPassword: any) {
   const parsedPhone = parseInt(providedData.phone);
-  var isUserFounded = false;
   for (const userKey in data) {
     const user = data[userKey];
     if (IsUserFounded(user.phone, parsedPhone)) {
-      isUserFounded = true;
       if (checkPassword(user.password, providedData.password)) { 
         setPhoneNumber('');
         setPassword('');
@@ -189,7 +187,7 @@ async function HandleRetrievedData(data: any, providedData: any, navigation: any
           rank: user.role,
           name: user.name,
           surname: user.surname,
-          phoneNumber: user.phone,
+          phoneNumber: String(user.phone),
           avatarLink: user.avatarLink
       });
     }

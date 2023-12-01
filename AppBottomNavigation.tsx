@@ -13,13 +13,13 @@ interface RouteParams {
     rank?: string;
     name?: string;
     surname?: string;
-    phone?: number;
+    phoneNumber?: string;
     avatarLink?: string;
 }
 
 function BottomTabs() {
     const route = useRoute();
-    const { rank, name, surname, phone, avatarLink } = route.params as RouteParams;
+    const { rank, name, surname, phoneNumber, avatarLink } = route.params as RouteParams;
     return (
         <Tab.Navigator 
             initialRouteName="Główna" 
@@ -51,7 +51,7 @@ function BottomTabs() {
                         <AntDesign name="home" color={color} size={35} />
                     )
                 }}
-                initialParams={{ rank, phone }}
+                initialParams={{ rank, phoneNumber }}
             />
             <Tab.Screen 
                 name="Portfel" 
@@ -79,7 +79,7 @@ function BottomTabs() {
                         <FontAwesome name="user" color={color} size={35} />
                     )
                 }}
-                initialParams={{ rank, name, surname, phone, avatarLink }}
+                initialParams={{ rank, name, surname, phoneNumber, avatarLink }}
             />
         </Tab.Navigator>
     );
