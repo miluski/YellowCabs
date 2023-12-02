@@ -1,14 +1,13 @@
-import Home from "./Home"
-import Wallet from './Wallet';
-import Map from "./Map";
 import * as React from 'react';
-import { AntDesign, FontAwesome5, FontAwesome, Fontisto } from '@expo/vector-icons';
+import styles from './styles';
+import Home from "../views/UserPanel/Home/Home"
+import Wallet from '../views/UserPanel/Wallet/Wallet';
+import Map from "../views/UserPanel/Map/Map";
+import UserProfile from "../views/UserPanel/UserProfile/UserProfile/UserProfile";
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { useRoute } from '@react-navigation/native';
-import UserProfile from "./UserProfile";
-
+import { AntDesign, FontAwesome5, FontAwesome, Fontisto } from '@expo/vector-icons';
 const Tab = createBottomTabNavigator();
-
 interface RouteParams {
     rank?: string;
     name?: string;
@@ -16,8 +15,7 @@ interface RouteParams {
     phoneNumber?: string;
     avatarLink?: string;
 }
-
-function BottomTabs() {
+export default function BottomTabs() {
     const route = useRoute();
     const { rank, name, surname, phoneNumber, avatarLink } = route.params as RouteParams;
     return (
@@ -25,19 +23,9 @@ function BottomTabs() {
             initialRouteName="Główna" 
             screenOptions={{
                 tabBarHideOnKeyboard: true,
-                tabBarStyle: {
-                    display: 'flex',
-                    position: 'absolute',
-                    elevation: 5,
-                    height: 90,
-                },
-                tabBarLabelStyle: {
-                    marginBottom: 20,
-                    fontSize: 12
-                },
-                tabBarIconStyle: {
-                    marginTop: 15,
-                },
+                tabBarStyle: styles.tabBarStyle,
+                tabBarLabelStyle: styles.tabBarLabelStyle,
+                tabBarIconStyle: styles.tabBarIconStyle,
                 headerShown: false,
                 tabBarActiveTintColor: '#FFB700',
                 tabBarInactiveTintColor: 'black',
@@ -48,7 +36,11 @@ function BottomTabs() {
                 component={Home}
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <AntDesign name="home" color={color} size={35} />
+                        <AntDesign 
+                            name="home" 
+                            color={color} 
+                            size={35} 
+                        />
                     )
                 }}
                 initialParams={{ rank, phoneNumber }}
@@ -58,7 +50,11 @@ function BottomTabs() {
                 component={Wallet}
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <Fontisto name="wallet" color={color} size={35} />
+                        <Fontisto 
+                            name="wallet" 
+                            color={color} 
+                            size={35} 
+                        />
                     )
                 }}
             />
@@ -67,16 +63,25 @@ function BottomTabs() {
                 component={Map}
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome5 name="map-marked-alt" color={color} size={35} />
+                        <FontAwesome5 
+                            name="map-marked-alt" 
+                            color={color} 
+                            size={35} 
+                        />
                     )
                 }}
+                initialParams={{ rank }}
             />
             <Tab.Screen 
                 name="Konto"
                 component={UserProfile}
                 options={{
                     tabBarIcon: ({ color }) => (
-                        <FontAwesome name="user" color={color} size={35} />
+                        <FontAwesome 
+                            name="user" 
+                            color={color} 
+                            size={35} 
+                        />
                     )
                 }}
                 initialParams={{ rank, name, surname, phoneNumber, avatarLink }}
@@ -84,5 +89,3 @@ function BottomTabs() {
         </Tab.Navigator>
     );
 }
-
-export default BottomTabs;

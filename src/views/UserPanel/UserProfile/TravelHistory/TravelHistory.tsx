@@ -1,6 +1,5 @@
-import { View, Text } from "@gluestack-ui/themed";
 import React from "react";
-
+import { View, Text } from "@gluestack-ui/themed";
 export default function TravelHistory() {
     return (
         <View>

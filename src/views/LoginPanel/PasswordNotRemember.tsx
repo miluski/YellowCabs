@@ -1,12 +1,12 @@
 import * as Font from 'expo-font';
 import styles from "./styles";
-import { config } from "@gluestack-ui/config";
 import React, { useState } from "react";
+import { config } from "@gluestack-ui/config";
 import { View, Vibration, Alert } from "react-native";
 import { GluestackUIProvider, Text, Input } from "@gluestack-ui/themed";
 import { Box, FormControl, FormControlError, FormControlErrorText } from "@gluestack-ui/themed";
 import { Button, FormControlLabel, FormControlLabelText, InputField, ButtonText } from "@gluestack-ui/themed";
-function PasswordNotRemember({
+export default function PasswordNotRemember({
   navigation
 }: {
   navigation: any;
@@ -14,9 +14,9 @@ function PasswordNotRemember({
   const [isLoaded, setIsLoaded] = useState(false);
   const loadCustomFont = async () => {
     await Font.loadAsync({
-      'DejaVuSans-Bold': require('./assets/fonts/DejaVuSans-Bold.ttf'),
-      'DejaVuSans': require('./assets/fonts/DejaVuSans.ttf'),
-      'DejaVuSans-ExtraLight': require('./assets/fonts/DejaVuSans-ExtraLight.ttf')
+      'DejaVuSans-Bold': require('../../assets/fonts/DejaVuSans-Bold.ttf'),
+      'DejaVuSans': require('../../assets/fonts/DejaVuSans.ttf'),
+      'DejaVuSans-ExtraLight': require('../../assets/fonts/DejaVuSans-ExtraLight.ttf')
     });
   };
   loadCustomFont().then(() => {
@@ -25,16 +25,18 @@ function PasswordNotRemember({
   if (!isLoaded) {
     return null;
   } else {
-    return <GluestackUIProvider config={config}>
-        <View style={styles.background}>
-        <Text style={styles.recoverPassword}>Przywracanie hasła</Text>
-          <View style={styles.hintsView}>
-            <Box>
-              <DataForm navigation={navigation}/>
-            </Box>
-          </View>
+    return( 
+      <GluestackUIProvider config={config}>
+        <View style={styles.panelMainView}>
+          <Text style={styles.recoverPasswordText}>Przywracanie hasła</Text>
+            <View style={styles.dataInputView}>
+              <Box>
+                <DataForm navigation={navigation}/>
+              </Box>
+            </View>
         </View>
-    </GluestackUIProvider>;
+      </GluestackUIProvider>
+    );
   }
 }
 const DataForm = (props: {navigation: any}) => {
@@ -46,54 +48,94 @@ const DataForm = (props: {navigation: any}) => {
   const [isInvalidPassword, setIsInvalidPassword] = useState(false);
   const [isInvalidRepeatedPassword, setIsInvalidRepeatedPassword] = useState(false);
   const [isInvalidSecretPassword, setIsInvalidSecretPassword] = useState(false);
-  return <Box>
-    <PhoneInput phoneNumber={phoneNumber} isInvalid={isInvalidPhone} setPhoneNumber={setPhoneNumber} />
-    <SecretPasswordInput secretPassword={secretPassword} isInvalid={isInvalidSecretPassword} setSecretPassword={setSecretPassword} />
-    <PasswordInput password={password} hintText={"Nowe Hasło"} isInvalid={isInvalidPassword} setPassword={setPassword} />
-    <PasswordInput password={repeatedPassword} hintText={"Powtórz nowe Hasło"} isInvalid={isInvalidRepeatedPassword} setPassword={setRepeatedPassword} />
-    <RecoverPasswordButton onPress={async ()=>{
-      const isValidPhone = await validatePhone(phoneNumber);
-      const isValidSecretPassword = await validateSecretPassword(secretPassword, phoneNumber);
-      const isValidPassword = validatePassword(password);
-      const isValidRepeatedPassword = validateRepeatedPassword(password, repeatedPassword) && validatePassword(repeatedPassword);
-      setIsInvalidPhone(!isValidPhone);
-      setIsInvalidPassword(!isValidPassword);
-      setIsInvalidRepeatedPassword(!isValidRepeatedPassword);
-      setIsInvalidSecretPassword(!isValidSecretPassword);
-      if(isValidPhone && isValidSecretPassword && isValidPassword && isValidRepeatedPassword)
-        await HandlePasswordRecovery(parseInt(phoneNumber), password, props.navigation);
-    }}
-     />
-  </Box>;
+  return( 
+    <Box>
+      <PhoneInput 
+        phoneNumber={phoneNumber} 
+        isInvalid={isInvalidPhone} 
+        setPhoneNumber={setPhoneNumber} 
+      />
+      <SecretPasswordInput 
+        secretPassword={secretPassword} 
+        isInvalid={isInvalidSecretPassword} 
+        setSecretPassword={setSecretPassword} 
+      />
+      <PasswordInput 
+        password={password} 
+        hintText={"Nowe Hasło"} 
+        isInvalid={isInvalidPassword} 
+        setPassword={setPassword} 
+      />
+      <PasswordInput 
+        password={repeatedPassword} 
+        hintText={"Powtórz nowe Hasło"} 
+        isInvalid={isInvalidRepeatedPassword} 
+        setPassword={setRepeatedPassword} 
+      />
+      <RecoverPasswordButton 
+        onPress={async ()=>{
+          const isValidPhone = await validatePhone(phoneNumber);
+          const isValidSecretPassword = await validateSecretPassword(secretPassword, phoneNumber);
+          const isValidPassword = validatePassword(password);
+          const isValidRepeatedPassword = validateRepeatedPassword(password, repeatedPassword) && validatePassword(repeatedPassword);
+          setIsInvalidPhone(!isValidPhone);
+          setIsInvalidPassword(!isValidPassword);
+          setIsInvalidRepeatedPassword(!isValidRepeatedPassword);
+          setIsInvalidSecretPassword(!isValidSecretPassword);
+          if(isValidPhone && isValidSecretPassword && isValidPassword && isValidRepeatedPassword)
+            await HandlePasswordRecovery(parseInt(phoneNumber), password, props.navigation);
+        }}
+      />
+    </Box>
+  );
 };
 const PhoneInput = (props: {
   phoneNumber: string | undefined;
   isInvalid: boolean | undefined;
   setPhoneNumber: (arg0: string) => void;
 }) => {
-  return <FormControl size="lg" isDisabled={false} isInvalid={props.isInvalid} isReadOnly={false} isRequired={false}>
-    <PhoneLabel />
-    <Input style={styles.inputFields}>
-      <InputField type="text" value={props.phoneNumber} placeholder="123123123" onChangeText={actualPhoneNumber => {
-        props.setPhoneNumber(actualPhoneNumber);
-      }} selectionColor={"black"} keyboardType="numeric" />
-    </Input>
-    <PhoneBadInput />
-  </FormControl>;
+  return( 
+    <FormControl 
+      size="lg" 
+      isDisabled={false} 
+      isInvalid={props.isInvalid} 
+      isReadOnly={false} 
+      isRequired={false}
+    >
+      <PhoneLabel/>
+      <Input style={styles.inputFields}>
+        <InputField 
+          type="text" 
+          value={props.phoneNumber} 
+          placeholder="123123123" 
+          onChangeText={actualPhoneNumber => {
+            props.setPhoneNumber(actualPhoneNumber);
+          }} 
+          selectionColor={"black"} 
+          keyboardType="numeric" 
+        />
+      </Input>
+      <PhoneBadInput/>
+    </FormControl>
+  );
 };
 const PhoneLabel = () => {
-  return <FormControlLabel mb="$1">
-    <FormControlLabelText style={styles.phoneText}>
-      Numer telefonu
-    </FormControlLabelText>
-  </FormControlLabel>;
+  return( 
+    <FormControlLabel mb="$1">
+      <FormControlLabelText style={styles.formInputControlLabelText}>
+        Numer telefonu
+      </FormControlLabelText>
+    </FormControlLabel>
+  );
 };
 const PhoneBadInput = () => {
-  return <FormControlError>
-    <FormControlErrorText style={styles.errors}>
-      Wprowadzony telefon jest nieprawidłowy!
-    </FormControlErrorText>
-  </FormControlError>;
+  return( 
+    <FormControlError>
+      <FormControlErrorText style={styles.formInputErrorLabelText}>
+        Wprowadzony telefon jest nieprawidłowy!
+      </FormControlErrorText>
+    </FormControlError>
+  );
 };
 const SecretPasswordInput = (props: {
   secretPassword: string | undefined;
@@ -127,7 +169,7 @@ const SecretPasswordInput = (props: {
 const SecretPasswordLabel = () => {
   return (
     <FormControlLabel mb="$1">
-      <FormControlLabelText style={styles.labelText}>
+      <FormControlLabelText style={styles.formInputControlLabelText}>
         Sekretne Hasło
       </FormControlLabelText>
     </FormControlLabel>
@@ -136,7 +178,7 @@ const SecretPasswordLabel = () => {
 const SecretPasswordBadInput = () => {
   return (
     <FormControlError>
-      <FormControlErrorText style={styles.errors}>
+      <FormControlErrorText style={styles.formInputErrorLabelText}>
         Wprowadzony sekret jest nieprawidłowy!
       </FormControlErrorText>
     </FormControlError>
@@ -168,14 +210,14 @@ const PasswordInput = (props: {
           selectionColor={"black"}
         />
       </Input>
-      <PasswordBadInput />
+      <PasswordBadInput/>
     </FormControl>
   );
 };
 const PasswordLabel = (props: {hintText: string}) => {
   return (
     <FormControlLabel mb="$1">
-      <FormControlLabelText style={styles.labelText}>
+      <FormControlLabelText style={styles.formInputControlLabelText}>
         <Text>{props.hintText}</Text>
       </FormControlLabelText>
     </FormControlLabel>
@@ -184,7 +226,7 @@ const PasswordLabel = (props: {hintText: string}) => {
 const PasswordBadInput = () => {
   return (
     <FormControlError>
-      <FormControlErrorText style={styles.errors}>
+      <FormControlErrorText style={styles.formInputErrorLabelText}>
         Wprowadzone hasło jest nieprawidłowe!
       </FormControlErrorText>
     </FormControlError>
@@ -192,7 +234,11 @@ const PasswordBadInput = () => {
 };
 const RecoverPasswordButton = (props: any) => {
   return (
-    <Button bgColor="#FFB700" style={styles.functionButton} onPress={props.onPress}>
+    <Button 
+      bgColor="#FFB700" 
+      style={styles.recoverPasswordButton} 
+      onPress={props.onPress}
+    >
       <ButtonText style={styles.buttonText}>Przywróć hasło</ButtonText>
     </Button>
   );
@@ -311,4 +357,3 @@ function ShowAlert(title: string, message: string) {
     },
   ]);
 }
-export default PasswordNotRemember;

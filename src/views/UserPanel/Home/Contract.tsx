@@ -1,8 +1,7 @@
 import React, { useState } from "react"
 import styles from "./styles";
-import { Text, Button, ButtonText, HStack, VStack, View } from "@gluestack-ui/themed"
+import { Text, Button, ButtonText, VStack, View } from "@gluestack-ui/themed"
 import { SimpleLineIcons } from '@expo/vector-icons'; 
-
 export const Contract = () => {
   // TODO: Backend z bazy (JSON pobierany za pomocą get z bazy)
   const initialContractsData = [
@@ -18,77 +17,61 @@ export const Contract = () => {
     { id: 10, from: 'San Francisco', to: 'San Jose', km: 32},
     { id: 11, from: 'San Francisco', to: 'Mill valley', km: 32}
   ];
-
   const [contractsData, setContractsData] = useState(initialContractsData);
   const [isAccepted, setIsAccepted] = useState(false);
-
   return (
     <View>
       {contractsData.map((contract, index) => (
-        <VStack space="xs" key={index} style={styles.singleContract}> 
-          <View style={{flexDirection: 'row', marginTop: 15}}>
+        <VStack 
+          space="xs" 
+          key={index} 
+          style={styles.singleContractStack}
+        > 
+          <View style={styles.contractContentView}>
             <SimpleLineIcons 
               name="pin" 
               size={32} 
               color="black"
-              style={{
-                marginRight: 35,
-                marginTop: 10
-              }} 
+              style={styles.pinIcon} 
             />
-            <View style={{flexDirection: 'column'}}>
+            <View style={styles.fromToTextsView}>
               <Text>Z: {contract.from} </Text>
               <Text>Do: {contract.to} </Text>
             </View>
             <Text 
-              style={{
-                color: '#FFB700', 
-                marginLeft: 15, 
-                marginTop: 15
-                }}
+              style={styles.kilometersText}
             >
               {contract.km}km
             </Text>
           </View>
           {isAccepted?
-              <AcceptedButtons/>
+            <AcceptedButtons/>
             :
             <NotAcceptedButtons 
-            handleRefusePress={handleRefusePress} 
-            handleAcceptPress={handleAcceptPress} 
-            index={index} 
-            contract={contract}/>
+              handleRefusePress={handleRefusePress} 
+              handleAcceptPress={handleAcceptPress} 
+              index={index} 
+              contract={contract}
+            />
           }
         </VStack>
       ))}
       {isAccepted?
         <>
-          <Text style = {{
-            alignSelf: 'center',
-            marginBottom: 15,
-            marginTop: 15,
-            fontFamily: 'DejaVuSans',
-            fontSize: 15
-          }}
-          >
+          <Text style={styles.routeIsOnMapText}>
             Trasa została wyznaczona na mapie
           </Text>
-          <Text style = {{
-            alignSelf: 'center',
-            fontFamily: 'DejaVuSans',
-            fontSize: 15
-          }}
-          >
+          <Text style = {styles.checkMapText}>
             Sprawdź mapę
           </Text>
         </>
         :
-        <View style={{height: 75}}></View>
+        <View style={styles.paddingBottomView}/>
       }
     </View>
   )
   function handleRefusePress(index: any) {
-    console.log(index);
+    console.log('');
   }
   function handleAcceptPress(id: number) {
     const acceptedContract = contractsData.find(contract => contract.id === id);
@@ -101,7 +84,6 @@ export const Contract = () => {
     }
   }
 }
-
 const NotAcceptedButtons = (props: {
   handleRefusePress: any, 
   handleAcceptPress: any, 
@@ -116,13 +98,7 @@ const NotAcceptedButtons = (props: {
           props.handleRefusePress(props.index);
         }}
       >
-        <ButtonText 
-          style={{
-            color: 'black', 
-            fontFamily: 'DejaVuSans', 
-            fontSize: 12
-          }}
-        >
+        <ButtonText style={styles.contractRefuseButtonText}>
           Odrzuć
         </ButtonText>
       </Button>
@@ -132,46 +108,21 @@ const NotAcceptedButtons = (props: {
           props.handleAcceptPress(props.contract.id);
         }}
       >
-        <ButtonText 
-          style={{
-            color: 'black', 
-            fontFamily: 'DejaVuSans', 
-            fontSize: 12
-          }}
-        >
+        <ButtonText style={styles.contractAcceptButtonText}>
           Akceptuj
         </ButtonText>
       </Button>
     </View>
-  )
+  );
 }
-
 const AcceptedButtons = () => {
   return (
-    <View style={{flexDirection:'column'}}>
-      <Button 
-        style={{
-          alignSelf:'center',
-          marginTop: 15,
-          marginBottom: 15,
-          borderColor: '#FFB700',
-          borderRadius: 10,
-          borderWidth: 1,
-          minWidth: 150,
-          maxWidth: 150,
-          backgroundColor: 'white'
-        }}
-      >
-        <ButtonText 
-          style={{
-            color: 'black', 
-            fontFamily: 'DejaVuSans', 
-            fontSize: 12,
-          }}
-        >
+    <View style={styles.acceptedButtonView}>
+      <Button style={styles.acceptedButton}>
+        <ButtonText style={styles.acceptedButtonText}>
           Zaakceptowano
         </ButtonText>
       </Button>
     </View>
-  )
+  );
 }
