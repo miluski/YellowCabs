@@ -284,30 +284,6 @@ async function getDataFromDatabase(dataType: any, providedData: any[]) {
     return false;
   }
 }
-function HandleRetrievedData(data: any, providedData: any[], dataType: string) : any {
-  let isValid = false;
-  for(const userKey in data) {
-    const user = data[userKey];
-    switch(dataType) {
-      case 'phone':
-        isValid = parseInt(providedData[0]) == user.phone;
-        if(isValid)
-          return isValid;
-      break;
-      case 'secretPassword':
-        isValid = providedData[0] == user.secretPassword && parseInt(providedData[1]) == user.phone;
-        if(isValid)
-          return isValid;
-      break;
-      case 'userKey':
-        isValid = parseInt(providedData[0]) == user.phone;
-        if(isValid)
-          return userKey;
-      break;
-    }
-  }
-  return isValid;
-}
 async function HandlePasswordRecovery(phone: number, newPassword: string, navigation: any) {
   const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
   const databasePath = '/users.json'; 
@@ -338,6 +314,30 @@ async function HandlePasswordRecovery(phone: number, newPassword: string, naviga
     console.error(error);
     return false;
   }
+}
+function HandleRetrievedData(data: any, providedData: any[], dataType: string) : any {
+  let isValid = false;
+  for(const userKey in data) {
+    const user = data[userKey];
+    switch(dataType) {
+      case 'phone':
+        isValid = parseInt(providedData[0]) == user.phone;
+        if(isValid)
+          return isValid;
+      break;
+      case 'secretPassword':
+        isValid = providedData[0] == user.secretPassword && parseInt(providedData[1]) == user.phone;
+        if(isValid)
+          return isValid;
+      break;
+      case 'userKey':
+        isValid = parseInt(providedData[0]) == user.phone;
+        if(isValid)
+          return userKey;
+      break;
+    }
+  }
+  return isValid;
 }
 function getSecret(length: number) {
   let result = '';

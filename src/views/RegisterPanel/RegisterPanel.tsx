@@ -2,7 +2,7 @@ import * as Font from "expo-font";
 import styles from "./styles";
 import React, { useState } from "react";
 import { config } from "@gluestack-ui/config";
-import { Alert, Vibration, View } from "react-native";
+import { Alert, TouchableWithoutFeedback, Vibration, View } from "react-native";
 import { Button, GluestackUIProvider, Text, Box, FormControl, FormControlError, ButtonGroup } from "@gluestack-ui/themed";
 import { FormControlErrorText, FormControlLabel, FormControlLabelText, Input} from "@gluestack-ui/themed";
 import { InputField, ButtonText, RadioGroup, CircleIcon, Radio, RadioIcon, RadioIndicator, RadioLabel, ScrollView, HStack } from "@gluestack-ui/themed";
@@ -158,7 +158,7 @@ const DataForm = (props: { navigation: any, isDriver: boolean }) => {
               const dataObject = {
                 name: name,
                 surname: surname,
-                phone: parseInt(phoneNumber),
+                phone: phoneNumber,
                 voivodeship: voivodeship,
                 driverlicense: driverlicense.toUpperCase(),
                 cardid: cardid.toUpperCase(), 
@@ -176,7 +176,7 @@ const DataForm = (props: { navigation: any, isDriver: boolean }) => {
               const dataObject = {
                 name: name,
                 surname: surname,
-                phone: parseInt(phoneNumber),
+                phone: phoneNumber,
                 voivodeship: voivodeship,
                 password: password,
                 agreement: !isAgreementNotChecked,
@@ -506,54 +506,44 @@ const TermAndConditionsButton = (props: {
   navigation: any;
 }) => {
   return (
-    <>
+    <TouchableWithoutFeedback>
       <Button 
         action={"secondary"} 
         variant={"link"} 
         size={"xs"} 
         isDisabled={false} 
-        style={styles.policyPrivacyTermsAndConditionsButtons} 
-        onPress={() => {
-          props.navigation.navigate('TermsAndConditions');
-        }}
+        style={styles.policyPrivacyTermsAndConditionsButtons}
+        onPress={()=>{
+          props.navigation.navigate('TermsAndConditions')
+        }} 
       >
-        <ButtonText 
-          style={styles.rulesAndTermsButtonText}
-          onPress={() => {
-            props.navigation.navigate('TermsAndConditions');
-          }}
-        >
+        <ButtonText style={styles.rulesAndTermsButtonText}>
           Zasady & Warunki
         </ButtonText>
       </Button>
-    </>
+    </TouchableWithoutFeedback>
   );
 }
 const PrivacyPolicyButton = (props: {
   navigation: any;
 }) => {
   return (
-    <>
+    <TouchableWithoutFeedback>
       <Button 
         action={"secondary"} 
         variant={"link"} 
         size={"xs"} 
         isDisabled={false} 
         style={styles.policyPrivacyTermsAndConditionsButtons} 
-        onPress={() => {
-          props.navigation.navigate('PrivacyPolicy');
+        onPress={()=>{
+          props.navigation.navigate('PrivacyPolicy')
         }}
       >
-        <ButtonText 
-          style={styles.privacyPolicyButtonText} 
-          onPress={() => {
-            props.navigation.navigate('PrivacyPolicy');
-          }}
-        >
+        <ButtonText style={styles.privacyPolicyButtonText}>
           Polityka prywatności
         </ButtonText>
       </Button>
-    </>
+    </TouchableWithoutFeedback>
   );
 }
 const Label = (props: {hintText: string}) => {

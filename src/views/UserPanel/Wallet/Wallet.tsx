@@ -3,6 +3,7 @@ import styles from "./styles";
 import  Operations from './Operations';
 import { Text, View, ScrollView } from "@gluestack-ui/themed";
 import { Ionicons, AntDesign, FontAwesome } from '@expo/vector-icons';
+import { TouchableWithoutFeedback } from "react-native";
 export default function Wallet() {
   return(
     <ScrollView>
@@ -59,26 +60,28 @@ const CameraIconView = () => {
 }
 const ScanQrCodeTextView = () => {
   return (
-    <View> 
-      <Text 
-        style={styles.scanQrCodeText} 
-        onPress={handlePress}
-      > 
-        Skanuj kod QR 
-      </Text>
-    </View>
+    <TouchableWithoutFeedback
+      onPress={handlePress}
+    >
+        <Text 
+          style={styles.scanQrCodeText} 
+        > 
+          Skanuj kod QR 
+        </Text>
+    </TouchableWithoutFeedback>
   );
 }
 const AngleIconView = () => {
   return (
-    <View> 
+    <TouchableWithoutFeedback
+      onPress={handlePress}
+    >
       <FontAwesome 
         name="angle-right" 
         size={45} 
         color="black" 
-        onPress={handlePress} 
       />
-    </View>
+    </TouchableWithoutFeedback>
   );
 }
 function handlePress() {

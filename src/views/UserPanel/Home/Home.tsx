@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./styles";
 import MapViewDirections from "react-native-maps-directions";
-import { TouchableOpacity } from "react-native";
+import { TouchableWithoutFeedback } from "react-native";
 import { useRoute } from '@react-navigation/native';
 import { Contract } from "./Contract";
 import { EvilIcons, Entypo, Feather } from '@expo/vector-icons';
@@ -10,11 +10,12 @@ import { Button, Input, InputField, InputSlot, ScrollView, Text, View, ButtonTex
 const origin = {latitude: 37.3318456, longitude: -122.0296002};
 const destination = {latitude: 37.771707, longitude: -122.4053769};
 interface RouteParams {
+    userKey?: string;
     rank?: string;
 }
 export default function Home() {
     const route = useRoute();
-    const { rank } = route.params as RouteParams;
+    const { userKey, rank } = route.params as RouteParams;
     if(rank=='driver')
         return <DriverHome/>;
     else
@@ -25,7 +26,7 @@ const DriverHome = () => {
         <ScrollView>
             <View style={styles.homeScrollView}>
                 <Text style={styles.myOrdersText}>Moje zlecenia</Text>
-                <Contract></Contract>
+                <Contract/>
             </View>
         </ScrollView>
     )
@@ -246,7 +247,7 @@ const TaxiTypeView = (props:{
     setIsPremiumTaxi: Function,
 }) => {
     return (
-        <TouchableOpacity 
+        <TouchableWithoutFeedback 
             onPress={()=>{
                 switch(props.type) {
                     case "Standard":
@@ -288,7 +289,7 @@ const TaxiTypeView = (props:{
                     </View>
                 )
             }
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
     );
 }
 const OrderTaxiButton = (props: {setIsRideStarted: any}) => {

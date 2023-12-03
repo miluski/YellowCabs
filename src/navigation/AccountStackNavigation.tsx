@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import RatingsView from "../views/UserPanel/UserProfile/Ratings/RatingsView";
 import SettingsView from "../views/UserPanel/UserProfile/Settings/SettingsView";
 import TravelHistory from "../views/UserPanel/UserProfile/TravelHistory/TravelHistory";
@@ -8,14 +8,14 @@ import { createStackNavigator } from '@react-navigation/stack';
 const Stack = createStackNavigator();
 interface RouteParams {
     rank?: string;
-    name?: string;
-    surname?: string;
-    phoneNumber?: string;
+    userKey?: string;
     avatarLink?: string;
+    vibrations?: string;
+    notifications?: string;
 }
 export default function AccountNavigation() {
     const route = useRoute();
-    const { rank, name, surname, phoneNumber, avatarLink } = route.params as RouteParams;
+    const { rank, userKey, avatarLink, vibrations, notifications } = route.params as RouteParams;  
     return (
         <Stack.Navigator 
             screenOptions={{ 
@@ -28,10 +28,10 @@ export default function AccountNavigation() {
                 component={BottomTabs} 
                 initialParams={{ 
                     rank, 
-                    name, 
-                    surname, 
-                    phoneNumber, 
+                    userKey,
                     avatarLink,
+                    vibrations,
+                    notifications
                 }} 
             />
             <Stack.Screen 
@@ -39,9 +39,9 @@ export default function AccountNavigation() {
                 component={RatingsView} 
                 initialParams={{ 
                     rank, 
-                    name, 
-                    surname,
-                    phoneNumber 
+                    userKey,
+                    vibrations,
+                    notifications
                 }} 
             />
             <Stack.Screen 
@@ -49,20 +49,20 @@ export default function AccountNavigation() {
                 component={SettingsView} 
                 initialParams={{ 
                     rank, 
-                    name, 
-                    surname, 
-                    phoneNumber, 
-                    avatarLink 
-                    }} 
+                    userKey,
+                    avatarLink,
+                    vibrations,
+                    notifications
+                }} 
             />
             <Stack.Screen 
                 name="TravelHistory" 
                 component={TravelHistory} 
                 initialParams={{ 
                     rank, 
-                    name, 
-                    surname, 
-                    phoneNumber 
+                    userKey,
+                    vibrations,
+                    notifications
                 }} 
             />
         </Stack.Navigator>

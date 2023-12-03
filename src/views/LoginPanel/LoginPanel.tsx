@@ -255,7 +255,8 @@ async function HandleLoginButtonPress(
   const databasePath = '/users.json';
   const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
   const getRequestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
-  fetch(getRequestURL).then(response => {
+  fetch(getRequestURL)
+  .then(response => {
     return response.json();
   }).then(async data => {
     await HandleRetrievedData(data, providedData, navigation, setPhoneNumber, setPassword);
@@ -279,21 +280,21 @@ async function HandleRetrievedData(
         setPassword('');
         navigation.navigate("MainPanel", {
           rank: user.role,
-          name: user.name,
-          surname: user.surname,
-          phoneNumber: String(user.phone),
-          avatarLink: user.avatarLink
-      });
-    }
+          userKey: userKey,
+          avatarLink: user.avatarLink,
+          vibrations: String(user.vibrations),
+          notifications: String(user.notifications)
+        });
+      }
       else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
     }
   }
 }
 function IsUserFounded(phone: number, providedPhone: number) {
-  return phone === providedPhone;
+  return phone == providedPhone;
 }
 function checkPassword(password: string, providedPassword: string) {
-  return password === providedPassword;
+  return password == providedPassword;
 }
 function ShowAlert(title: string, message: string) {
   Vibration.vibrate(500);

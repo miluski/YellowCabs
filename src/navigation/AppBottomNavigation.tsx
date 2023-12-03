@@ -10,14 +10,14 @@ import { AntDesign, FontAwesome5, FontAwesome, Fontisto } from '@expo/vector-ico
 const Tab = createBottomTabNavigator();
 interface RouteParams {
     rank?: string;
-    name?: string;
-    surname?: string;
-    phoneNumber?: string;
+    userKey? : string;
     avatarLink?: string;
+    vibrations?: string;
+    notifications?: string;
 }
 export default function BottomTabs() {
     const route = useRoute();
-    const { rank, name, surname, phoneNumber, avatarLink } = route.params as RouteParams;
+    const { rank, userKey, avatarLink, vibrations, notifications } = route.params as RouteParams;  
     return (
         <Tab.Navigator 
             initialRouteName="Główna" 
@@ -43,7 +43,7 @@ export default function BottomTabs() {
                         />
                     )
                 }}
-                initialParams={{ rank, phoneNumber }}
+                initialParams={{ userKey, rank, vibrations, notifications}}
             />
             <Tab.Screen 
                 name="Portfel" 
@@ -57,6 +57,7 @@ export default function BottomTabs() {
                         />
                     )
                 }}
+                initialParams={{ userKey, vibrations, notifications }}
             />
             <Tab.Screen 
                 name="Mapa" 
@@ -70,7 +71,7 @@ export default function BottomTabs() {
                         />
                     )
                 }}
-                initialParams={{ rank }}
+                initialParams={{ rank, vibrations, notifications }}
             />
             <Tab.Screen 
                 name="Konto"
@@ -84,7 +85,7 @@ export default function BottomTabs() {
                         />
                     )
                 }}
-                initialParams={{ rank, name, surname, phoneNumber, avatarLink }}
+                initialParams={{ rank, userKey, avatarLink, vibrations, notifications }}
             />
         </Tab.Navigator>
     );
