@@ -2,7 +2,6 @@ import React from 'react';
 import styles from './styles';
 import { Text } from 'react-native';
 const Operations = () => {
-  //TODO: Backend z bazy (JSON pobierany za pomoca get z bazy)
   const operationsData = [
     { date: '23-10-2023', cost: '23.64zł' },
     { date: '24-11-2023', cost: '21.72zł' },

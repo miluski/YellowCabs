@@ -5,6 +5,8 @@ import { useRoute } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import { isEnabled } from "react-native/Libraries/Performance/Systrace";
 import { Alert, Vibration } from "react-native";
+import { initializeApp } from 'firebase/app';
+import { getStorage, ref, uploadBytes } from "firebase/storage";
 import { Button, Text, Box, FormControl, FormControlError, Switch } from "@gluestack-ui/themed";
 import { FormControlErrorText, FormControlLabel, FormControlLabelText, Input} from "@gluestack-ui/themed";
 import { InputField, ButtonText, ScrollView, View, Image } from "@gluestack-ui/themed";
@@ -65,7 +67,10 @@ export default function SettingsView({navigation}: any) {
               :
               <></>
             }
-            <ChangeProfilePhotoButton/>
+            <ChangeProfilePhotoButton 
+              oldPhone={phoneNumber}
+              navigation={navigation}
+            />
             <ActualizePersonalDataSwitchButton
               actualizePersonalData={actualizePersonalData}
               setActualizePersonalData={setActualizePersonalData}
@@ -168,12 +173,12 @@ const VibrationsSwitchOption = (props: {
     </View>
   );
 }
-const ChangeProfilePhotoButton = () => {
+const ChangeProfilePhotoButton = (oldPhone: any, navigation: any) => {
   return (
     <Button 
       style={styles.actionButtons}
       onPress={async () => {
-        await handleChangeProfilePhoto();
+        await handleChangeProfilePhoto(oldPhone, navigation);
       }}
     >
       <Feather 
@@ -426,16 +431,39 @@ function validatePassword(password: string) {
 function validateRepeatedPassword(password: string, repeatedPassword: string) {
   return repeatedPassword===password;
 }
-async function handleChangeProfilePhoto() {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
-      allowsEditing: true,
-      aspect: [4, 3],
-      quality: 1,
+async function handleChangeProfilePhoto(oldPhone: string, navigation: any) {
+  const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
+  const databasePath = '/users.json';
+  const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
+  const requestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
+  const response = await fetch(requestURL);
+  const data = await response.json();
+  const userKey = GetUserKey(oldPhone, data);  
+  let result = await ImagePicker.launchImageLibraryAsync({
+    mediaTypes: ImagePicker.MediaTypeOptions.All,
+    allowsEditing: true,
+    aspect: [4, 3],
+    quality: 1,
+  });
+  if (!result.canceled) {
+    initializeApp({
+      apiKey: "AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ",    
+      appId: "1:447116941349:android:425acb5214d8b2175707cc", 
+      projectId: "yellowcabs",
+      databaseURL: "https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app/",
+      storageBucket: "gs://yellowcabs.appspot.com"
     });
-    if (!result.canceled) {
-      console.log(result.assets[0].uri);
-    }
+    const response = await fetch(result.assets[0].uri);
+    const blob = await response.blob();
+    const storage = getStorage();
+    const storageRef = ref(storage, `images/${userKey}/avatar.jpg`);
+    const metadata = {
+      contentType: 'image/jpeg',
+    };
+    uploadBytes(storageRef, blob, metadata);
+    ShowAlert("Sukces", "Pomyślnio zmieniono zdjęcie profilowe! \nNastąpi wylogowanie celem zaktualizowania ustawień!");
+    navigation.navigate("LoginPanel");
+  }
 }
 async function HandleEditData(
   dataToUpdate: any | undefined,

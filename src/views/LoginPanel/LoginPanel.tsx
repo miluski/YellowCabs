@@ -1,7 +1,9 @@
 import * as Font from "expo-font";
 import styles from "./styles";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { config } from "@gluestack-ui/config";
+import { initializeApp } from 'firebase/app';
+import { getDownloadURL, getStorage, ref } from "firebase/storage";
 import { View, Vibration, Alert } from "react-native";
 import { GluestackUIProvider, Image, Text, Input } from "@gluestack-ui/themed";
 import { Box, FormControl, FormControlError, FormControlErrorText } from "@gluestack-ui/themed";
@@ -276,12 +278,23 @@ async function HandleRetrievedData(
     const user = data[userKey];
     if (IsUserFounded(user.phone, parsedPhone)) {
       if (checkPassword(user.password, providedData.password)) { 
+        initializeApp({
+          apiKey: "AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ",    
+          appId: "1:447116941349:android:425acb5214d8b2175707cc", 
+          projectId: "yellowcabs",
+          databaseURL: "https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app/",
+          storageBucket: "gs://yellowcabs.appspot.com"
+        });
+        const storage = getStorage();
+        const starsRef = ref(storage, `images/${userKey}/avatar.jpg`);
+        const url = await getDownloadURL(starsRef);
+        console.log(url);
         setPhoneNumber('');
         setPassword('');
         navigation.navigate("MainPanel", {
           rank: user.role,
           userKey: userKey,
-          avatarLink: user.avatarLink,
+          avatarLink: url,
           vibrations: String(user.vibrations),
           notifications: String(user.notifications)
         });
