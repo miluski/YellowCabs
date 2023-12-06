@@ -105,6 +105,69 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     maxWidth: windowWidth-75,
     marginTop: 25
+  },
+  termsAndPrivacyHeaderFirst: {
+    alignSelf: 'center',
+    fontFamily: 'DejaVuSans',
+    fontSize: 25,
+    paddingTop: 5,
+    paddingBottom: 10,
+  },
+  termsAndPrivacyHeader: {
+    alignSelf: 'center',
+    fontFamily: 'DejaVuSans',
+    fontSize: 25,
+    paddingTop: 30,
+    paddingBottom: 10,
+  },
+  termsAndPrivacyHeaderLine: {
+    alignSelf: 'center',
+    fontFamily: 'DejaVuSans',
+    fontSize: 25,
+    paddingTop: 4,
+    paddingBottom: 10,
+  },
+  termsAndPrivacyText: {
+    fontFamily: 'DejaVuSans',
+    fontSize: 15,
+    marginLeft: 15,
+  },
+  termsAndPrivacyBackButtons: {
+    marginBottom: 25,
+    width: 300,
+    alignSelf: 'center',
+    borderColor: '#FFB700',
+    borderRadius: 20,
+    borderWidth: 2,
+    backgroundColor: '#FFB700',
+    marginTop: 25
+  },
+  termsAndPrivacyBackButtonsText: {
+    color: 'black', 
+    fontFamily: 'DejaVuSans', 
+    fontSize: 22,
+    textAlign: 'center'
+  },
+  headerTerms:{
+    fontFamily: 'DejaVuSans',
+    fontSize: 28,
+    alignItems: 'center',
+    paddingTop: 5,
+  },
+  termsAppView:{
+    paddingTop: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingBottom: 10,
+  },
+  textSmallTerms:{
+    fontFamily: 'DejaVuSans',
+    fontSize: 15,
+  },
+  termsAppScrollView:{
+    marginRight: windowWidth/20,
+    marginLeft: windowWidth/20,
+    flex: 1
   }
 });
 export default styles;
