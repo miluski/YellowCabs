@@ -173,12 +173,15 @@ const VibrationsSwitchOption = (props: {
     </View>
   );
 }
-const ChangeProfilePhotoButton = (oldPhone: any, navigation: any) => {
+const ChangeProfilePhotoButton = (props: {
+  oldPhone: any, 
+  navigation: any
+}) => {
   return (
     <Button 
       style={styles.actionButtons}
       onPress={async () => {
-        await handleChangeProfilePhoto(oldPhone, navigation);
+        await handleChangeProfilePhoto(props);
       }}
     >
       <Feather 
@@ -431,14 +434,17 @@ function validatePassword(password: string) {
 function validateRepeatedPassword(password: string, repeatedPassword: string) {
   return repeatedPassword===password;
 }
-async function handleChangeProfilePhoto(oldPhone: string, navigation: any) {
+async function handleChangeProfilePhoto(props: {
+  oldPhone: any, 
+  navigation: any
+}) {
   const firebaseDatabaseURL = 'https://yellowcabs-default-rtdb.europe-west1.firebasedatabase.app';
   const databasePath = '/users.json';
   const apiKey = 'AIzaSyDeyE8rWM6Jqyq-IyujTPd19BdL8MQvqpQ';
   const requestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
   const response = await fetch(requestURL);
   const data = await response.json();
-  const userKey = GetUserKey(oldPhone, data);  
+  const userKey = GetUserKey(props.oldPhone, data);  
   let result = await ImagePicker.launchImageLibraryAsync({
     mediaTypes: ImagePicker.MediaTypeOptions.All,
     allowsEditing: true,
@@ -462,7 +468,7 @@ async function handleChangeProfilePhoto(oldPhone: string, navigation: any) {
     };
     uploadBytes(storageRef, blob, metadata);
     ShowAlert("Sukces", "Pomyślnio zmieniono zdjęcie profilowe! \nNastąpi wylogowanie celem zaktualizowania ustawień!");
-    navigation.navigate("LoginPanel");
+    props.navigation.navigate("LoginPanel");
   }
 }
 async function HandleEditData(
@@ -526,7 +532,7 @@ async function HandleChangeAppSettings(
   const requestURL = `${firebaseDatabaseURL}${databasePath}?key=${apiKey}`;
   const response = await fetch(requestURL);
   const data = await response.json();
-  const userKey = GetUserKey(oldPhone, data);
+  const userKey = GetUserKey(String(oldPhone), data);
   let finalNotifications = "no";
   let finalVibrations = "no";
   if(notifications=="true")

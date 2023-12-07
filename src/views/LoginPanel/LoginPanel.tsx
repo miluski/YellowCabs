@@ -287,8 +287,12 @@ async function HandleRetrievedData(
         });
         const storage = getStorage();
         const starsRef = ref(storage, `images/${userKey}/avatar.jpg`);
-        const url = await getDownloadURL(starsRef);
-        console.log(url);
+        let url = "https://st3.depositphotos.com/1767687/17621/v/450/depositphotos_176214104-stock-illustration-default-avatar-profile-icon.jpg";
+        try {
+          url = await getDownloadURL(starsRef);
+        } catch (error) {
+            console.log("Not existing user avatar, setting default");
+        }
         setPhoneNumber('');
         setPassword('');
         navigation.navigate("MainPanel", {

@@ -512,7 +512,7 @@ const TermAndConditionsButton = (props: {
         isDisabled={false} 
         style={styles.policyPrivacyTermsAndConditionsButtons}
         onPress={()=>{
-          props.navigation.navigate('TermsAndConditions')
+          props.navigation.navigate("TermsAndConditions")
         }} 
       >
         <ButtonText style={styles.rulesAndTermsButtonText}>
@@ -534,7 +534,7 @@ const PrivacyPolicyButton = (props: {
         isDisabled={false} 
         style={styles.policyPrivacyTermsAndConditionsButtons} 
         onPress={()=>{
-          props.navigation.navigate('PrivacyPolicy')
+          props.navigation.navigate("PrivacyPolicy")
         }}
       >
         <ButtonText style={styles.privacyPolicyButtonText}>
