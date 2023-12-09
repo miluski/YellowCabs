@@ -38,6 +38,7 @@ export default function UserProfile(props:{navigation: any}) {
           avatarLink={avatarLink}
           vibrations={vibrations}
           notifications={notifications}
+          rank={rank}
         />
       </View>
     );
@@ -95,11 +96,15 @@ const MenuOptionView = (props:{
   userKey: string | undefined,
   avatarLink: string | undefined,
   vibrations: string | undefined,
-  notifications: string | undefined
+  notifications: string | undefined,
+  rank: string | undefined
 }) => {
   return (
     <View style={styles.menuOptionsView}>
-      <MyRatingsView navigation={props.navigation}/>
+      <MyRatingsView 
+        navigation={props.navigation}
+        rank={props.rank}
+      />
       <SettingsView 
         navigation={props.navigation}
         phone={props.phone}
@@ -115,12 +120,15 @@ const MenuOptionView = (props:{
     </View> 
   );
 }
-const MyRatingsView = (props:{navigation: any}) => {
+const MyRatingsView = (props:{
+  navigation: any,
+  rank: string | undefined
+}) => {
   return (
     <TouchableWithoutFeedback 
       style={styles.menuOptionView} 
       onPress={()=>{
-        handleMyRatings(props.navigation)
+        handleMyRatings(props.navigation, props.rank);
       }}
     >
       <View style={styles.menuOptionView} >
@@ -246,8 +254,13 @@ const LogoutView = (props:{navigation: any}) => {
     </TouchableWithoutFeedback>
   );
 }
-function handleMyRatings(navigation: any) {
-  navigation.navigate("RatingsView");
+function handleMyRatings(
+  navigation: any,
+  rank: string | undefined
+) {
+  navigation.navigate("RatingsView", {
+    rank: rank
+  });
 }
 function handleSettings(
   navigation: any, 

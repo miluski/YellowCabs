@@ -1,7 +1,6 @@
-import { Text } from 'react-native';
 import styles from "./styles"
-import { View, ScrollView, Image, Button, ButtonText } from "@gluestack-ui/themed";
-import { Rating, AirbnbRating } from 'react-native-ratings';
+import { View, Image, Button, ButtonText, Text  } from "@gluestack-ui/themed";
+import { AirbnbRating } from 'react-native-ratings';
 import { TextInput } from 'react-native';
 import React from "react";
 
@@ -20,16 +19,16 @@ const DriversRatings = () => {
         <View style={styles.ratingHeader}>
           <Text style={styles.ratingHeader}>Oceń Kierowce</Text>
         </View>
-    {driversRatings.map((driver) => (
+    {driversRatings.map((driver, index) => (
         <View>
         <View style={styles.singleRatingContainer}>
           <View style={styles.allInfoRating}>
             <View>
-              <Image source={{ uri: 'https://images.pexels.com/photos/5835419/pexels-photo-5835419.jpeg' }} style={styles.imageAvatar}/>
+              <Image source={{ uri: 'https://images.pexels.com/photos/5835419/pexels-photo-5835419.jpeg' }} style={styles.imageAvatar} alt='Zdjecie kierowcy'/>
             </View>
           <View>
             <View>  
-              <Text style={{ fontSize: 20, marginLeft: 10 }}>
+              <Text style={{ fontSize: 20, marginLeft: 10 }}  key={index}>
                   {driver.name} {driver.surname}
               </Text>
             </View>

@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
   ratingScrollView:{
-    alignItems: "center",
+    flex: 1
   },
   ratingHeader:{
     fontSize: 40,
