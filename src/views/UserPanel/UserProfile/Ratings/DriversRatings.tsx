@@ -1,0 +1,74 @@
+import { Text } from 'react-native';
+import styles from "./styles"
+import { View, ScrollView, Image, Button, ButtonText } from "@gluestack-ui/themed";
+import { Rating, AirbnbRating } from 'react-native-ratings';
+import { TextInput } from 'react-native';
+import React from "react";
+
+const DriversRatings = () => {
+  //const ratingCompleted = (rating) => {
+    //console.log("Rating = " + rating)
+  //}
+
+  const driversRatings = [
+    { name: 'Michał', surname: 'Adamski' },
+    { name: 'Wojciech', surname: 'Krzysztof' },
+  ];
+
+  return (
+    <>
+        <View style={styles.ratingHeader}>
+          <Text style={styles.ratingHeader}>Oceń Kierowce</Text>
+        </View>
+    {driversRatings.map((driver) => (
+        <View>
+        <View style={styles.singleRatingContainer}>
+          <View style={styles.allInfoRating}>
+            <View>
+              <Image source={{ uri: 'https://images.pexels.com/photos/5835419/pexels-photo-5835419.jpeg' }} style={styles.imageAvatar}/>
+            </View>
+          <View>
+            <View>  
+              <Text style={{ fontSize: 20, marginLeft: 10 }}>
+                  {driver.name} {driver.surname}
+              </Text>
+            </View>
+
+            <View style={styles.starsRating}>
+              <AirbnbRating
+                showRating={false}
+                size={30}
+                //onFinishRating={ratingCompleted}
+              />
+            </View>
+          </View>
+          </View>
+
+          <View>
+          <Text style={styles.yourOppinion}>Twoja opinia:</Text>
+            <TextInput style={styles.ratingTextInput}/>
+          </View>
+
+          <View style={styles.buttonsRatingContainer}>
+            <Button 
+              style={styles.skipButton}
+              //onPress={() => {props.navigation.navigate('gdziesnawigacja');}}
+              >
+              <ButtonText >Pomiń</ButtonText>
+            </Button>
+            <Button 
+              style={styles.rateButton}
+              //onPress={() => {props.navigation.navigate('gdziesnawigacja');}}
+              >
+              <ButtonText>Oceń</ButtonText>
+            </Button>
+          </View>
+        </View>
+        </View>
+        ))}
+    </>
+  );
+
+};
+
+export default DriversRatings;
