@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
     fontSize: 13
   },
   paddingBottomView: {
-    height: 75
+    height: 100
   },
   contractButtons: {
     flexDirection: 'row',
@@ -49,8 +49,8 @@ const styles = StyleSheet.create({
     borderColor: 'black',
     borderRadius: 10,
     borderWidth: 1,
-    minWidth: 130,
-    maxWidth: 130,
+    minWidth: '42%',
+    maxWidth: '42%',
     backgroundColor: 'white',
     marginRight: 5
   },
@@ -63,8 +63,8 @@ const styles = StyleSheet.create({
     borderColor: '#FFB700',
     borderRadius: 10,
     borderWidth: 1,
-    minWidth: 130,
-    maxWidth: 130,
+    minWidth: '42%',
+    maxWidth: '42%',
     backgroundColor: 'white',
     marginLeft: 5
   },
@@ -83,8 +83,8 @@ const styles = StyleSheet.create({
     borderColor: '#FFB700',
     borderRadius: 10,
     borderWidth: 1,
-    minWidth: 150,
-    maxWidth: 150,
+    minWidth: '50%',
+    maxWidth: '50%',
     backgroundColor: 'white'
   },
   acceptedButtonText: {
@@ -102,12 +102,12 @@ const styles = StyleSheet.create({
     fontSize: 32,
     alignSelf: 'center',
     paddingTop: 10,
-    marginTop: 75,
+    marginTop: '25%',
     marginBottom: 30
   },
   map: {
     width: '100%',
-    height: '40%',
+    height: '40%'
   },
   mapSearchInput: {
     borderRadius: 20,

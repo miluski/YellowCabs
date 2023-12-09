@@ -1,19 +1,20 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+const windowHeight = Dimensions.get('window').height;
 const styles = StyleSheet.create({
   yourWalletText: {
     fontFamily: 'DejaVuSans',
-    paddingTop: 90,
+    paddingTop: '25%',
     fontSize: 45,
     textAlign: "center"
   },
   accountBalanceView: {
-    marginTop: 40,
+    marginTop: '5%',
     margin: 20,
     fontSize: 20,
     padding: 10,
     paddingTop: 30,
     paddingBottom: 30,
-    heigth: 200,
+    heigth: '50%',
     borderRadius: 25,
     borderWidth: 5,
     borderColor: '#FFB700',
@@ -22,8 +23,8 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
   },
   accountBalanceDetailsView: {
-    width: 200,
-    height: 100,
+    width: '65%',
+    height: windowHeight/7,
     alignItems: "center",
     justifyContent: 'center',
   },

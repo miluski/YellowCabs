@@ -15,7 +15,7 @@ const [isLoaded, setIsLoaded] = useState(false);
   loadCustomFont().then(() => {
     setIsLoaded(true);
   });
-  if (isLoaded) {
+  if (!isLoaded) {
     return null;
   }
   else{ 

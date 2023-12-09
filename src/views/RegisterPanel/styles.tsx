@@ -2,16 +2,15 @@ import { StyleSheet, Dimensions } from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   mainPanelView: {
-    flex: 1,
-    centerContent: true
+    flex: 1
   },
   registerYourSelfText: {
     fontFamily: 'DejaVuSans',
     fontSize: 32,
     alignSelf: 'center',
-    paddingTop: 10,
-    marginTop: 75,
-    marginBottom: 30
+    paddingTop: '4%',
+    marginTop: '15%',
+    marginBottom: '10%'
   },
   topTexts: {
     fontFamily: 'DejaVuSans',
@@ -19,27 +18,28 @@ const styles = StyleSheet.create({
     alignSelf: 'center'
   },
   dataInputView: {
-    paddingTop: 20,
+    paddingTop: '7%',
     alignSelf: 'center',
     alignItems: 'center'
   },
   dataFormBox: {
-    paddingHorizontal: 30
+    paddingHorizontal: '8.5%'
   },
   creatingNewAccountText: {
-    marginTop: 10,
+    marginTop: '2%',
+    alignSelf: 'center',
     fontFamily: 'DejaVuSans',
     fontSize: 13
   },
   driverPassengerSwitchButtonGroup: {
-    paddingTop: 10,
-    paddingBottom: 30
+    paddingTop: '2%',
+    paddingBottom: '5%'
   },
   buttons: {
     borderRadius: 20,
     borderColor: 'black',
     borderWidth: 1,
-    marginTop: 20
+    marginTop: '5%'
   },
   buttonText: {
     fontFamily: 'DejaVuSans',
@@ -56,15 +56,15 @@ const styles = StyleSheet.create({
     borderColor: 'black'
   },
   policyPrivacyTermsAndConditionsStack: {
-    paddingBottom: 50,
+    paddingBottom: '7%',
     alignItems: 'baseline'
   },
   policyPrivacyTermsAndConditionsButtons: {
-    paddingLeft: 100,
-    paddingTop: 10
+    paddingLeft: '32%',
+    paddingTop: '2%'
   },
   andConnectorText: {
-    marginRight: -100
+    marginRight: '-31%'
   },
   rulesAndTermsButtonText: {
     alignSelf: 'center',
@@ -89,13 +89,13 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   registerButton: {
-    borderRadius: 10,
+    borderRadius: 20,
     borderColor: 'black',
     borderWidth: 1,
     marginTop: 25,
     marginBottom: 25,
-    width: 275,
-    alignSelf: 'center'
+    width: windowWidth/1.5,
+    alignSelf: 'center',
   },
   agreementText: {
     fontFamily: 'DejaVuSans',
@@ -133,14 +133,14 @@ const styles = StyleSheet.create({
     marginLeft: 15,
   },
   termsAndPrivacyBackButtons: {
-    marginBottom: 25,
-    width: 300,
+    marginBottom: '5%',
+    width: windowWidth/1.5,
     alignSelf: 'center',
-    borderColor: '#FFB700',
+    borderColor: 'black',
     borderRadius: 20,
-    borderWidth: 2,
+    borderWidth: 1,
     backgroundColor: '#FFB700',
-    marginTop: 25
+    marginTop: '5%'
   },
   termsAndPrivacyBackButtonsText: {
     color: 'black', 
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     paddingTop: 5,
   },
   termsAppView:{
-    paddingTop: 50,
+    paddingTop: '15%',
     justifyContent: 'center',
     alignItems: 'center',
     paddingBottom: 10,

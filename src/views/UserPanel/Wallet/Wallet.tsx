@@ -4,6 +4,7 @@ import  Operations from './Operations';
 import { Text, View, ScrollView } from "@gluestack-ui/themed";
 import { Ionicons, AntDesign, FontAwesome } from '@expo/vector-icons';
 import { TouchableWithoutFeedback } from "react-native";
+import CameraView from "./CameraView";
 export default function Wallet() {
   return(
     <ScrollView>
@@ -85,5 +86,7 @@ const AngleIconView = () => {
   );
 }
 function handlePress() {
-  console.log('');
+  return (
+    <CameraView/>
+  );
 }

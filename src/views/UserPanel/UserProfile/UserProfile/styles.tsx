@@ -4,15 +4,15 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   profileInfoView: {
-    marginTop: 100,
-    paddingBottom: 40,
+    marginTop: '25%',
+    paddingBottom: '10%',
     flexDirection: 'row',
     justifyContent: "center",
     alignItems: 'center',
     borderBottomWidth: 2
   },
   nameSurnameRankView: {
-    width: 200
+    width: '50%'
   },
   userImage: {
     width: 100,
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
   },
   menuOptionsView: {
     paddingTop: 20,
-    height: 350
+    height: '50%'
   },
   menuOptionText: {
     fontWeight: 'normal',
