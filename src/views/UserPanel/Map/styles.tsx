@@ -9,7 +9,7 @@ const styles = StyleSheet.create({
   },
   mapSearchInput:{
     borderRadius: 20,
-    margin: 50,
+    margin: '13%',
     borderColor: 'gray',
     backgroundColor: '#FFF',
     borderWidth: 1,

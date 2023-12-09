@@ -1,7 +1,8 @@
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Dimensions } from 'react-native';
+const windowWidth = Dimensions.get('window').width;
 const styles = StyleSheet.create({
   settingsScrollView: {
-    marginTop: 50
+    marginTop: '10%'
   },
   accountSettingsText: {
     alignSelf: 'center',
@@ -40,32 +41,32 @@ const styles = StyleSheet.create({
   },
   bottomUnderLineView: {
     borderBottomWidth: 2, 
-    width: 300
+    width: windowWidth/1.3
   },
   switchOptionView: {
     flexDirection: 'row', 
     justifyContent: 'space-between',
-    width: 300, 
+    width: '75%', 
     alignItems: 'center',
   },
   switchButtonStyle:{
     marginLeft: 10
   },
   actionButtons: {
-    marginBottom: 25,
-    width: 275,
+    marginBottom: '5%',
+    width: windowWidth/1.5,
     alignSelf: 'center',
     borderColor: '#FFB700',
     borderRadius: 20,
     borderWidth: 2,
     backgroundColor: 'white',
-    marginTop: 10
+    marginTop: '5%'
   },
   changeProfilePhotoButtonText: {
     color: 'black', 
     fontFamily: 'DejaVuSans', 
     fontSize: 12,
-    width: 200,
+    width: '95%',
     textAlign: "center"
   },
   confirmButtonText: {
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 12
   },
   inputDataBox: {
-    paddingHorizontal: 30
+    paddingHorizontal: '10%'
   },
   inputFields: {
     borderRadius: 10,

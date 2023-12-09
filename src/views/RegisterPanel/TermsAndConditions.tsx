@@ -14,7 +14,7 @@ const [isLoaded, setIsLoaded] = useState(false);
   loadCustomFont().then(() => {
     setIsLoaded(true);
   });
-  if (isLoaded) {
+  if (!isLoaded) {
     return null;
   }
   else{ 
@@ -29,8 +29,8 @@ const [isLoaded, setIsLoaded] = useState(false);
 				<View style={styles.termsAppScrollView}>
 					<Text style={styles.termsAndPrivacyHeaderFirst}>§ 1 Pojęcia ogólne</Text>
 					<Text style={styles.textSmallTerms}>1. Regulamin – niniejszy regulamin.</Text>
-						<Text style={styles.textSmallTerms}>2. Aplikacja – aplikacja "YellowCab".</Text>
-						<Text style={styles.textSmallTerms}>3. Usługodawca – firma "YellowCab".</Text>
+						<Text style={styles.textSmallTerms}>2. Aplikacja – aplikacja "YellowCabs".</Text>
+						<Text style={styles.textSmallTerms}>3. Usługodawca – firma "YellowCabs".</Text>
 						<Text style={styles.textSmallTerms}>4. Usługobiorca – każda osoba fizyczna, uzyskująca dostęp do Aplikacji i korzystająca z usług świadczonych za pośrednictwem Aplikacji przez Usługodawcę.</Text>
 						<Text style={styles.textSmallTerms}>5. Komunikacja Drogą Elektroniczną – Komunikacja pomiędzy stronami za pośrednictwem poczty elektronicznej (e-mail).</Text>
 					<Text style={styles.termsAndPrivacyHeader}>§ 2 Postanowienia ogólne</Text>
@@ -102,7 +102,7 @@ const [isLoaded, setIsLoaded] = useState(false);
 						<Text style={styles.textSmallTerms}>4. Usługodawca zastrzega sobie prawo do wyłączenia Aplikacji na stałe, bez wcześniejszego uprzedzania o tym Usługobiorców.</Text>
 						<Text style={styles.textSmallTerms}>5. Usługodawca zastrzega sobie prawo do dokonania cesji w części lub w całości wszelkich swoich praw i obowiązków związanych z Aplikacją, bez zgody i możliwości wyrażania jakichkolwiek sprzeciwów przez Usługobiorców.</Text>
 						<Text style={styles.textSmallTerms}>6. We wszelkich sprawach związanych z działalnością Aplikacji należy kontaktować się z Usługodawcę korzystając z jednej z poniższych form kontaktu:</Text>
-						<Text style={styles.termsAndPrivacyText}>1. Wysyłając wiadomość na adres e-mail: YellowCab@gmail.pl</Text>
+						<Text style={styles.termsAndPrivacyText}>1. Wysyłając wiadomość na adres e-mail: YellowCabs@gmail.pl</Text>
 						<Text style={styles.termsAndPrivacyText}>2. Poprzez połączenie telefoniczne z numerem: +48 694 202 137</Text>
 						<Text style={styles.textSmallTerms}>7. Kontakt przy użyciu wskazanych środków komunikacji wyłącznie w sprawach związanych z prowadzonym Aplikacją.</Text>
 					<Button 

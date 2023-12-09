@@ -4,7 +4,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     position: 'absolute',
     elevation: 5,
-    height: 90
+    height: '11.5%'
   },
   tabBarLabelStyle: {
     marginBottom: 20,

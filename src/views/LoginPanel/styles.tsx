@@ -7,7 +7,7 @@ const styles = StyleSheet.create({
     color: 'white'
   },
   yellowCabsText: {
-    paddingTop: 100,
+    paddingTop: '25%',
     alignSelf: 'center',
     fontFamily: 'DejaVuSans',
     fontSize: 45
@@ -17,7 +17,7 @@ const styles = StyleSheet.create({
     alignContent: 'center',
   },
   dataInputView: {
-    paddingTop: 20,
+    paddingTop: '5%',
     alignSelf: 'center',
     alignItems: 'center'
   },
@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   formInputControlLabelText: {
-    paddingTop: 10,
+    paddingTop: '2%',
     fontFamily: 'DejaVuSans',
     fontSize: 18
   },
@@ -34,7 +34,7 @@ const styles = StyleSheet.create({
     fontSize: 15
   },
   notRememberPasswordButton: {
-    paddingLeft: 100,
+    paddingLeft: '25%',
     paddingTop: 10
   },
   notRememberPasswordButtonText: {
@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderColor: 'black',
     borderWidth: 1,
-    marginTop: 20
+    marginTop: '5%'
   },
   buttonText: {
     fontFamily: 'DejaVuSans',
@@ -57,14 +57,14 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     fontFamily: 'DejaVuSans',
     fontSize: 18, 
-    paddingBottom: 50
+    paddingBottom: '10%'
   },
   recoverPasswordButton: {
-    borderRadius: 10,
+    borderRadius: 20,
     borderColor: 'black',
     borderWidth: 1,
-    marginTop: 75,
-    width: 275,
+    marginTop: '20%',
+    width: '95%',
     alignSelf: 'center'
   }
 });
