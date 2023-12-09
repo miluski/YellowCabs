@@ -3,24 +3,29 @@ const styles = StyleSheet.create({
   ratingScrollView:{
     flex: 1
   },
-  ratingHeader:{
-    fontSize: 40,
+  allRatingContainer:{
+    justifyContent: "center",
     alignItems: "center",
-    marginTop: 30,
+  },
+  ratingHeader:{
+    fontSize: 20, 
+    alignItems: "center",
+    fontFamily: 'DejaVuSans',
+    marginTop: 40,
   },
   singleRatingContainer:{
     width: 320,
-    height: 210,
+    height: 220,
     borderWidth: 2,
     borderRadius: 20,
-    marginTop: 10,
+    marginTop: 20,
   },
   singleRatingContainerViewOnly:{
       width: 320,
       height: 200,
       borderWidth: 2,
       borderRadius: 20,
-      marginTop: 10,
+      marginTop: 20,
   },
   allInfoRating:{
     padding: 10,
@@ -58,19 +63,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginLeft: 20,
     marginRight: 20,
-    marginBottom: 10,
   },  
   skipButton:{
     width: 120,
     borderRadius: 20,
     justifyContent: "center",
     alignItems: "center",
+    backgroundColor: "transparent",
+    borderColor: "#707070",
     borderWidth: 2,
   },
   rateButton:{
     width: 120,
     borderRadius: 20,
     borderColor: "#FFB700",
+    backgroundColor: "transparent",
     borderWidth: 2,
     justifyContent: "center",
     alignItems: "center",
