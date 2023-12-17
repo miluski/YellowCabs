@@ -21,7 +21,7 @@ const DriversRatings = () => {
       </View>
       <View style={styles.allRatingContainer}>
         {driversRatings.map((driver, index) => (
-          <View>
+          <View key={index}>
             <View style={styles.singleRatingContainer}>
               <View style={styles.allInfoRating}>
                 <View>
@@ -35,7 +35,7 @@ const DriversRatings = () => {
                 </View>
                 <View>
                   <View>
-                    <Text style={{ fontSize: 20, marginLeft: 10 }} key={index}>
+                    <Text style={{ fontSize: 20, marginLeft: 10 }}>
                       {driver.name} {driver.surname}
                     </Text>
                   </View>
