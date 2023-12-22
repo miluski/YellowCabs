@@ -19,6 +19,8 @@ interface RouteParams {
 	avatarLink?: string;
 	vibrations?: string;
 	notifications?: string;
+	destination?: any;
+	isRouteStarted?: boolean | undefined;
 }
 export default function BottomTabs() {
 	const route = useRoute();

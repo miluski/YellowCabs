@@ -16,7 +16,7 @@ import {
 	View,
 	ButtonText,
 } from "@gluestack-ui/themed";
-import { GoogleMapsApiCredentials } from "../../../../api.config";
+import { GoogleApiCredentials } from "../../../../api.config";
 const origin = { latitude: 37.3318456, longitude: -122.0296002 };
 const destination = { latitude: 37.771707, longitude: -122.4053769 };
 interface RouteParams {
@@ -61,7 +61,7 @@ const MapViewComponent = (props: { markerVisible: boolean }) => {
 			<MapViewDirections
 				origin={origin}
 				destination={destination}
-				apikey={GoogleMapsApiCredentials.apiKey}
+				apikey={GoogleApiCredentials.apiKey}
 				strokeWidth={3}
 				strokeColor='hotpink'
 			/>
