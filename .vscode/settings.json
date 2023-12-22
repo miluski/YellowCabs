@@ -1,6 +1,0 @@
-{
-    "git.ignoreLimitWarning": true,
-    "prettier.bracketSameLine": true,
-    "prettier.singleAttributePerLine": true,
-    "prettier.useTabs": true
-}
