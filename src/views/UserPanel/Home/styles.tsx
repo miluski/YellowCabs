@@ -105,10 +105,6 @@ const styles = StyleSheet.create({
 		marginTop: "25%",
 		marginBottom: 30,
 	},
-	map: {
-		width: "100%",
-		height: "40%",
-	},
 	mapSearchInput: {
 		borderRadius: 20,
 		margin: 50,
@@ -134,6 +130,7 @@ const styles = StyleSheet.create({
 		width: "100%",
 		height: "65%",
 		borderRadius: 50,
+		marginTop: "-25%",
 	},
 	fromInput: {
 		borderColor: "white",
@@ -241,6 +238,14 @@ const styles = StyleSheet.create({
 		fontFamily: "DejaVuSans",
 		fontSize: 13,
 		marginTop: "8%",
+	},
+	spinner: {
+		alignSelf: "center",
+		width: "100%",
+		height: "100%",
+	},
+	mapTabView: {
+		flex: 1,
 	},
 });
 export default styles;

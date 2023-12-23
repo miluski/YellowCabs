@@ -24,7 +24,7 @@ interface RouteParams {
 }
 export default function BottomTabs() {
 	const route = useRoute();
-	const { rank, userKey, avatarLink, vibrations, notifications } =
+	const routedParams =
 		route.params as RouteParams;
 	return (
 		<Tab.Navigator
@@ -50,7 +50,7 @@ export default function BottomTabs() {
 						/>
 					),
 				}}
-				initialParams={{ userKey, rank, vibrations, notifications }}
+				initialParams={routedParams}
 			/>
 			<Tab.Screen
 				name='Portfel'
@@ -64,7 +64,7 @@ export default function BottomTabs() {
 						/>
 					),
 				}}
-				initialParams={{ userKey, vibrations, notifications }}
+				initialParams={routedParams}
 			/>
 			<Tab.Screen
 				name='Mapa'
@@ -78,7 +78,7 @@ export default function BottomTabs() {
 						/>
 					),
 				}}
-				initialParams={{ rank, vibrations, notifications }}
+				initialParams={routedParams}
 			/>
 			<Tab.Screen
 				name='Konto'
@@ -92,7 +92,7 @@ export default function BottomTabs() {
 						/>
 					),
 				}}
-				initialParams={{ rank, userKey, avatarLink, vibrations, notifications }}
+				initialParams={routedParams}
 			/>
 		</Tab.Navigator>
 	);

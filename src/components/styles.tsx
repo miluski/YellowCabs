@@ -3,6 +3,10 @@ const styles = StyleSheet.create({
 	mapTabView: {
 		flex: 1,
 	},
+    homeMap: {
+        width: "100%",
+        height: "50%",
+    },
 	map: {
 		width: "100%",
 		height: "100%",

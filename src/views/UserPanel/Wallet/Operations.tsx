@@ -25,8 +25,9 @@ const Operations = () => {
 		<>
 			{operationsData.map((operation, index) => (
 			<Text key={index} style={styles.singleOperationText}>
-				<Text style={{fontSize: 13}}> Przejazd: {operation.date} </Text>   
-				<Text style={{color: operation.type === 'inflow' ? 'green' : 'red'}}>   Koszt: {operation.cost}</Text>
+				<Text style={{fontSize: 13}}> Przejazd dnia: {operation.date} </Text> 
+				<Text style={{fontSize: 14}}> 			Koszt: </Text>  
+				<Text style={{color: operation.type === 'inflow' ? 'green' : 'red'}}> {operation.cost}</Text>
 			</Text>
 			))}
 		</>
