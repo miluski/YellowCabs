@@ -65,70 +65,68 @@ export default function SettingsView({ navigation }: any) {
 		useState(finalVibrations);
 	const [isNotificationsSwitchChecked, setIsNotificationsSwitchChecked] =
 		useState(finalNotifications);
-	if (newName && newSurname && phone) {
-		return (
-			<ScrollView style={styles.settingsScrollView}>
-				<Text style={styles.accountSettingsText}>Ustawienia konta</Text>
-				<View style={styles.mainPanelView}>
-					<TextAndAvatarView
+	return (
+		<ScrollView style={styles.settingsScrollView}>
+			<Text style={styles.accountSettingsText}>Ustawienia konta</Text>
+			<View style={styles.mainPanelView}>
+				<TextAndAvatarView
+					name={newName}
+					surname={newSurname}
+					finalRank={finalRank}
+					avatarLink={avatarLink}
+				/>
+				<NotificationsSwitchOption
+					setIsChecked={setIsNotificationsSwitchChecked}
+					isChecked={isNotificationsSwitchChecked}
+				/>
+				<VibrationsSwitchOption
+					setIsChecked={setIsVibrationSwitchChecked}
+					isChecked={isVibrationSwitchChecked}
+				/>
+				{isNotificationsSwitchChecked != finalNotifications ||
+				isVibrationSwitchChecked != finalVibrations ? (
+					<ConfirmButton
+						onPress={() => {
+							HandleChangeAppSettings(
+								String(isVibrationSwitchChecked),
+								String(isNotificationsSwitchChecked),
+								phoneNumber,
+								navigation
+							);
+						}}
+					/>
+				) : (
+					<></>
+				)}
+				<ChangeProfilePhotoButton
+					oldPhone={phoneNumber}
+					navigation={navigation}
+				/>
+				<ActualizePersonalDataSwitchButton
+					actualizePersonalData={actualizePersonalData}
+					setActualizePersonalData={setActualizePersonalData}
+				/>
+				{actualizePersonalData ? (
+					<DataForm
 						name={newName}
 						surname={newSurname}
-						finalRank={finalRank}
-						avatarLink={avatarLink}
-					/>
-					<NotificationsSwitchOption
-						setIsChecked={setIsNotificationsSwitchChecked}
-						isChecked={isNotificationsSwitchChecked}
-					/>
-					<VibrationsSwitchOption
-						setIsChecked={setIsVibrationSwitchChecked}
-						isChecked={isVibrationSwitchChecked}
-					/>
-					{isNotificationsSwitchChecked != finalNotifications ||
-					isVibrationSwitchChecked != finalVibrations ? (
-						<ConfirmButton
-							onPress={() => {
-								HandleChangeAppSettings(
-									String(isVibrationSwitchChecked),
-									String(isNotificationsSwitchChecked),
-									phoneNumber,
-									navigation
-								);
-							}}
-						/>
-					) : (
-						<></>
-					)}
-					<ChangeProfilePhotoButton
+						phone={phone}
 						oldPhone={phoneNumber}
+						password={password}
+						repeatedPassword={repeatedPassword}
+						setName={setName}
+						setSurname={setSurname}
+						setPhone={setPhone}
+						setPassword={setPassword}
+						setRepeatedPassword={setRepeatedPassword}
 						navigation={navigation}
 					/>
-					<ActualizePersonalDataSwitchButton
-						actualizePersonalData={actualizePersonalData}
-						setActualizePersonalData={setActualizePersonalData}
-					/>
-					{actualizePersonalData ? (
-						<DataForm
-							name={newName}
-							surname={newSurname}
-							phone={phone}
-							oldPhone={phoneNumber}
-							password={password}
-							repeatedPassword={repeatedPassword}
-							setName={setName}
-							setSurname={setSurname}
-							setPhone={setPhone}
-							setPassword={setPassword}
-							setRepeatedPassword={setRepeatedPassword}
-							navigation={navigation}
-						/>
-					) : (
-						<></>
-					)}
-				</View>
-			</ScrollView>
-		);
-	}
+				) : (
+					<></>
+				)}
+			</View>
+		</ScrollView>
+	);
 }
 const TextAndAvatarView = (props: {
 	name: string | undefined;
@@ -249,11 +247,11 @@ const ActualizePersonalDataSwitchButton = (props: {
 	);
 };
 const DataForm = (props: {
-	name: string;
-	surname: string;
-	phone: string;
+	name: string | undefined;
+	surname: string | undefined;
+	phone: string | undefined;
 	oldPhone: string | undefined;
-	password: string;
+	password: string | undefined;
 	repeatedPassword: string;
 	setName: any | undefined;
 	setSurname: any | undefined;
@@ -296,33 +294,37 @@ const DataForm = (props: {
 			<ConfirmButton
 				onPress={() => {
 					if (
-						validateData(dataToUpdate.name) &&
-						validateData(dataToUpdate.surname) &&
-						validatePhone(dataToUpdate.phone) &&
+						(dataToUpdate.password || dataToUpdate.repeatedPassword) &&
 						validatePassword(dataToUpdate.password) &&
+						validatePassword(dataToUpdate.repeatedPassword) &&
 						validateRepeatedPassword(
 							dataToUpdate.password,
 							dataToUpdate.repeatedPassword
-						)
-					)
+						) &&
+						validateData(dataToUpdate.name) &&
+						validateData(dataToUpdate.surname) &&
+						validatePhone(dataToUpdate.phone)
+					) {
 						HandleEditData(
 							dataToUpdate,
 							props.oldPhone,
 							true,
 							props.navigation
 						);
-					else if (
+					} else if (
+						!dataToUpdate.password &&
+						!dataToUpdate.repeatedPassword &&
 						validateData(dataToUpdate.name) &&
 						validateData(dataToUpdate.surname) &&
 						validatePhone(dataToUpdate.phone)
-					)
+					) {
 						HandleEditData(
 							dataToUpdate,
 							props.oldPhone,
 							false,
 							props.navigation
 						);
-					else ShowAlert("Błąd", "Wypełnij poprawnie wszystkie pola");
+					} else ShowAlert("Błąd", "Wypełnij poprawnie wszystkie pola");
 				}}
 			/>
 		</Box>
@@ -432,7 +434,7 @@ const PasswordInput = (props: {
 		</FormControl>
 	);
 };
-const ConfirmButton = (props: any) => {
+const ConfirmButton = (props: any | undefined) => {
 	return (
 		<Button
 			bgColor='#FFB700'
@@ -460,18 +462,21 @@ const BadInput = (props: { hintText: string | undefined }) => {
 		</FormControlError>
 	);
 };
-function validateData(data: string) {
-	return data.length >= 3;
+function validateData(data: string | undefined) {
+	return data && data.length >= 3;
 }
-function validatePhone(phone: string) {
+function validatePhone(phone: string | undefined) {
 	var phonePattern = /^[0-9]{9}$/;
-	return phone.length == 9 && phonePattern.test(phone);
+	return phone && phone.length == 9 && phonePattern.test(phone);
 }
-function validatePassword(password: string) {
+function validatePassword(password: string | undefined) {
 	var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-	return password.length >= 8 && passPattern.test(password);
+	return password && password.length >= 8 && passPattern.test(password);
 }
-function validateRepeatedPassword(password: string, repeatedPassword: string) {
+function validateRepeatedPassword(
+	password: string | undefined,
+	repeatedPassword: string | undefined
+) {
 	return repeatedPassword === password;
 }
 async function handleChangeProfilePhoto(props: {
