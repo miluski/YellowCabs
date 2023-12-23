@@ -12,10 +12,12 @@ interface RouteParams {
 	avatarLink?: string;
 	vibrations?: string;
 	notifications?: string;
+	destination?: any;
+	isRouteStarted?: boolean | undefined;
 }
 export default function AccountNavigation() {
 	const route = useRoute();
-	const { rank, userKey, avatarLink, vibrations, notifications } =
+	const routedParams =
 		route.params as RouteParams;
 	return (
 		<Stack.Navigator
@@ -26,44 +28,22 @@ export default function AccountNavigation() {
 			<Stack.Screen
 				name='Account'
 				component={BottomTabs}
-				initialParams={{
-					rank,
-					userKey,
-					avatarLink,
-					vibrations,
-					notifications,
-				}}
+				initialParams={routedParams}
 			/>
 			<Stack.Screen
 				name='RatingsView'
 				component={RatingsView}
-				initialParams={{
-					rank,
-					userKey,
-					vibrations,
-					notifications,
-				}}
+				initialParams={routedParams}
 			/>
 			<Stack.Screen
 				name='SettingsView'
 				component={SettingsView}
-				initialParams={{
-					rank,
-					userKey,
-					avatarLink,
-					vibrations,
-					notifications,
-				}}
+				initialParams={routedParams}
 			/>
 			<Stack.Screen
 				name='TravelHistory'
 				component={TravelHistory}
-				initialParams={{
-					rank,
-					userKey,
-					vibrations,
-					notifications,
-				}}
+				initialParams={routedParams}
 			/>
 		</Stack.Navigator>
 	);

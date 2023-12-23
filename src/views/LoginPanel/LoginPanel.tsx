@@ -300,6 +300,11 @@ async function HandleRetrievedData(
 					avatarLink: url,
 					vibrations: String(user.vibrations),
 					notifications: String(user.notifications),
+					destination: {
+						latitude: 0.0000,
+						longitude: 0.0000,
+					},
+					isRouteStarted: false,
 				});
 			} else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
 		}

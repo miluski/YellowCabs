@@ -1,11 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles";
-import MapViewDirections from "react-native-maps-directions";
 import { TouchableWithoutFeedback } from "react-native";
 import { useRoute } from "@react-navigation/native";
 import { Contract } from "./Contract";
-import { EvilIcons, Entypo, Feather } from "@expo/vector-icons";
-import MapView, { Callout, Marker } from "react-native-maps";
+import { Entypo, Feather } from "@expo/vector-icons";
 import {
 	Button,
 	Input,
@@ -16,18 +14,21 @@ import {
 	View,
 	ButtonText,
 } from "@gluestack-ui/themed";
-import { GoogleApiCredentials } from "../../../../api.config";
-const origin = { latitude: 37.3318456, longitude: -122.0296002 };
-const destination = { latitude: 37.771707, longitude: -122.4053769 };
+import setActualUserLocation from "../../../functions/SetActualUserLocation";
+import SearchBarView from "../../../components/SearchBarViewComponent";
+import MapViewComponent from "../../../components/MapViewComponent";
 interface RouteParams {
 	userKey?: string;
 	rank?: string;
+	destination?: any;
+	isRouteStarted?: boolean;
 }
 export default function Home() {
 	const route = useRoute();
-	const { userKey, rank } = route.params as RouteParams;
-	if (rank == "driver") return <DriverHome />;
-	else return <PassengerHome />;
+	let routedProps =
+		route.params as RouteParams;
+	if (routedProps.rank == "driver") return <DriverHome />;
+	else return <PassengerHome props={routedProps}/>;
 }
 const DriverHome = () => {
 	return (
@@ -39,105 +40,77 @@ const DriverHome = () => {
 		</ScrollView>
 	);
 };
-const PassengerHome = () => {
+const PassengerHome = ({props}: any) => {
+	const [userLocation, setUserLocation] = useState({});
+	const [isRetrieved, setIsRetrieved] = useState(false);
+	useEffect(() => {
+		(async () => {
+			await setActualUserLocation({ setUserLocation, setIsRetrieved });
+		})();
+	}, []);
 	return (
-		<>
-			<MapViewComponent markerVisible={false} />
-			<SearchBarView />
-			<BottomOptionsView />
-		</>
-	);
-};
-const MapViewComponent = (props: { markerVisible: boolean }) => {
-	return (
-		<MapView
-			style={styles.map}
-			initialRegion={{
-				latitude: 37.3318456,
-				longitude: -122.0296002,
-				latitudeDelta: 0.0922,
-				longitudeDelta: 0.0421,
-			}}>
-			<MapViewDirections
-				origin={origin}
-				destination={destination}
-				apikey={GoogleApiCredentials.apiKey}
-				strokeWidth={3}
-				strokeColor='hotpink'
-			/>
-			{props.markerVisible ? (
-				<>
-					<Marker
-						coordinate={destination}
-						title='Marker Title'
-						description='Marker Description'>
-						<Callout tooltip={true}>
-							<View>
-								<Text>Miejsce spotkania</Text>
-							</View>
-						</Callout>
-					</Marker>
-					<Marker
-						coordinate={origin}
-						title='Marker Title'
-						description='Marker Description'>
-						<Callout tooltip={true}>
-							<View>
-								<Text>Moja lokalizacja</Text>
-							</View>
-						</Callout>
-					</Marker>
-				</>
+		<View style={styles.mapTabView}>
+			{isRetrieved ? (
+				<PassengerMapView
+					myLocalizationMarkerVisible={true}
+					destinationLocalizationMarkerVisible={props.isRouteStarted}
+					userLocation={userLocation}
+					setUserLocation={setUserLocation}
+					destination={props.destination}
+					isRouteStarted={props.isRouteStarted}
+					mapScreenName="HomeScreen"
+				/>
 			) : (
 				<></>
 			)}
-		</MapView>
+		</View>
 	);
 };
-const SearchBarView = () => {
+const PassengerMapView = (props: {
+	myLocalizationMarkerVisible : boolean;
+	destinationLocalizationMarkerVisible : boolean | undefined;
+	userLocation : any | undefined;
+	setUserLocation : any | undefined;
+	destination : any | undefined;
+	isRouteStarted : any | undefined;
+	mapScreenName: string | undefined;
+}) => {
 	return (
-		<View style={styles.searchInputComponentsView}>
-			<Input style={styles.mapSearchInput}>
-				<InputSlot pl='$3'>
-					<EvilIcons
-						style={styles.searchIcon}
-						name='search'
-						size={32}
-						color='black'
-					/>
-				</InputSlot>
-				<InputField
-					placeholder='Szukaj miejsca'
-					selectionColor={"black"}
-				/>
-			</Input>
+		<View style={styles.mapTabView}>
+			<MapViewComponent {...props} />
+			<SearchBarView setUserLocation={props.setUserLocation} />
+			<BottomOptionsView />
 		</View>
 	);
 };
 const BottomOptionsView = () => {
 	const [isRideStarted, setIsRideStarted] = useState(false);
-	return isRideStarted ? (
+	return (
 		<View style={styles.bottomOptionsMainView}>
-			<FromInput disabled={true} />
-			<ToInput disabled={true} />
-			<Text style={styles.driverIsOnRouteText}>
-				Kierowca już jest w drodze.
-			</Text>
-			<Text style={styles.weWillInformYouText}>
-				Poinformujemy Cię gdy dotrze do Ciebie.
-			</Text>
-			<Text style={styles.yourRouteIsPlacedText}>
-				Twoja trasa została zaznaczona na mapie
-			</Text>
-			<Text style={styles.checkMapText}>Sprawdź mapę</Text>
-			<CancelRideButton setIsRideStarted={setIsRideStarted} />
-		</View>
-	) : (
-		<View style={styles.bottomOptionsMainView}>
-			<FromInput disabled={false} />
-			<ToInput disabled={false} />
-			<ChooseTaxiTypeView />
-			<OrderTaxiButton setIsRideStarted={setIsRideStarted} />
+			{isRideStarted ? (
+				<>
+					<FromInput disabled={true} />
+					<ToInput disabled={true} />
+					<Text style={styles.driverIsOnRouteText}>
+						Kierowca już jest w drodze.
+					</Text>
+					<Text style={styles.weWillInformYouText}>
+						Poinformujemy Cię gdy dotrze do Ciebie.
+					</Text>
+					<Text style={styles.yourRouteIsPlacedText}>
+						Twoja trasa została zaznaczona na mapie
+					</Text>
+					<Text style={styles.checkMapText}>Sprawdź mapę</Text>
+					<CancelRideButton setIsRideStarted={setIsRideStarted} />
+				</>
+			) : (
+				<>
+					<FromInput disabled={false} />
+					<ToInput disabled={false} />
+					<ChooseTaxiTypeView />
+					<OrderTaxiButton setIsRideStarted={setIsRideStarted} />
+				</>
+			)}
 		</View>
 	);
 };
