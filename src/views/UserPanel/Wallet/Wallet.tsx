@@ -4,13 +4,16 @@ import Operations from "./Operations";
 import { Text, View, ScrollView } from "@gluestack-ui/themed";
 import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
 import { TouchableWithoutFeedback } from "react-native";
-import CameraView from "./CameraView";
-export default function Wallet() {
+export default function Wallet({
+	navigation,
+}: {
+	navigation: any;
+}) {
 	return (
 		<ScrollView>
 			<Text style={styles.yourWalletText}>Twój portfel</Text>
 			<AccountBalanceView />
-			<TopUpAccountView />
+			<TopUpAccountView navigation={navigation} />
 			<View style={styles.operationsView}>
 				<Text style={styles.lastOperationsText}> Ostatnie operacje </Text>
 				<Operations></Operations>
@@ -36,14 +39,14 @@ const AccountBalanceView = () => {
 		</View>
 	);
 };
-const TopUpAccountView = () => {
+const TopUpAccountView = ({ navigation }: any) => {
 	return (
 		<View style={styles.topUpAccountView}>
 			<Text style={styles.topUpAccountText}> Doładuj konto </Text>
 			<View style={styles.scanQrCodeView}>
 				<CameraIconView />
-				<ScanQrCodeTextView />
-				<AngleIconView />
+				<ScanQrCodeTextView navigation={navigation} />
+				<AngleIconView navigation={navigation} />
 			</View>
 		</View>
 	);
@@ -59,16 +62,22 @@ const CameraIconView = () => {
 		</View>
 	);
 };
-const ScanQrCodeTextView = () => {
+const ScanQrCodeTextView = ({ navigation }: any) => {
 	return (
-		<TouchableWithoutFeedback onPress={handlePress}>
+		<TouchableWithoutFeedback
+			onPress={() => {
+				navigation.navigate("CameraView");
+			}}>
 			<Text style={styles.scanQrCodeText}>Skanuj kod QR</Text>
 		</TouchableWithoutFeedback>
 	);
 };
-const AngleIconView = () => {
+const AngleIconView = ({ navigation }: any) => {
 	return (
-		<TouchableWithoutFeedback onPress={handlePress}>
+		<TouchableWithoutFeedback
+			onPress={() => {
+				navigation.navigate("CameraView");
+			}}>
 			<FontAwesome
 				name='angle-right'
 				size={45}
@@ -77,6 +86,3 @@ const AngleIconView = () => {
 		</TouchableWithoutFeedback>
 	);
 };
-function handlePress() {
-	return <CameraView />;
-}

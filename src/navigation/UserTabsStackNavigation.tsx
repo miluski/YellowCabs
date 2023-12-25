@@ -2,6 +2,7 @@ import React from "react";
 import RatingsView from "../views/UserPanel/UserProfile/Ratings/RatingsView";
 import SettingsView from "../views/UserPanel/UserProfile/Settings/SettingsView";
 import TravelHistory from "../views/UserPanel/UserProfile/TravelHistory/TravelHistory";
+import CameraView from "../views/UserPanel/Wallet/CameraView";
 import BottomTabs from "./AppBottomNavigation";
 import { useRoute } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
@@ -15,7 +16,7 @@ interface RouteParams {
 	destination?: any;
 	isRouteStarted?: boolean | undefined;
 }
-export default function AccountNavigation() {
+export default function UserTabsStackNavigation() {
 	const route = useRoute();
 	const routedParams =
 		route.params as RouteParams;
@@ -44,6 +45,10 @@ export default function AccountNavigation() {
 				name='TravelHistory'
 				component={TravelHistory}
 				initialParams={routedParams}
+			/>
+			<Stack.Screen
+				name='CameraView'
+				component={CameraView}
 			/>
 		</Stack.Navigator>
 	);
