@@ -162,12 +162,14 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 			/>
 			<CreateAccountButton
 				onPress={async () => {
-					const isPhoneExists = await checkIfUserExists(parseInt(phoneNumber));
-					if (isPhoneExists)
+					let isValidPhone = validatePhone(phoneNumber);
+					const isPhoneExists = await getUserKeyWhenUserExists(parseInt(phoneNumber));
+					if (isPhoneExists) {
 						setPhoneErrorMessage("Podany numer telefonu już posiada konto!");
+						isValidPhone = false;
+					}
 					const isValidName = validateData(name);
 					const isValidSurname = validateData(surname);
-					const isValidPhone = validatePhone(phoneNumber);
 					const isValidVoivodeship = validateVoivodeship(voivodeship);
 					const isValidDriverLicense = validateDriverLicense(driverlicense);
 					const isValidCardid = validateCardId(cardid);
@@ -187,7 +189,7 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 						);
 					setIsInvalidName(!isValidName);
 					setIsInvalidSurname(!isValidSurname);
-					setIsInvalidPhone(!isValidPhone || isPhoneExists);
+					setIsInvalidPhone(!isValidPhone);
 					setIsInvalidVoivodeship(!isValidVoivodeship);
 					setIsInvalidDriverlicense(!isValidDriverLicense);
 					setIsInvalidCardid(!isValidCardid);
@@ -220,6 +222,7 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 							agreement: !isAgreementNotChecked,
 							role: "driver",
 							secretPassword: generatedSecret,
+							accountBilance: 0.000,
 						};
 						await registerUser(dataObject, props.navigation, generatedSecret);
 					} else if (
@@ -245,6 +248,7 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 							secretPassword: generatedSecret,
 							vibrations: "yes",
 							notifications: "yes",
+							accountBilance: 0.0,
 						};
 						await registerUser(dataObject, props.navigation, generatedSecret);
 					}
@@ -606,14 +610,14 @@ const BadInput = (props: { hintText: string | undefined }) => {
 		</FormControlError>
 	);
 };
-async function checkIfUserExists(phone: number) {
+async function getUserKeyWhenUserExists(phone: number) {
 	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
 		const response = await fetch(requestURL);
 		const data = await response.json();
 		for (const userKey in data) {
 			const user = data[userKey];
-			if (user.phone === phone) return true;
+			if (user.phone === phone) return userKey;
 		}
 		return false;
 	} catch (error) {
@@ -632,6 +636,10 @@ async function registerUser(data: any, navigation: any, secret: string) {
 			body: JSON.stringify(data),
 		});
 		if (postResponse.ok) {
+			const userKey = await getUserKeyWhenUserExists(data.phone);
+			await createUserDirectory(userKey, "transactions");
+			await createUserDirectory(userKey, "ratings");
+			await createUserDirectory(userKey, "travelhistories");
 			ShowAlert(
 				"Sukces",
 				"Pomyślnie zarejestrowano konto!\nTwój sekret to: " +
@@ -639,10 +647,32 @@ async function registerUser(data: any, navigation: any, secret: string) {
 					"\nZapisz go w bezpiecznym miejscu!"
 			);
 			navigation.navigate("LoginPanel");
-		} else ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+		} else {
+			ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+		}
 	} catch (error) {
 		console.error(error);
 		return false;
+	}
+}
+async function createUserDirectory(userKey: any, directoryName: string) {
+	const url = `${FirebaseApiCredentials.databaseURL}/${directoryName}/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const postResponse = await fetch(url, {
+			method: "PATCH",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({temp: "temp"}),
+		});
+
+		if (postResponse.ok) {
+			console.log(
+				`Successfully created directory (${directoryName}) for user: ${userKey}`
+			);
+		}
+	} catch (error) {
+		console.error(error);
 	}
 }
 function getSecret(length: number) {
