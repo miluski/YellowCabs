@@ -247,5 +247,8 @@ const styles = StyleSheet.create({
 	mapTabView: {
 		flex: 1,
 	},
+	suggestionsFlatList: {
+		marginLeft: "14%",
+	},
 });
 export default styles;

@@ -6,15 +6,14 @@ import { GoogleApiCredentials } from "../../api.config";
 import styles from "./styles";
 export default function MapViewComponent(props: {
 	myLocalizationMarkerVisible: boolean;
-	destinationLocalizationMarkerVisible: boolean | undefined;
 	isRouteStarted: boolean | undefined;
 	userLocation: any;
 	destination: any;
-    mapScreenName: string | undefined;
+	mapScreenName: string | undefined;
 }) {
 	return (
 		<MapView
-			style={props.mapScreenName=="HomeScreen"?(styles.homeMap):(styles.map)}
+			style={props.mapScreenName == "HomeScreen" ? styles.homeMap : styles.map}
 			region={{
 				latitude: props.userLocation.latitude,
 				longitude: props.userLocation.longitude,
@@ -40,11 +39,11 @@ export default function MapViewComponent(props: {
 						description='Marker Description'>
 						<Callout tooltip={true}>
 							<View>
-								<Text>Moja lokalizacja</Text>
+								<Text>Miejsce startu</Text>
 							</View>
 						</Callout>
 					</Marker>
-					{props.destinationLocalizationMarkerVisible ? (
+					{props.isRouteStarted ? (
 						<>
 							<Marker
 								coordinate={props.destination}
@@ -52,7 +51,7 @@ export default function MapViewComponent(props: {
 								description='Marker Description'>
 								<Callout tooltip={true}>
 									<View>
-										<Text>Miejsce spotkania</Text>
+										<Text>Miejsce docelowe</Text>
 									</View>
 								</Callout>
 							</Marker>
