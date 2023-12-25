@@ -4,7 +4,7 @@ import RegisterPanel from "../views/RegisterPanel/RegisterPanel";
 import PasswordNotRemember from "../views/LoginPanel/PasswordNotRemember";
 import TermsAndConditions from "../views/RegisterPanel/TermsAndConditions";
 import PrivacyPolicy from "../views/RegisterPanel/PrivacyPolicy";
-import AccountNavigation from "./AccountStackNavigation";
+import UserTabsStackNavigation from "./UserTabsStackNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 const Stack = createStackNavigator();
@@ -34,7 +34,7 @@ export default function AppNavigation() {
 				/>
 				<Stack.Screen
 					name='MainPanel'
-					component={AccountNavigation}
+					component={UserTabsStackNavigation}
 				/>
 			</Stack.Navigator>
 		</NavigationContainer>

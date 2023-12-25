@@ -94,5 +94,10 @@ const styles = StyleSheet.create({
 	paddingBottomView: {
 		height: 100,
 	},
+	cameraMainView: {
+		flex: 1,
+		flexDirection: "column",
+		justifyContent: "center",
+	},
 });
 export default styles;
