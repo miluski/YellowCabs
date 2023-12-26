@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
 		fontSize: 18,
 		paddingTop: 7,
 		backgroundColor: 'white', 
-		borderRadius: 15,           
+		borderRadius: 15,        
 		padding: 10,
 		justifyContent: 'center',
 		marginVertical: 5,
@@ -99,5 +99,41 @@ const styles = StyleSheet.create({
 		flexDirection: "column",
 		justifyContent: "center",
 	},
+	CameraContainer: {
+		flex: 1,
+		flexDirection: 'column',
+		borderRadius: 25,
+	},
+	scanQrText: {
+		paddingTop: 55,
+		fontSize: 30,
+		textAlign: 'center',
+		margin: 10,
+	},
+	barcodeScanner: {
+		flex: 1,
+		flexDirection: 'column',
+		marginTop: 40,
+		alignItems: 'center',
+	},
+	absoluteFillObject: {
+		position: 'absolute',
+		width: 450,
+		height: 450,
+	},
+	Cameratext: {
+		fontSize: 16,
+		textAlign: 'center',
+		margin: 10,
+	},
+	CameraButtonsView: {
+		flexDirection: 'row',
+		justifyContent: 'space-around',
+		margin: 20,
+		padding: 20,
+	},
+	scanAgain:{
+		color: "red",
+	}
 });
 export default styles;
