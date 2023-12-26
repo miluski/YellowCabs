@@ -14,7 +14,10 @@ interface RouteParams {
 	vibrations?: string;
 	notifications?: string;
 	destination?: any;
-	isRouteStarted?: boolean | undefined;
+	isRouteStarted?: boolean;
+	accountBilance? : any;
+	userLocation? : any;
+	myLocalizationMarkerVisible? : boolean;
 }
 export default function UserTabsStackNavigation() {
 	const route = useRoute();
