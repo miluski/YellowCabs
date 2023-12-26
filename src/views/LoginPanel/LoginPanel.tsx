@@ -1,6 +1,6 @@
 import * as Font from "expo-font";
 import styles from "./styles";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FirebaseApiCredentials } from "../../../api.config";
 import { config } from "@gluestack-ui/config";
 import { initializeApp } from "firebase/app";
@@ -20,6 +20,7 @@ import {
 	InputField,
 	ButtonText,
 } from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 export default function LoginPanel({ navigation }: { navigation: any }) {
 	const [isLoaded, setIsLoaded] = useState(false);
 	const loadCustomFont = async () => {
@@ -252,6 +253,26 @@ async function HandleLoginButtonPress(
 	setPhoneNumber: any,
 	setPassword: any
 ) {
+	try {
+		await AsyncStorage.setItem(
+			"MapCredentialsList",
+			JSON.stringify({
+				myLocalizationMarkerVisible: false,
+				isRouteStarted: false,
+				userLocation: {
+					latitude: 0.0,
+					longitude: 0.0,
+				},
+				destination: {
+					latitude: 0.0,
+					longitude: 0.0,
+				},
+				rank: providedData.rank,
+			})
+		);
+	} catch (error) {
+		console.log(error);
+	}
 	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
 	fetch(requestURL)
 		.then((response) => {
@@ -301,10 +322,11 @@ async function HandleRetrievedData(
 					vibrations: String(user.vibrations),
 					notifications: String(user.notifications),
 					destination: {
-						latitude: 0.0000,
-						longitude: 0.0000,
+						latitude: 0.0,
+						longitude: 0.0,
 					},
 					isRouteStarted: false,
+					accountBilance: user.accountBilance,
 				});
 			} else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
 		}

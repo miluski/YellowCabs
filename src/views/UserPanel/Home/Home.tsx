@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles";
 import {
 	Alert,
@@ -20,6 +20,7 @@ import {
 	ButtonText,
 	FlatList,
 } from "@gluestack-ui/themed";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import setActualUserLocation from "../../../functions/SetActualUserLocation";
 import SearchBarView from "../../../components/SearchBarViewComponent";
 import MapViewComponent from "../../../components/MapViewComponent";
@@ -28,14 +29,23 @@ import {
 	GoogleApiCredentials,
 } from "../../../../api.config";
 interface RouteParams {
-	userKey?: string;
 	rank?: string;
+	destination?: any;
+	isRouteStarted?: boolean;
+	myLocalizationMarkerVisible?: boolean;
+	userLocation?: any;
+	userKey?: string;
+	accountBilance?: any;
 }
-export default function Home({ navigation }: any) {
+export default function Home({ navigation }: { navigation: any }) {
 	const route = useRoute();
 	let routedProps = route.params as RouteParams;
+	const passengerHomeProps = {
+		...routedProps,
+		navigation,
+	};
 	if (routedProps.rank == "driver") return <DriverHome />;
-	else return <PassengerHome props={routedProps} />;
+	else return <PassengerHome props={passengerHomeProps} />;
 }
 const DriverHome = () => {
 	return (
@@ -63,7 +73,6 @@ const PassengerHome = ({ props }: any) => {
 				<View style={styles.mapTabView}>
 					<PassengerMapView
 						myLocalizationMarkerVisible={true}
-						destinationLocalizationMarkerVisible={props.isRouteStarted}
 						userLocation={userLocation}
 						setUserLocation={setUserLocation}
 						destination={destination}
@@ -72,6 +81,9 @@ const PassengerHome = ({ props }: any) => {
 						setIsRouteStarted={setIsRouteStarted}
 						mapScreenName='HomeScreen'
 						userKey={props.userKey}
+						navigation={props.navigation}
+						accountBilance={props.accountBilance}
+						rank={props.rank}
 					/>
 				</View>
 			) : (
@@ -82,15 +94,17 @@ const PassengerHome = ({ props }: any) => {
 };
 const PassengerMapView = (props: {
 	myLocalizationMarkerVisible: boolean;
-	destinationLocalizationMarkerVisible: boolean | undefined;
 	userLocation: any | undefined;
-	setUserLocation: any | undefined;
+	setUserLocation: Function;
 	destination: any | undefined;
-	setDestination: any | undefined;
+	setDestination: Function;
 	isRouteStarted: any | undefined;
-	setIsRouteStarted: any | undefined;
+	setIsRouteStarted: Function;
 	mapScreenName: string | undefined;
 	userKey: string | undefined;
+	navigation: any;
+	accountBilance: any | undefined;
+	rank: any | undefined;
 }) => {
 	return (
 		<View style={styles.mapTabView}>
@@ -102,12 +116,15 @@ const PassengerMapView = (props: {
 };
 const BottomOptionsView = (props: {
 	isRouteStarted: any | undefined;
-	setIsRouteStarted: any | undefined;
+	setIsRouteStarted: Function;
 	userLocation: any | undefined;
-	setUserLocation: any | undefined;
+	setUserLocation: Function;
 	destination: any | undefined;
-	setDestination: any | undefined;
+	setDestination: Function;
 	userKey: string | undefined;
+	navigation: any | undefined;
+	accountBilance: any | undefined;
+	rank: any | undefined;
 }) => {
 	const [pricePerKilometer, setPricePerKilometer] = useState(4.99);
 	return (
@@ -133,7 +150,10 @@ const BottomOptionsView = (props: {
 						Twoja trasa została zaznaczona na mapie
 					</Text>
 					<Text style={styles.checkMapText}>Sprawdź mapę</Text>
-					<CancelRideButton setIsRouteStarted={props.setIsRouteStarted} />
+					<CancelRideButton
+						setIsRouteStarted={props.setIsRouteStarted}
+						rank={props.rank}
+					/>
 				</>
 			) : (
 				<>
@@ -153,6 +173,9 @@ const BottomOptionsView = (props: {
 						from={props.userLocation}
 						to={props.destination}
 						pricePerKilometer={pricePerKilometer}
+						navigation={props.navigation}
+						accountBilance={props.accountBilance}
+						rank={props.rank}
 					/>
 				</>
 			)}
@@ -439,6 +462,9 @@ const OrderTaxiButton = (props: {
 	from: any;
 	to: any;
 	pricePerKilometer: any;
+	navigation: any;
+	accountBilance: any;
+	rank: any;
 }) => {
 	const finalPrice = async () => {
 		return await calculateCoursePrice({ ...props });
@@ -449,20 +475,30 @@ const OrderTaxiButton = (props: {
 			style={styles.orderTaxiButton}
 			onPress={async () => {
 				if (props.to && props.from) {
-					props.setIsRouteStarted(true);
-					handleOrderTaxiButtonPress({
-						assignedClientUserKey: props.userKey,
-						assignedDriverUserKey: null,
-						from: {
-							latitude: props.from.latitude,
-							longitude: props.from.longitude,
-						},
-						to: {
-							latitude: props.to.latitude,
-							longitude: props.to.longitude,
-						},
-						price: await finalPrice(),
-					});
+					if (props.accountBilance >= (await finalPrice())) {
+						const routeCredentials = {
+							...props,
+							myLocalizationMarkerVisible: true,
+							isRouteStarted: true,
+						};
+						await storeRouteCredentials(routeCredentials);
+						props.setIsRouteStarted(true);
+						handleOrderTaxiButtonPress({
+							assignedClientUserKey: props.userKey,
+							assignedDriverUserKey: null,
+							from: {
+								latitude: props.from.latitude,
+								longitude: props.from.longitude,
+							},
+							to: {
+								latitude: props.to.latitude,
+								longitude: props.to.longitude,
+							},
+							price: await finalPrice(),
+						});
+					} else {
+						ShowAlert("Błąd", "Nie masz wystarczających środków na koncie!");
+					}
 				} else {
 					ShowAlert("Błąd", "Proszę uzupełnić miejsce docelowe podróży!");
 				}
@@ -470,6 +506,54 @@ const OrderTaxiButton = (props: {
 			<ButtonText style={styles.buttonText}>Zamów taksówkę</ButtonText>
 		</Button>
 	);
+};
+const CancelRideButton = (props: { setIsRouteStarted: any; rank: string }) => {
+	return (
+		<Button
+			bgColor='#FFB700'
+			style={styles.endRideButton}
+			onPress={async () => {
+				props.setIsRouteStarted(false);
+				const routeCredentials = {
+						myLocalizationMarkerVisible: true,
+						isRouteStarted: false,
+						from: { latitude: 0.0, longitude: 0.0 },
+						to: { latitude: 0.0, longitude: 0.0 },
+						rank: props.rank,
+				};
+				await storeRouteCredentials(routeCredentials);
+			}}>
+			<ButtonText style={styles.buttonText}>Zakończ Przejazd</ButtonText>
+		</Button>
+	);
+};
+const storeRouteCredentials = async (props: {
+	myLocalizationMarkerVisible: boolean;
+	isRouteStarted: boolean;
+	from: any;
+	to: any;
+	rank: string;
+}) => {
+	try {
+		await AsyncStorage.setItem(
+			"MapCredentialsList",
+			JSON.stringify({
+				myLocalizationMarkerVisible: props.myLocalizationMarkerVisible,
+				isRouteStarted: props.isRouteStarted,
+				userLocation: {
+					latitude: props.from.latitude,
+					longitude: props.from.longitude,
+				},
+				destination: {
+					latitude: props.to.latitude,
+					longitude: props.to.longitude,
+				},
+				rank: props.rank,
+			})
+		);
+	} catch (error) {
+		console.log(error);
+	}
 };
 async function calculateCoursePrice(props: {
 	pricePerKilometer: any;
@@ -490,18 +574,6 @@ async function calculateCoursePrice(props: {
 	}
 	return 0.0;
 }
-const CancelRideButton = (props: { setIsRouteStarted: any }) => {
-	return (
-		<Button
-			bgColor='#FFB700'
-			style={styles.endRideButton}
-			onPress={() => {
-				props.setIsRouteStarted(false);
-			}}>
-			<ButtonText style={styles.buttonText}>Zakończ Przejazd</ButtonText>
-		</Button>
-	);
-};
 async function handleOrderTaxiButtonPress(props: {
 	assignedClientUserKey: any;
 	assignedDriverUserKey: any;

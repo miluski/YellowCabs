@@ -5,47 +5,58 @@ import { View } from "@gluestack-ui/themed";
 import MapViewComponent from "../../../components/MapViewComponent";
 import setActualUserLocation from "../../../functions/SetActualUserLocation";
 import SearchBarView from "../../../components/SearchBarViewComponent";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 interface RouteParams {
 	rank?: string;
 	destination?: any;
 	isRouteStarted?: boolean;
+	myLocalizationMarkerVisible?: boolean;
+	userLocation?: any;
 }
 export default function Map() {
 	const route = useRoute();
-	let { rank, destination, isRouteStarted } =
-		route.params as RouteParams;
-	const [userLocation, setUserLocation] = useState({});
+	let routedParams = route.params as RouteParams;
+	const [userLocation, setUserLocation] = useState(routedParams.userLocation);
 	const [isRetrieved, setIsRetrieved] = useState(false);
+	const [mapCredentials, setMapCredentials] = useState(routedParams);
 	useEffect(() => {
 		(async () => {
-			await setActualUserLocation({setUserLocation, setIsRetrieved});
+			const jsonValue = await AsyncStorage.getItem('MapCredentialsList')
+			const routedMapCredentials = jsonValue!=null ? JSON.parse(jsonValue) : null;
+			if(routedMapCredentials!=null && routedMapCredentials.isRouteStarted==true) {
+				setMapCredentials(routedMapCredentials);
+				setUserLocation(routedMapCredentials.userLocation);
+				setIsRetrieved(true);
+			}
+			else
+				await setActualUserLocation({ setUserLocation, setIsRetrieved });
 		})();
 	}, []);
 	return (
 		<>
-		  {isRetrieved ? (
-			<>
-			  {rank === "driver" ? (
-				<DriverMapView
-				  userLocation={userLocation}
-				  setUserLocation={setUserLocation}
-				  destination={destination}
-				  isRouteStarted={isRouteStarted}
-				/>
-			  ) : (
-				<PassengerMapView
-				  userLocation={userLocation}
-				  setUserLocation={setUserLocation}
-				  destination={destination}
-				  isRouteStarted={isRouteStarted}
-				/>
-			  )}
-			</>
-		  ) : (
-			<></>
-		  )}
+			{isRetrieved ? (
+				<>
+					{routedParams.rank === "driver" ? (
+						<DriverMapView
+							userLocation={userLocation}
+							setUserLocation={setUserLocation}
+							destination={mapCredentials.destination}
+							isRouteStarted={mapCredentials.isRouteStarted}
+						/>
+					) : (
+						<PassengerMapView
+							userLocation={userLocation}
+							setUserLocation={setUserLocation}
+							destination={mapCredentials.destination}
+							isRouteStarted={mapCredentials.isRouteStarted}
+						/>
+					)}
+				</>
+			) : (
+				<></>
+			)}
 		</>
-	  );
+	);
 }
 const PassengerMapView = (props: {
 	userLocation: any;
@@ -57,11 +68,10 @@ const PassengerMapView = (props: {
 		<View style={styles.mapTabView}>
 			<MapViewComponent
 				myLocalizationMarkerVisible={true}
-				destinationLocalizationMarkerVisible={false}
 				userLocation={props.userLocation}
 				destination={props.destination}
 				isRouteStarted={props.isRouteStarted}
-				mapScreenName="MapScreen"
+				mapScreenName='MapScreen'
 			/>
 			<SearchBarView setUserLocation={props.setUserLocation} />
 		</View>
@@ -77,11 +87,10 @@ const DriverMapView = (props: {
 		<View style={styles.mapTabView}>
 			<MapViewComponent
 				myLocalizationMarkerVisible={true}
-				destinationLocalizationMarkerVisible={props.isRouteStarted}
 				userLocation={props.userLocation}
 				destination={props.destination}
 				isRouteStarted={props.isRouteStarted}
-				mapScreenName="MapScreen"
+				mapScreenName='MapScreen'
 			/>
 			<SearchBarView setUserLocation={props.setUserLocation} />
 		</View>

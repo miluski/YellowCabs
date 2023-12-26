@@ -5,7 +5,6 @@ import Wallet from "../views/UserPanel/Wallet/Wallet";
 import Map from "../views/UserPanel/Map/Map";
 import UserProfile from "../views/UserPanel/UserProfile/UserProfile/UserProfile";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import { useRoute } from "@react-navigation/native";
 import {
 	AntDesign,
@@ -21,7 +20,10 @@ interface RouteParams {
 	vibrations?: string;
 	notifications?: string;
 	destination?: any;
-	isRouteStarted?: boolean | undefined;
+	isRouteStarted?: boolean;
+	accountBilance? : any;
+	userLocation? : any;
+	myLocalizationMarkerVisible? : boolean;
 }
 export default function BottomTabs() {
 	const route = useRoute();
@@ -78,6 +80,7 @@ export default function BottomTabs() {
 							size={35}
 						/>
 					),
+					unmountOnBlur: true
 				}}
 				initialParams={routedParams}
 			/>
