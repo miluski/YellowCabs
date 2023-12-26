@@ -7,7 +7,7 @@ const searchLocationBarStyles = StyleSheet.create({
 		borderWidth: 1,
 		height: "100%",
 		width: "75%",
-		marginLeft: "15%",
+		marginLeft: "14%",
         marginTop: "10%",
 		paddingHorizontal: "3%",
 	},
