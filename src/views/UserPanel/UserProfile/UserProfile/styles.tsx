@@ -41,7 +41,13 @@ const styles = StyleSheet.create({
 		fontWeight: "normal",
 		fontSize: 20,
 		paddingRight: 30,
-		marginLeft: -20,
+		marginLeft: -25,
+	},
+	menuSettingsOptionText: {
+		fontWeight: "normal",
+		fontSize: 20,
+		paddingRight: 30,
+		marginLeft: -35,
 	},
 	menuOptionBottomText: {
 		fontWeight: "normal",

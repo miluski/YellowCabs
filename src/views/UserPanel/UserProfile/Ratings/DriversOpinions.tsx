@@ -12,12 +12,12 @@ const DriverOpinions = () => {
 		{
 			name: "Michał",
 			surname: "Kowalski",
-			oppinion: "Dobry kierowca",
+			opinion: "Dobry kierowca",
 			rating: 3,
 		},
-		{ name: "Jan", surname: "Jan", oppinion: "Dobry kierowca", rating: 5 },
-		{ name: "Jan", surname: "Jan", oppinion: "Dobry kierowca", rating: 5 },
-		{ name: "Jan", surname: "Jan", oppinion: "Dobry kierowca", rating: 5 },
+		{ name: "Jan", surname: "Jan", opinion: "Dobry kierowca", rating: 5 },
+		{ name: "Jan", surname: "Jan", opinion: "Dobry kierowca", rating: 5 },
+		{ name: "Jan", surname: "Jan", opinion: "Dobry kierowca", rating: 5 },
 	];
 
 	return (
@@ -60,8 +60,8 @@ const DriverOpinions = () => {
 							</View>
 
 							<View>
-								<Text style={styles.yourOppinion}>Opinia:</Text>
-								<Text style={styles.yourOppinion}>{driver.oppinion}</Text>
+								<Text style={styles.yourOpinion}>Opinia:</Text>
+								<Text style={styles.yourOpinion}>{driver.opinion}</Text>
 							</View>
 						</View>
 					</View>
