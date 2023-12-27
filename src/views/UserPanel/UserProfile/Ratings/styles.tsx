@@ -46,7 +46,7 @@ const styles = StyleSheet.create({
 		flex: 1,
 		flexDirection: "row",
 	},
-	yourOppinion: {
+	yourOpinion: {
 		fontSize: 13,
 		marginLeft: 20,
 	},

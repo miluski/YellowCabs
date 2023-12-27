@@ -5,4 +5,5 @@
 /.vscode
 /android
 /config
+/qr_codes
 api.config.js

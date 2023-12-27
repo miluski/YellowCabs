@@ -1,6 +1,6 @@
 import * as Font from "expo-font";
 import styles from "./styles";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FirebaseApiCredentials } from "../../../api.config";
 import { config } from "@gluestack-ui/config";
 import { initializeApp } from "firebase/app";
@@ -262,10 +262,12 @@ async function HandleLoginButtonPress(
 				userLocation: {
 					latitude: 0.0,
 					longitude: 0.0,
+					description: "",
 				},
 				destination: {
 					latitude: 0.0,
 					longitude: 0.0,
+					description: "",
 				},
 				rank: providedData.rank,
 			})

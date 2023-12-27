@@ -51,7 +51,7 @@ const DriversRatings = () => {
 							</View>
 
 							<View>
-								<Text style={styles.yourOppinion}>Twoja opinia:</Text>
+								<Text style={styles.yourOpinion}>Twoja opinia:</Text>
 								<TextInput style={styles.ratingTextInput} />
 							</View>
 

@@ -6,18 +6,18 @@ import styles from "./styles";
 export default function App() {
   const [scanned, setScanned] = useState(false);
   const [data, setData] = useState("");
-  const [hasPermission, setHasPermission] = useState(null);
+  const [hasPermission, setHasPermission] = useState(false);
   const [amount, setAmount] = useState("");
   const [serialnumber, setSerialNumber] = useState("");
 
   useEffect(() => {
     (async () => {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
-      setHasPermission(status === "granted");
+      setHasPermission(status==="granted");
     })();
   }, []);
 
-  const handleBarCodeScanned = ({ data }) => {
+  const handleBarCodeScanned = ({ data }: any) => {
     setScanned(true);
     //Postac kodu qr: JSQR-0001-100-20231231-1a2b3c4d
     //Inna postac qr: MSQR-0001-200-20231231-4a3b2c1d

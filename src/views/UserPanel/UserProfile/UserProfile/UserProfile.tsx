@@ -184,7 +184,7 @@ const SettingsView = (props: {
 					/>
 				</View>
 				<View>
-					<Text style={styles.menuOptionText}>Ustawienia</Text>
+					<Text style={styles.menuSettingsOptionText}>Ustawienia</Text>
 				</View>
 				<View>
 					<FontAwesome
