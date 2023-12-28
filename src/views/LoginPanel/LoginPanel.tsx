@@ -328,7 +328,6 @@ async function HandleRetrievedData(
 						longitude: 0.0,
 					},
 					isRouteStarted: false,
-					accountBilance: user.accountBilance,
 				});
 			} else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
 		}

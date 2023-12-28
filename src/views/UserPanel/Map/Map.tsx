@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { View } from "@gluestack-ui/themed";
 import MapViewComponent from "../../../components/MapViewComponent";
-import setActualUserLocation from "../../../functions/SetActualUserLocation";
+import setActualUserLocation from "../../../functions/setActualUserLocation";
 import SearchBarView from "../../../components/SearchBarViewComponent";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 interface RouteParams {
@@ -19,6 +19,7 @@ export default function Map() {
 	const [userLocation, setUserLocation] = useState(routedParams.userLocation);
 	const [isRetrieved, setIsRetrieved] = useState(false);
 	const [mapCredentials, setMapCredentials] = useState(routedParams);
+	const [userLocationDescription, setUserLocationDescription] = useState("");
 	useEffect(() => {
 		(async () => {
 			const jsonValue = await AsyncStorage.getItem('MapCredentialsList')
@@ -29,7 +30,7 @@ export default function Map() {
 				setIsRetrieved(true);
 			}
 			else
-				await setActualUserLocation({ setUserLocation, setIsRetrieved });
+				await setActualUserLocation({ setUserLocation, setIsRetrieved, setUserLocationDescription});
 		})();
 	}, []);
 	return (
@@ -73,7 +74,11 @@ const PassengerMapView = (props: {
 				isRouteStarted={props.isRouteStarted}
 				mapScreenName='MapScreen'
 			/>
-			<SearchBarView setUserLocation={props.setUserLocation} />
+			{props.isRouteStarted ? (
+				<></>
+			) : (
+				<SearchBarView setUserLocation={props.setUserLocation} />
+			)}
 		</View>
 	);
 };
@@ -92,7 +97,11 @@ const DriverMapView = (props: {
 				isRouteStarted={props.isRouteStarted}
 				mapScreenName='MapScreen'
 			/>
-			<SearchBarView setUserLocation={props.setUserLocation} />
+			{props.isRouteStarted ? (
+				<></>
+			) : (
+				<SearchBarView setUserLocation={props.setUserLocation} />
+			)}
 		</View>
 	);
 };

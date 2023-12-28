@@ -4,6 +4,7 @@ import { GoogleApiCredentials } from "../../api.config";
 export default async function setActualUserLocation(props: {
 	setUserLocation: any;
 	setIsRetrieved: any;
+	setUserLocationDescription: any;
 }) {
 	let { status } = await Location.requestForegroundPermissionsAsync();
 	if (status === "granted") {
@@ -20,6 +21,7 @@ export default async function setActualUserLocation(props: {
 						longitude: retrievedData.coords.longitude,
 						description: data.results[0].name,
 					});
+					props.setUserLocationDescription(data.results[0].name);
 				} else {
 					console.error("Błąd podczas pobierania sugestii miejsc:", data.status);
 				}

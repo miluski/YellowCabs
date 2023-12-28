@@ -20,8 +20,6 @@ import {
 	ButtonText,
 	FlatList,
 } from "@gluestack-ui/themed";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import setActualUserLocation from "../../../functions/SetActualUserLocation";
 import SearchBarView from "../../../components/SearchBarViewComponent";
 import MapViewComponent from "../../../components/MapViewComponent";
 import {
@@ -30,6 +28,9 @@ import {
 } from "../../../../api.config";
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
+import getActualAccountBilance from "../../../functions/getActualAccountBilance";
+import setActualUserLocation from "../../../functions/SetActualUserLocation";
+import storeRouteCredentials from "../../../functions/storeRouteCredentials";
 interface RouteParams {
 	rank?: string;
 	destination?: any;
@@ -37,17 +38,25 @@ interface RouteParams {
 	myLocalizationMarkerVisible?: boolean;
 	userLocation?: any;
 	userKey?: string;
-	accountBilance?: any;
 }
 export default function Home({ navigation }: { navigation: any }) {
 	const route = useRoute();
 	let routedProps = route.params as RouteParams;
-	const passengerHomeProps = {
-		...routedProps,
-		navigation,
-	};
-	if (routedProps.rank == "driver") return <DriverHome />;
-	else return <PassengerHome {...passengerHomeProps} />;
+	const [accountBilance, setAccountBilance] = useState(null);
+	useEffect(() => {
+		(async () => {
+			setAccountBilance(await getActualAccountBilance(routedProps.userKey));
+		})();
+	}, []);
+	if (accountBilance != null) {
+		const passengerHomeProps = {
+			...routedProps,
+			accountBilance: accountBilance,
+			navigation,
+		};
+		if (routedProps.rank == "driver") return <DriverHome />;
+		else return <PassengerHome {...passengerHomeProps} />;
+	} else return <></>;
 }
 const DriverHome = () => {
 	return (
@@ -64,9 +73,47 @@ const PassengerHome = (props: any) => {
 	const [destination, setDestination] = useState({});
 	const [isRetrieved, setIsRetrieved] = useState(false);
 	const [isRouteStarted, setIsRouteStarted] = useState(false);
+	const [userLocationDescription, setUserLocationDescription] = useState("");
+	const [destinationDescription, setDestinationDescription] = useState("");
+	const [
+		hasToCheckIsOrderRefusedByDriver,
+		setHasToCheckIsOrderRefusedByDriver,
+	] = useState(false);
+	const [coursePrice, setCoursePrice] = useState(0.0);
+	if (hasToCheckIsOrderRefusedByDriver) {
+		setHasToCheckIsOrderRefusedByDriver(false);
+		setTimeout(() => {
+			setHasToCheckIsOrderRefusedByDriver(true);
+		}, 2000);
+		(async () => {
+			await handleCheckIsOrderRefused({
+				...props,
+				setIsRouteStarted: setIsRouteStarted,
+			});
+		})();
+	}
 	useEffect(() => {
 		(async () => {
-			await setActualUserLocation({ setUserLocation, setIsRetrieved });
+			const isRideAlreadyStarted = await checkIfRideIsAlreadyStarted({
+				userKey: props.userKey,
+				setUserLocation: setUserLocation,
+				setUserLocationDescription: setUserLocationDescription,
+				setDestination: setDestination,
+				setDestinationDescription: setDestinationDescription,
+				setIsRouteStarted: setIsRouteStarted,
+				setIsRetrieved: setIsRetrieved,
+				setHasToCheckIsOrderRefusedByDriver:
+					setHasToCheckIsOrderRefusedByDriver,
+				hasToCheckIsOrderRefusedByDriver: hasToCheckIsOrderRefusedByDriver,
+				rank: props.rank,
+				setCoursePrice: setCoursePrice,
+			});
+			if (!isRideAlreadyStarted)
+				await setActualUserLocation({
+					setUserLocation,
+					setIsRetrieved,
+					setUserLocationDescription,
+				});
 		})();
 	}, []);
 	const passengerMapViewProps = {
@@ -82,6 +129,13 @@ const PassengerHome = (props: any) => {
 		navigation: props.navigation,
 		accountBilance: props.accountBilance,
 		rank: props.rank,
+		setUserLocationDescription: setUserLocationDescription,
+		setDestinationDescription: setDestinationDescription,
+		destinationDescription: destinationDescription,
+		userLocationDescription: userLocationDescription,
+		setHasToCheckIsOrderRefusedByDriver: setHasToCheckIsOrderRefusedByDriver,
+		setCoursePrice: setCoursePrice,
+		coursePrice: coursePrice,
 	};
 	return (
 		<>
@@ -99,33 +153,32 @@ const PassengerMapView = (props: any) => {
 	return (
 		<View style={styles.mapTabView}>
 			<MapViewComponent {...props} />
-			<SearchBarView setUserLocation={props.setUserLocation} />
+			{props.isRouteStarted ? (
+				<></>
+			) : (
+				<SearchBarView setUserLocation={props.setUserLocation} />
+			)}
 			<BottomOptionsView {...props} />
 		</View>
 	);
 };
 const BottomOptionsView = (props: any) => {
 	const [pricePerKilometer, setPricePerKilometer] = useState(4.99);
-	const [userLocationDescription, setUserLocationDescription] = useState(
-		props.userLocation.description
-	);
-	const [destinationDescription, setDestinationDescription] = useState("");
-	const [coursePrice, setCoursePrice] = useState(0.00);
 	return (
 		<View style={styles.bottomOptionsMainView}>
 			{props.isRouteStarted ? (
 				<>
 					<FromInput
 						disabled={true}
-						userLocationDescription={userLocationDescription}
+						userLocationDescription={props.userLocationDescription}
 						setUserLocation={props.setUserLocation}
-						setUserLocationDescription={setUserLocationDescription}
+						setUserLocationDescription={props.setUserLocationDescription}
 					/>
 					<ToInput
 						disabled={true}
 						setDestination={props.setDestination}
-						destinationDescription={destinationDescription}
-						setDestinationDescription={setDestinationDescription}
+						destinationDescription={props.destinationDescription}
+						setDestinationDescription={props.setDestinationDescription}
 					/>
 					<Text style={styles.driverIsOnRouteText}>
 						Kierowca już jest w drodze.
@@ -142,24 +195,24 @@ const BottomOptionsView = (props: any) => {
 						rank={props.rank}
 						userKey={props.userKey}
 						accountBilance={props.accountBilance}
-						coursePrice={coursePrice}
-						fromDescription={userLocationDescription}
-						toDescription={destinationDescription}
+						coursePrice={props.coursePrice}
+						fromDescription={props.userLocationDescription}
+						toDescription={props.destinationDescription}
 					/>
 				</>
 			) : (
 				<>
 					<FromInput
 						disabled={false}
-						userLocationDescription={userLocationDescription}
+						userLocationDescription={props.userLocationDescription}
 						setUserLocation={props.setUserLocation}
-						setUserLocationDescription={setUserLocationDescription}
+						setUserLocationDescription={props.setUserLocationDescription}
 					/>
 					<ToInput
 						disabled={false}
 						setDestination={props.setDestination}
-						destinationDescription={destinationDescription}
-						setDestinationDescription={setDestinationDescription}
+						destinationDescription={props.destinationDescription}
+						setDestinationDescription={props.setDestinationDescription}
 					/>
 					<ChooseTaxiTypeView setPricePerKilometer={setPricePerKilometer} />
 					<OrderTaxiButton
@@ -167,17 +220,20 @@ const BottomOptionsView = (props: any) => {
 						userKey={props.userKey}
 						from={{
 							...props.userLocation,
-							description: userLocationDescription,
+							description: props.userLocationDescription,
 						}}
 						to={{
 							...props.destination,
-							description: destinationDescription,
+							description: props.destinationDescription,
 						}}
 						pricePerKilometer={pricePerKilometer}
 						navigation={props.navigation}
 						accountBilance={props.accountBilance}
 						rank={props.rank}
-						setCoursePrice={setCoursePrice}
+						setCoursePrice={props.setCoursePrice}
+						setHasToCheckIsOrderRefusedByDriver={
+							props.setHasToCheckIsOrderRefusedByDriver
+						}
 					/>
 				</>
 			)}
@@ -298,9 +354,9 @@ const ToInput = (props: any) => {
 	);
 };
 const findPlace = async (props: any) => {
-	const apiUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${props.searchedPlaceDescription}&language=pl&key=${GoogleApiCredentials.apiKey}`;
+	const endpointUrl = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${props.searchedPlaceDescription}&language=pl&key=${GoogleApiCredentials.apiKey}`;
 	try {
-		const response = await fetch(apiUrl);
+		const response = await fetch(endpointUrl);
 		const data = await response.json();
 		if (data.status === "OK") {
 			const suggestions = data.predictions
@@ -312,10 +368,42 @@ const findPlace = async (props: any) => {
 		console.log("Błąd:", error);
 	}
 };
-async function getLocationFromName(locationName: string) {
-	const apiUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${GoogleApiCredentials.apiKey}`;
+async function checkIfRideIsAlreadyStarted(props: any) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/orders.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
-		const response = await fetch(apiUrl);
+		const response = await fetch(endpointUrl);
+		const data = await response.json();
+		for (const orderKey in data) {
+			const order = data[orderKey];
+			if (order.assignedClientUserKey === props.userKey) {
+				props.setIsRouteStarted(true);
+				props.setHasToCheckIsOrderRefusedByDriver(true);
+				props.setUserLocationDescription(order.from.description);
+				props.setUserLocation(order.from);
+				props.setDestinationDescription(order.to.description);
+				props.setDestination(order.to);
+				props.setIsRetrieved(true);
+				props.setCoursePrice(order.price);
+				const routeCredentials = {
+					myLocalizationMarkerVisible: true,
+					isRouteStarted: true,
+					from: order.from,
+					to: order.to,
+					rank: props.rank,
+				};
+				await storeRouteCredentials(routeCredentials);
+				return true;
+			}
+		}
+	} catch (error) {
+		console.log(error);
+	}
+	return false;
+}
+async function getLocationFromName(locationName: string) {
+	const endpointUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${locationName}&key=${GoogleApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
 		const data = await response.json();
 		if (data.status === "OK" && data.results.length > 0) {
 			const { lat, lng } = data.results[0].geometry.location;
@@ -329,7 +417,7 @@ async function getLocationFromName(locationName: string) {
 		return null;
 	}
 }
-const ChooseTaxiTypeView = (props: {setPricePerKilometer: any}) => {
+const ChooseTaxiTypeView = (props: { setPricePerKilometer: any }) => {
 	const [isStandardTaxi, setIsStandardTaxi] = useState(true);
 	const [isComfortTaxi, setIsComfortTaxi] = useState(false);
 	const [isElectricEcoTaxi, setIsElectricEcoTaxi] = useState(false);
@@ -481,6 +569,7 @@ const OrderTaxiButton = (props: any) => {
 								kilometers: credentials.kilometers,
 							});
 							props.setIsRouteStarted(true);
+							props.setHasToCheckIsOrderRefusedByDriver(true);
 						} else {
 							ShowAlert("Błąd", "Nie masz wystarczających środków na koncie!");
 						}
@@ -516,39 +605,31 @@ const CancelRideButton = (props: any) => {
 					rank: props.rank,
 				};
 				await storeRouteCredentials(routeCredentials);
-				await handleCancelTaxiButtonPress({...props});
+				await handleCancelTaxiButtonPress({ ...props });
 			}}>
 			<ButtonText style={styles.buttonText}>Zakończ Przejazd</ButtonText>
 		</Button>
 	);
 };
-const storeRouteCredentials = async (props: any) => {
-	try {
-		await AsyncStorage.setItem(
-			"MapCredentialsList",
-			JSON.stringify({
-				myLocalizationMarkerVisible: props.myLocalizationMarkerVisible,
-				isRouteStarted: props.isRouteStarted,
-				userLocation: {
-					latitude: props.from.latitude,
-					longitude: props.from.longitude,
-				},
-				destination: {
-					latitude: props.to.latitude,
-					longitude: props.to.longitude,
-				},
-				rank: props.rank,
-			})
-		);
-	} catch (error) {
-		console.log(error);
+async function handleCheckIsOrderRefused(props: any) {
+	const isOrderRefused = await checkIsOrderRefusedByDriver(props.userKey);
+	if (isOrderRefused) {
+		props.setIsRouteStarted(false);
+		const routeCredentials = {
+			myLocalizationMarkerVisible: true,
+			isRouteStarted: false,
+			from: { latitude: 0.0, longitude: 0.0, description: "" },
+			to: { latitude: 0.0, longitude: 0.0, description: "" },
+			rank: props.rank,
+		};
+		await storeRouteCredentials(routeCredentials);
 	}
-};
+}
 async function calculateCoursePrice(props: any) {
-	const apiUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${props.from.latitude},${props.from.longitude}&
+	const endpointUrl = `https://maps.googleapis.com/maps/api/distancematrix/json?units=metric&origins=${props.from.latitude},${props.from.longitude}&
 	destinations=${props.to.latitude},${props.to.longitude}&key=${GoogleApiCredentials.apiKey}`;
 	try {
-		const response = await fetch(apiUrl);
+		const response = await fetch(endpointUrl);
 		const data = await response.json();
 		if (data.status === "OK") {
 			const kilometers = data.rows[0].elements[0].distance.value / 1000;
@@ -586,19 +667,23 @@ async function handleCancelTaxiButtonPress(props: any) {
 				data[orderKey].assignedClientUserKey === props.userKey &&
 				data[orderKey].assignedDriverUserKey
 			) {
-				removeTaxiOrder(orderKey);
-				decrementUserAccountBilance({...props});
-				addUserTransaction({...props});
-				addTravelToUserTravelHistory({...props});
-				addPassengerRating({
+				await decrementUserAccountBilance({ ...props });
+				await incrementDriverAccountBilance({
+					...props,
+					driverUserKey: data[orderKey].assignedDriverUserKey,
+				});
+				await addUserTransaction({ ...props });
+				await addTravelToUserTravelHistory({ ...props });
+				await addPassengerRating({
 					userKey: props.userKey,
 					driverUserKey: data[orderKey].assignedDriverUserKey,
 				});
+				await removeTaxiOrder(orderKey);
 			} else if (
 				data[orderKey].assignedClientUserKey === props.userKey &&
 				!data[orderKey].assignedDriverUserKey
 			) {
-				removeTaxiOrder(orderKey);
+				await removeTaxiOrder(orderKey);
 			}
 		}
 	} catch (error) {
@@ -618,8 +703,9 @@ async function removeTaxiOrder(orderKey: any) {
 async function decrementUserAccountBilance(props: any) {
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	const updatedUserObject = {
-		accountBilance: props.accountBilance - props.coursePrice,
+		accountBilance: Number(props.accountBilance) - Number(props.coursePrice),
 	};
+	console.log(updatedUserObject);
 	try {
 		await fetch(endpointUrl, {
 			method: "PATCH",
@@ -632,11 +718,47 @@ async function decrementUserAccountBilance(props: any) {
 		console.error(error);
 	}
 }
+async function incrementDriverAccountBilance(props: any) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.driverUserKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	const accountBilance = await getDriverAccountBilance({...props});
+	const updatedUserObject = {
+		accountBilance: Number(accountBilance) + Number(props.coursePrice),
+	};
+	console.log(updatedUserObject);
+	try {
+		await fetch(endpointUrl, {
+			method: "PATCH",
+			headers: {
+				"Content-type": "application/json",
+			},
+			body: JSON.stringify(updatedUserObject),
+		});
+	} catch (error) {
+		console.error(error);
+	}
+}
+async function getDriverAccountBilance(props: any) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.driverUserKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
+		const data = await response.json();
+		return data.accountBilance;
+	}
+	catch(error) {
+		console.log(error);
+	}
+	return 0.0;
+}
 async function addUserTransaction(props: any) {
 	const actualDate = new Date();
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/transactions/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
-	const actualMonth = actualDate.getMonth()+1;
-	const formattedDate = actualDate.getDate() + " - " + actualMonth  + " - " + actualDate.getFullYear();
+	const actualMonth = actualDate.getMonth() + 1;
+	const formattedDate =
+		actualDate.getDate() +
+		" - " +
+		actualMonth +
+		" - " +
+		actualDate.getFullYear();
 	const userTransactionObject = {
 		date: formattedDate,
 		cost: props.coursePrice,
@@ -661,7 +783,7 @@ async function addTravelToUserTravelHistory(props: any) {
 		from: props.fromDescription,
 		to: props.toDescription,
 		day: actualDate.getDate(),
-		month: actualDate.getMonth()+1,
+		month: actualDate.getMonth() + 1,
 		year: actualDate.getFullYear(),
 		hourAndMinute: actualDate.getHours() + ":" + actualDate.getMinutes(),
 	};
@@ -703,13 +825,13 @@ async function getDriverCredentials(driverUserKey: any) {
 	try {
 		const response = await fetch(endpointUrl);
 		const data = await response.json();
-		for(const userKey in data) {
-			if(userKey===driverUserKey) {
+		for (const userKey in data) {
+			if (userKey === driverUserKey) {
 				const user = data[userKey];
 				return {
 					name: user.name,
 					surname: user.surname,
-				}
+				};
 			}
 		}
 	} catch (error) {
@@ -725,9 +847,22 @@ async function getDriverAvatarLink(driverUserKey: any) {
 	try {
 		url = await getDownloadURL(starsRef);
 	} catch (error) {
-		console.log("Not existing driver avatar, setting default");
+		console.log("Not existing user avatar, setting default");
 	}
 	return url;
+}
+async function checkIsOrderRefusedByDriver(userKey: any) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/orders.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
+		const data = await response.json();
+		for (const orderKey in data) {
+			if (data[orderKey].assignedClientUserKey === userKey) return false;
+		}
+	} catch (error) {
+		console.error(error);
+	}
+	return true;
 }
 function ShowAlert(title: string, message: string) {
 	Vibration.vibrate(500);

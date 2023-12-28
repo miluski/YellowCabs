@@ -28,17 +28,17 @@ export default function App({ navigation }: { navigation: any }) {
 				<View style={styles.cameraContainer}>
 					<BarCodeScanner
 						onBarCodeScanned={(qrCode) => {
-								if (!isScanned) {
-									handleBarCodeScanned(
-										qrCode,
-										routedParams.userKey,
-										routedParams.accountBilance,
-										isScanned,
-										setIsScanned,
-										navigation
-									);
-                  setIsScanned(true);
-								}
+							if (!isScanned) {
+								handleBarCodeScanned(
+									qrCode,
+									routedParams.userKey,
+									routedParams.accountBilance,
+									isScanned,
+									setIsScanned,
+									navigation
+								);
+								setIsScanned(true);
+							}
 						}}
 						style={styles.qrCodeScannerContainer}
 					/>
@@ -68,18 +68,18 @@ const handleBarCodeScanned = (
 		(async () => {
 			const isValidQrCode = await isQrCodeValid(parts, qrCode.data);
 			if (isValidQrCode && !isScanned) {
-        const finalAccountBilance = Number(accountBilance) + Number(parts[2]);
+				const finalAccountBilance = Number(accountBilance) + Number(parts[2]);
 				await addFundsToUserWallet(userKey, finalAccountBilance);
 				await addUserTransaction({
 					userKey: userKey,
 					addedFunds: parts[2],
 				});
 				await addExpiredQrCode(qrCode.data);
-				navigation.navigate("Portfel", {
-          userKey: userKey,
-          accountBilance: finalAccountBilance,
-        });
-        ShowAlert("Sukces", "Zasilono konto środkami o wartości " + parts[2] + " zł!");
+				navigation.navigate("Główna");
+				ShowAlert(
+					"Sukces",
+					"Zasilono konto środkami o wartości " + parts[2] + " zł!"
+				);
 			} else {
 				ShowAlert("Błąd", "Zeskanowany kod QR jest nieprawidłowy!");
 				setTimeout(() => {
@@ -90,7 +90,6 @@ const handleBarCodeScanned = (
 	}
 };
 async function isQrCodeValid(qrCodeParts: any, qrCode: any) {
-	console.log(await checkIfQrCodeIsUsedInThePast(qrCode));
 	return (
 		isQrCodePartsLengthValid(qrCodeParts) &&
 		isQrCodeFlagPartValid(qrCodeParts[0]) &&
@@ -139,7 +138,6 @@ async function checkIfQrCodeIsUsedInThePast(qrCode: any) {
 		const response = await fetch(endpointUrl);
 		const data = await response.json();
 		for (const qrCodeKey in data) {
-			console.log(qrCode, data[qrCodeKey].qrCode);
 			if (data[qrCodeKey].qrCode === qrCode) return true;
 		}
 	} catch (error) {

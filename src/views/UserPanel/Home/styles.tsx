@@ -14,11 +14,12 @@ const styles = StyleSheet.create({
 		marginTop: 15,
 	},
 	pinIcon: {
-		marginRight: 35,
+		marginRight: "7%",
 		marginTop: 10,
 	},
 	fromToTextsView: {
 		flexDirection: "column",
+		width: "57%"
 	},
 	kilometersText: {
 		color: "#FFB700",
