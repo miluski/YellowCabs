@@ -6,13 +6,17 @@ import { useRoute } from "@react-navigation/native";
 import styles from "./styles";
 interface RouteParams {
 	rank?: string;
+	userKey?: string;
+	name?: string;
+	surname?: string;
+	avatarLink?: string;
 }
 export default function RatingsView() {
 	const route = useRoute();
-	const { rank } = route.params as RouteParams;
+	const routedParams = route.params as RouteParams;
 	return (
 		<ScrollView style={styles.ratingScrollView}>
-			{rank == "driver" ? <DriverOpinions /> : <DriversRatings />}
+			{routedParams.rank == "driver" ? <DriverOpinions /> : <DriversRatings />}
 		</ScrollView>
 	);
 }

@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
 	textContainerView: {
 		flexWrap: 'wrap',
 		flexDirection: 'row',
-		width: "85%",
+		width: "89%",
 	}
 });
 export default styles;

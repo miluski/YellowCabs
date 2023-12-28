@@ -102,6 +102,9 @@ const MenuOptionView = (props: {
 			<MyRatingsView
 				navigation={props.navigation}
 				rank={props.rank}
+				name={props.name}
+				avatarLink={props.avatarLink}
+				surname={props.surname}
 			/>
 			<SettingsView
 				navigation={props.navigation}
@@ -121,12 +124,15 @@ const MenuOptionView = (props: {
 const MyRatingsView = (props: {
 	navigation: any;
 	rank: string | undefined;
+	name: string | undefined;
+	surname: string | undefined;
+	avatarLink: string | undefined;
 }) => {
 	return (
 		<TouchableWithoutFeedback
 			style={styles.menuOptionView}
 			onPress={() => {
-				handleMyRatings(props.navigation, props.rank);
+				handleMyRatings(props.navigation, props.rank, props.name, props.surname, props.avatarLink);
 			}}>
 			<View style={styles.menuOptionView}>
 				<View style={styles.leftIconView}>
@@ -248,9 +254,18 @@ const LogoutView = (props: { navigation: any }) => {
 		</TouchableWithoutFeedback>
 	);
 };
-function handleMyRatings(navigation: any, rank: string | undefined) {
+function handleMyRatings(
+	navigation: any,
+	rank: string | undefined,
+	name: string | undefined,
+	surname: string | undefined,
+	avatarLink: string | undefined,
+) {
 	navigation.navigate("RatingsView", {
 		rank: rank,
+		name: name,
+		surname: surname,
+		avatarLink: avatarLink
 	});
 }
 function handleSettings(
