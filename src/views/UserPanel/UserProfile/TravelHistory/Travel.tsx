@@ -1,90 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles";
 import { Feather } from "@expo/vector-icons";
 import { Text, View } from "@gluestack-ui/themed";
+import { useRoute } from "@react-navigation/native";
+import { FirebaseApiCredentials } from "../../../../../api.config";
+interface TravelsData {
+	from: string;
+	to: string;
+	day: number;
+	month: number;
+	year: number;
+	hourAndMinute: string;
+}
+interface RouteParams {
+	userKey: string;
+}
 export default function Travel() {
-	const travelsData = [
-		{
-			from: "Los Angeles",
-			to: "San Francisco",
-			day: "23",
-			month: "10",
-			year: "2023",
-			hourAndMinute: "15:45",
-		},
-		{
-			from: "Los Angeles",
-			to: "San Francisco",
-			day: "24",
-			month: "10",
-			year: "2023",
-			hourAndMinute: "16:45",
-		},
-		{
-			from: "Los Angeles",
-			to: "San Francisco",
-			day: "25",
-			month: "10",
-			year: "2023",
-			hourAndMinute: "17:45",
-		},
-		{
-			from: "Los Angeles",
-			to: "San Francisco",
-			day: "26",
-			month: "10",
-			year: "2023",
-			hourAndMinute: "18:45",
-		},
-		{
-			from: "Los Angeles",
-			to: "San Francisco",
-			day: "27",
-			month: "10",
-			year: "2023",
-			hourAndMinute: "19:45",
-		},
-		{
-			from: "San Francisco",
-			to: "Los Angeles",
-			day: "23",
-			month: "11",
-			year: "2023",
-			hourAndMinute: "08:45",
-		},
-		{
-			from: "San Francisco",
-			to: "Los Angeles",
-			day: "23",
-			month: "11",
-			year: "2023",
-			hourAndMinute: "07:45",
-		},
-		{
-			from: "San Francisco",
-			to: "Los Angeles",
-			day: "23",
-			month: "11",
-			year: "2023",
-			hourAndMinute: "06:45",
-		},
-		{
-			from: "San Francisco",
-			to: "Los Angeles",
-			day: "23",
-			month: "11",
-			year: "2023",
-			hourAndMinute: "05:45",
-		},
-		{
-			from: "San Francisco",
-			to: "Los Angeles",
-			day: "23",
-			month: "11",
-			year: "2023",
-			hourAndMinute: "04:45",
-		},
-	];
+	const route = useRoute();
+	const routedParams = route.params as RouteParams;
+	const [travelsData, setTravelsData] = useState<TravelsData[]>([]);
+	useEffect(() => {
+		(async() => {
+			const retrievedTravelData = await getTravelsData(routedParams.userKey);
+			if(retrievedTravelData) 
+				setTravelsData(Object.values(retrievedTravelData));
+			else
+				setTravelsData([]);
+		})();
+	},[]);
 	const groupedTravels: any = {};
 	travelsData.forEach((travel) => {
 		const monthKey = `${travel.year}-${travel.month}`;
@@ -119,9 +62,12 @@ export default function Travel() {
 									color='black'
 								/>
 							</View>
-							<View>
+							<View style={styles.textContainerView}>
 								<Text style={styles.tripTextDest}>
-									Z {travel.from} do {travel.to}
+									Z: {travel.from} 
+								</Text>
+								<Text style={styles.tripDestinationTextDest}>
+									Do: {travel.to}
 								</Text>
 								<Text style={styles.tripTextDate}>
 									{travel.day}.{travel.month}.{travel.year}{" "}
@@ -134,4 +80,16 @@ export default function Travel() {
 			))}
 		</>
 	);
+}
+async function getTravelsData(userKey:string) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/travelhistories/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
+		const data = response.json();
+		return data;
+	}
+	catch(error) {
+		console.error(error);
+	}
+	return null;
 }

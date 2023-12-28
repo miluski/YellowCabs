@@ -22,11 +22,11 @@ const styles = StyleSheet.create({
 	singleTrip: {
 		marginTop: 10,
 		width: "90%",
-		height: windowHeight / 10,
 		borderRadius: 25,
 		borderColor: "black",
 		borderWidth: 2,
-		flexDirection: "row",
+		flexDirection: 'row',
+    	alignItems: 'center',
 	},
 	travelPin: {
 		width: 50,
@@ -48,12 +48,22 @@ const styles = StyleSheet.create({
 		marginTop: 14,
 		fontSize: 13,
 	},
+	tripDestinationTextDest: {
+		marginLeft: 12,
+		fontSize: 13,
+	},
 	tripTextDate: {
 		marginLeft: 12,
 		fontSize: 13,
+		marginBottom: 12
 	},
 	paddingBottomView: {
 		height: 75,
 	},
+	textContainerView: {
+		flexWrap: 'wrap',
+		flexDirection: 'row',
+		width: "85%",
+	}
 });
 export default styles;
