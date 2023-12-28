@@ -29,8 +29,8 @@ import {
 import { initializeApp } from "firebase/app";
 import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import getActualAccountBilance from "../../../functions/getActualAccountBilance";
-import setActualUserLocation from "../../../functions/SetActualUserLocation";
 import storeRouteCredentials from "../../../functions/storeRouteCredentials";
+import setActualUserLocation from "../../../functions/setActualUserLocation";
 interface RouteParams {
 	rank?: string;
 	destination?: any;
@@ -810,6 +810,9 @@ async function addPassengerRating(props: any) {
 		name: driverCredentials?.name,
 		surname: driverCredentials?.surname,
 		avatarLink: driverAvatarLink,
+		driverUserKey: props.driverUserKey,
+		numberOfStars: 1,
+		opinion: "",
 	};
 	try {
 		await fetch(endpointUrl, {
