@@ -516,13 +516,7 @@ const CancelRideButton = (props: any) => {
 					rank: props.rank,
 				};
 				await storeRouteCredentials(routeCredentials);
-				await handleCancelTaxiButtonPress({
-					userKey: props.userKey,
-					accountBilance: props.accountBilance,
-					coursePrice: props.coursePrice,
-					fromDescription: props.fromDescription,
-					toDescription: props.toDescription
-				});
+				await handleCancelTaxiButtonPress({...props});
 			}}>
 			<ButtonText style={styles.buttonText}>Zakończ Przejazd</ButtonText>
 		</Button>
@@ -731,7 +725,7 @@ async function getDriverAvatarLink(driverUserKey: any) {
 	try {
 		url = await getDownloadURL(starsRef);
 	} catch (error) {
-		console.log("Not existing user avatar, setting default");
+		console.log("Not existing driver avatar, setting default");
 	}
 	return url;
 }

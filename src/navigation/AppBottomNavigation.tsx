@@ -66,6 +66,7 @@ export default function BottomTabs() {
 							size={35}
 						/>
 					),
+					unmountOnBlur: true
 				}}
 				initialParams={routedParams}
 			/>

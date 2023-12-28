@@ -636,10 +636,6 @@ async function registerUser(data: any, navigation: any, secret: string) {
 			body: JSON.stringify(data),
 		});
 		if (postResponse.ok) {
-			const userKey = await getUserKeyWhenUserExists(data.phone);
-			await createUserDirectory(userKey, "transactions");
-			await createUserDirectory(userKey, "ratings");
-			await createUserDirectory(userKey, "travelhistories");
 			ShowAlert(
 				"Sukces",
 				"Pomyślnie zarejestrowano konto!\nTwój sekret to: " +
@@ -653,26 +649,6 @@ async function registerUser(data: any, navigation: any, secret: string) {
 	} catch (error) {
 		console.error(error);
 		return false;
-	}
-}
-async function createUserDirectory(userKey: any, directoryName: string) {
-	const url = `${FirebaseApiCredentials.databaseURL}/${directoryName}/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
-	try {
-		const postResponse = await fetch(url, {
-			method: "PATCH",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({temp: "temp"}),
-		});
-
-		if (postResponse.ok) {
-			console.log(
-				`Successfully created directory (${directoryName}) for user: ${userKey}`
-			);
-		}
-	} catch (error) {
-		console.error(error);
 	}
 }
 function getSecret(length: number) {
