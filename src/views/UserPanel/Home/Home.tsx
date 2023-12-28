@@ -679,6 +679,11 @@ async function handleCancelTaxiButtonPress(props: any) {
 					type: "inflow",
 				});
 				await addTravelToUserTravelHistory({ ...props });
+				await addTravelToUserTravelHistory({ 
+					userKey: data[orderKey].assignedDriverUserKey,
+					fromDescription: props.fromDescription,
+					toDescription: props.toDescription
+				});
 				await addPassengerRating({
 					userKey: props.userKey,
 					driverUserKey: data[orderKey].assignedDriverUserKey,
