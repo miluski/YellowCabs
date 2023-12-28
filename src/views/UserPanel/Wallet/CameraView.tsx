@@ -170,9 +170,9 @@ async function addUserTransaction(props: any) {
 	const actualMonth = actualDate.getMonth() + 1;
 	const formattedDate =
 		actualDate.getDate() +
-		" - " +
+		"-" +
 		actualMonth +
-		" - " +
+		"-" +
 		actualDate.getFullYear();
 	const userTransactionObject = {
 		date: formattedDate,

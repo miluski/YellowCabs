@@ -672,7 +672,12 @@ async function handleCancelTaxiButtonPress(props: any) {
 					...props,
 					driverUserKey: data[orderKey].assignedDriverUserKey,
 				});
-				await addUserTransaction({ ...props });
+				await addUserTransaction({ ...props, type: "outflow" });
+				await addUserTransaction({
+					userKey: data[orderKey].assignedDriverUserKey,
+					coursePrice: props.coursePrice,
+					type: "inflow",
+				});
 				await addTravelToUserTravelHistory({ ...props });
 				await addPassengerRating({
 					userKey: props.userKey,
@@ -720,7 +725,7 @@ async function decrementUserAccountBilance(props: any) {
 }
 async function incrementDriverAccountBilance(props: any) {
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.driverUserKey}.json?key=${FirebaseApiCredentials.apiKey}`;
-	const accountBilance = await getDriverAccountBilance({...props});
+	const accountBilance = await getDriverAccountBilance({ ...props });
 	const updatedUserObject = {
 		accountBilance: Number(accountBilance) + Number(props.coursePrice),
 	};
@@ -743,26 +748,22 @@ async function getDriverAccountBilance(props: any) {
 		const response = await fetch(endpointUrl);
 		const data = await response.json();
 		return data.accountBilance;
-	}
-	catch(error) {
+	} catch (error) {
 		console.log(error);
 	}
 	return 0.0;
 }
 async function addUserTransaction(props: any) {
+	console.log(props);
 	const actualDate = new Date();
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/transactions/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	const actualMonth = actualDate.getMonth() + 1;
 	const formattedDate =
-		actualDate.getDate() +
-		" - " +
-		actualMonth +
-		" - " +
-		actualDate.getFullYear();
+		actualDate.getDate() + "-" + actualMonth + "-" + actualDate.getFullYear();
 	const userTransactionObject = {
 		date: formattedDate,
 		cost: props.coursePrice,
-		type: "outflow",
+		type: props.type,
 	};
 	try {
 		await fetch(endpointUrl, {
