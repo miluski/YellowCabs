@@ -6,7 +6,7 @@ import { GoogleApiCredentials } from "../../api.config";
 import styles from "./styles";
 export default function MapViewComponent(props: {
 	myLocalizationMarkerVisible: boolean;
-	isRouteStarted: boolean;
+	isRouteStarted: boolean | undefined;
 	userLocation: any;
 	destination: any;
 	mapScreenName: string;

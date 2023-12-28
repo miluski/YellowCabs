@@ -15,7 +15,6 @@ interface RouteParams {
 	notifications?: string;
 	destination?: any;
 	isRouteStarted?: boolean;
-	accountBilance? : any;
 	userLocation? : any;
 	myLocalizationMarkerVisible? : boolean;
 }

@@ -1,25 +1,31 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles";
 import Operations from "./Operations";
 import { Text, View, ScrollView } from "@gluestack-ui/themed";
 import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
 import { TouchableWithoutFeedback } from "react-native";
+import getActualAccountBilance from "../../../functions/getActualAccountBilance";
 interface RouteParams {
 	userKey: string;
-	accountBilance: number;
 }
 export default function Wallet({ navigation }: { navigation: any }) {
 	const route = useRoute();
 	const routedParams = route.params as RouteParams;
+	const [accountBilance, setAccountBilance] = useState(0.0);
+	useEffect(() => {
+		(async() => {
+			setAccountBilance(await getActualAccountBilance(routedParams.userKey));
+		})();
+	},[]);
 	return (
 		<ScrollView>
 			<Text style={styles.yourWalletText}>Twój portfel</Text>
-			<AccountBalanceView accountBilance={routedParams.accountBilance}/>
+			<AccountBalanceView accountBilance={accountBilance} />
 			<TopUpAccountView
 				navigation={navigation}
 				userKey={routedParams.userKey}
-				accountBilance={routedParams.accountBilance}
+				accountBilance={accountBilance}
 			/>
 			<View style={styles.operationsView}>
 				<Text style={styles.lastOperationsText}> Ostatnie operacje </Text>
@@ -29,12 +35,15 @@ export default function Wallet({ navigation }: { navigation: any }) {
 		</ScrollView>
 	);
 }
-const AccountBalanceView = (props:{accountBilance: number}) => {
+const AccountBalanceView = (props: { accountBilance: any }) => {
 	return (
 		<View style={styles.accountBalanceView}>
 			<View style={styles.accountBalanceDetailsView}>
 				<Text style={styles.accountBilanceTexts}> Bilans konta </Text>
-				<Text style={styles.accountBilanceTexts}> {Math.round(props.accountBilance)} zł </Text>
+				<Text style={styles.accountBilanceTexts}>
+					{" "}
+					{Math.round(props.accountBilance)} zł{" "}
+				</Text>
 			</View>
 			<View style={styles.walletIconView}>
 				<Ionicons
@@ -46,7 +55,11 @@ const AccountBalanceView = (props:{accountBilance: number}) => {
 		</View>
 	);
 };
-const TopUpAccountView = (props: { navigation: any; userKey: string; accountBilance: number; }) => {
+const TopUpAccountView = (props: {
+	navigation: any;
+	userKey: string;
+	accountBilance: any;
+}) => {
 	return (
 		<View style={styles.topUpAccountView}>
 			<Text style={styles.topUpAccountText}> Doładuj konto </Text>
