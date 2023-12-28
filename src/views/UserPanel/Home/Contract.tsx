@@ -22,6 +22,23 @@ export const Contract = () => {
 	const [contractsData, setContractsData] = useState<Contract[]>([]);
 	const [isAccepted, setIsAccepted] = useState(false);
 	const [isFetched, setIsFetched] = useState(false);
+	const [hasToCheckPassengerEndedRide, setHasToCheckPassengerEndedRide] =
+		useState(true);
+	if (hasToCheckPassengerEndedRide) {
+		setHasToCheckPassengerEndedRide(false);
+		setTimeout(() => {
+			setHasToCheckPassengerEndedRide(true);
+		}, 2000);
+		(async () => {
+			await handleCheckIsOrderRefused({
+				userKey: driverUserKey,
+				isAccepted: isAccepted,
+				setIsAccepted: setIsAccepted,
+				setHasToCheckPassengerEndedRide: setHasToCheckPassengerEndedRide,
+				setContractsData: setContractsData,
+			});
+		})();
+	}
 	useEffect(() => {
 		(async () => {
 			const checkIfDriverHasActiveRoutes = await checkIfDriverHasNotEndedRoute({
@@ -66,6 +83,9 @@ export const Contract = () => {
 									contractsData={contractsData}
 									setContractsData={setContractsData}
 									setIsAccepted={setIsAccepted}
+									setHasToCheckPassengerEndedRide={
+										setHasToCheckPassengerEndedRide
+									}
 									contract={contract}
 								/>
 							)}
@@ -113,6 +133,7 @@ const NotAcceptedButtons = (props: {
 	contractsData: any;
 	setContractsData: Function;
 	setIsAccepted: Function;
+	setHasToCheckPassengerEndedRide: Function;
 	contract: any;
 }) => {
 	return (
@@ -145,13 +166,51 @@ const AcceptedButtons = () => {
 		</View>
 	);
 };
+async function handleCheckIsOrderRefused(props: any) {
+	const isOrderRefused = await checkIsOrderRefusedByPassenger(props.userKey);
+	if (isOrderRefused) {
+		props.setIsAccepted(false);
+		props.setHasToCheckPassengerEndedRide(false);
+		const routeCredentials = {
+			myLocalizationMarkerVisible: true,
+			isRouteStarted: false,
+			from: { latitude: 0.0, longitude: 0.0, description: "" },
+			to: { latitude: 0.0, longitude: 0.0, description: "" },
+			rank: props.rank,
+		};
+		const retrievedContracts = await getContracts();
+		if (retrievedContracts) {
+			const contractsArray = Object.values(retrievedContracts) as Contract[];
+			props.setContractsData(
+				contractsArray.filter(
+					(contract) => contract.assignedDriverUserKey === undefined
+				)
+			);
+		} else {
+			props.setContractsData([]);
+		}
+		await storeRouteCredentials(routeCredentials);
+	}
+}
+async function checkIsOrderRefusedByPassenger(userKey: any) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/orders.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
+		const data = await response.json();
+		for (const orderKey in data) {
+			if (data[orderKey].assignedDriverUserKey === userKey) return false;
+		}
+	} catch (error) {
+		console.error(error);
+	}
+	return true;
+}
 async function checkIfDriverHasNotEndedRoute(props: any) {
 	const contracts = await getContracts();
 	for (const contractKey in contracts) {
 		if (contracts[contractKey].assignedDriverUserKey === props.driverUserKey) {
 			props.setContractsData([contracts[contractKey]]);
 			props.setIsAccepted(true);
-			console.log(contracts[contractKey]);
 			const routeCredentials = {
 				myLocalizationMarkerVisible: true,
 				isRouteStarted: true,
@@ -177,6 +236,7 @@ async function getContracts() {
 }
 async function handleRefusePress(props: any) {
 	const orderKey = await getOrderKey({ ...props });
+	props.setHasToCheckPassengerEndedRide(false);
 	if (orderKey) {
 		const endpointUrl = `${FirebaseApiCredentials.databaseURL}/orders/${orderKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 		try {
@@ -212,6 +272,7 @@ async function handleAcceptPress(props: any) {
 			rank: props.rank,
 		};
 		await storeRouteCredentials(routeCredentials);
+		props.setHasToCheckPassengerEndedRide(true);
 	} else {
 		console.error(`Contract with id ${props.userKey} not found.`);
 	}
