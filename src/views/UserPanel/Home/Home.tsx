@@ -710,7 +710,6 @@ async function decrementUserAccountBilance(props: any) {
 	const updatedUserObject = {
 		accountBilance: Number(props.accountBilance) - Number(props.coursePrice),
 	};
-	console.log(updatedUserObject);
 	try {
 		await fetch(endpointUrl, {
 			method: "PATCH",
@@ -729,7 +728,6 @@ async function incrementDriverAccountBilance(props: any) {
 	const updatedUserObject = {
 		accountBilance: Number(accountBilance) + Number(props.coursePrice),
 	};
-	console.log(updatedUserObject);
 	try {
 		await fetch(endpointUrl, {
 			method: "PATCH",
@@ -754,7 +752,6 @@ async function getDriverAccountBilance(props: any) {
 	return 0.0;
 }
 async function addUserTransaction(props: any) {
-	console.log(props);
 	const actualDate = new Date();
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/transactions/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	const actualMonth = actualDate.getMonth() + 1;

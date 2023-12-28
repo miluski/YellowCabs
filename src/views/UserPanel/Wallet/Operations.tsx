@@ -1,36 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "./styles";
 import { Text } from "react-native";
-const Operations = () => {
-	const operationsData = [
-		{ date: "23-11-2023", cost: "23.64zł", type: "inflow" },
-		{ date: "22-11-2023", cost: "21.72zł", type: "inflow" },
-		{ date: "21-11-2023", cost: "12.14zł", type: "outflow" },
-		{ date: "20-11-2023", cost: "23.64zł", type: "inflow" },
-		{ date: "19-11-2023", cost: "21.72zł", type: "outflow" },
-		{ date: "18-11-2023", cost: "12.14zł", type: "outflow" },
-		{ date: "17-11-2023", cost: "23.64zł", type: "outflow" },
-		{ date: "16-11-2023", cost: "21.72zł", type: "inflow" },
-		{ date: "15-11-2023", cost: "12.14zł", type: "inflow" },
-		{ date: "14-10-2023", cost: "23.64zł", type: "outflow" },
-		{ date: "13-10-2023", cost: "21.72zł", type: "inflow" },
-		{ date: "12-10-2023", cost: "12.14zł", type: "outflow" },
-		{ date: "11-10-2023", cost: "23.64zł", type: "inflow" },
-		{ date: "10-10-2023", cost: "21.72zł", type: "outflow" },
-		{ date: "09-10-2023", cost: "12.14zł", type: "inflow" },
-		{ date: "08-10-2023", cost: "23.64zł", type: "inflow" },
-		{ date: "07-10-2023", cost: "21.72zł", type: "outflow" },
-	];
+import { FirebaseApiCredentials } from "../../../../api.config";
+import { useRoute } from "@react-navigation/native";
+interface OperationsData {
+	date: string;
+	cost: number;
+	type: string;
+}
+interface RouteParams {
+	userKey: string;
+}
+export default function Operations () {
+	const route = useRoute();
+	const routedParams = route.params as RouteParams;
+	const [operationsData, setOperationsData] = useState<OperationsData[]>([]);
+	useEffect(() => { 
+		(async() => {
+			const retrievedOperations = await getOperations(routedParams.userKey);
+			if(retrievedOperations)
+				setOperationsData(Object.values(retrievedOperations));
+			else
+				setOperationsData([]);
+		})();
+	}, []);
 	return (
 		<>
 			{operationsData.map((operation, index) => (
 			<Text key={index} style={styles.singleOperationText}>
 				<Text style={{fontSize: 13}}> Data operacji: {operation.date} </Text> 
 				<Text style={{fontSize: 14}}> {operation.type === 'inflow' ? ("		Wpływy:") : ("		Wydatki:")} </Text>  
-				<Text style={{color: operation.type === 'inflow' ? 'green' : 'red'}}> {operation.cost}</Text>
+				<Text style={{color: operation.type === 'inflow' ? 'green' : 'red'}}> {Math.round(operation.cost)} zł</Text>
 			</Text>
 			))}
 		</>
 	);
 };
-export default Operations;
+async function getOperations(userKey: string) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/transactions/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
+		const data = response.json();
+		return data;
+	}
+	catch(error) {
+		console.error(error);
+	}
+	return null;
+}
