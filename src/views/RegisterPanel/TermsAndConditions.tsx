@@ -8,12 +8,15 @@ import {
 	ScrollView,
 	ButtonText,
 } from "@gluestack-ui/themed";
-export default function TermsAndConditions({
-	navigation,
-}: {
-	navigation: any;
-}) {
+import { useRoute } from "@react-navigation/native";
+interface RouteParams {
+	previousScreenName?: string;
+}
+
+export default function TermsAndConditions({navigation,}: {navigation: any;}) {
 	const [isLoaded, setIsLoaded] = useState(false);
+	const route = useRoute();
+	const routedParams = route.params as RouteParams;
 	const loadCustomFont = async () => {
 		await Font.loadAsync({
 			"DejaVuSans-Bold": require("../../assets/fonts/DejaVuSans-Bold.ttf"),
@@ -261,7 +264,7 @@ export default function TermsAndConditions({
 						<Button
 							style={styles.termsAndPrivacyBackButtons}
 							onPress={() => {
-								navigation.navigate("RegisterPanel");
+								navigation.navigate("RegisterPanel", routedParams.previousScreenName === "PrivacyPolicy" ? { previousScreenName: "TermsAndConditions" } : undefined);
 							}}>
 							<ButtonText style={styles.termsAndPrivacyBackButtonsText}>
 								Powrót

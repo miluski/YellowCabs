@@ -101,15 +101,18 @@ const styles = StyleSheet.create({
 		alignSelf: "center",
 		fontFamily: "DejaVuSans",
 		fontSize: 25,
-		paddingTop: 5,
+		paddingTop: 15,
 		paddingBottom: 10,
+		color: "#FFB700",
 	},
 	termsAndPrivacyHeader: {
 		alignSelf: "center",
 		fontFamily: "DejaVuSans",
 		fontSize: 25,
-		paddingTop: 30,
+		paddingTop: 25,
 		paddingBottom: 10,
+		color: "#FFB700",
+		textAlign: "center",
 	},
 	termsAndPrivacyHeaderLine: {
 		alignSelf: "center",
@@ -153,7 +156,9 @@ const styles = StyleSheet.create({
 	},
 	textSmallTerms: {
 		fontFamily: "DejaVuSans",
-		fontSize: 15,
+		fontSize: 14,
+		color: "black",
+		textAlign: "justify",
 	},
 	termsAppScrollView: {
 		marginRight: windowWidth / 20,
