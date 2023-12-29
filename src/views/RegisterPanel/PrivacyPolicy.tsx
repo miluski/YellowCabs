@@ -8,7 +8,14 @@ import {
 	ScrollView,
 	ButtonText,
 } from "@gluestack-ui/themed";
+import { useRoute } from "@react-navigation/native";
+interface RouteParams {
+	previousScreenName?: string;
+}
+
 export default function PrivacyPolicy({ navigation }: { navigation: any }) {
+	const route = useRoute();
+	const routedParams = route.params as RouteParams;
 	const [isLoaded, setIsLoaded] = useState(false);
 	const loadCustomFont = async () => {
 		await Font.loadAsync({
@@ -187,10 +194,7 @@ export default function PrivacyPolicy({ navigation }: { navigation: any }) {
 							imienia i nazwiska.{" "}
 						</Text>
 						<Text style={styles.termsAndPrivacyHeader}>
-							§ 3 Zakres i cel zbierania
-						</Text>
-						<Text style={styles.termsAndPrivacyHeaderLine}>
-							danych osobowych
+							§ 3 Zakres i cel zbierania danych osobowych
 						</Text>
 						<Text style={styles.textSmallTerms}>
 							1. Przetwarzamy niezbędne dane osobowe w celu realizacji usług
@@ -323,7 +327,10 @@ export default function PrivacyPolicy({ navigation }: { navigation: any }) {
 						<Button
 							style={styles.termsAndPrivacyBackButtons}
 							onPress={() => {
-								navigation.navigate("RegisterPanel");
+								navigation.navigate(
+									routedParams.previousScreenName === "RegisterPanel" ? "TermsAndConditions" : "RegisterPanel",
+									routedParams.previousScreenName === "RegisterPanel" ? { previousScreenName: "PrivacyPolicy" } : undefined
+								);
 							}}>
 							<ButtonText style={styles.termsAndPrivacyBackButtonsText}>
 								Powrót

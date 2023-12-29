@@ -642,7 +642,9 @@ async function registerUser(data: any, navigation: any, secret: string) {
 					secret +
 					"\nZapisz go w bezpiecznym miejscu!"
 			);
-			navigation.navigate("LoginPanel");
+			navigation.navigate("PrivacyPolicy", {
+				previousScreenName: "RegisterPanel",
+			});
 		} else {
 			ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
 		}
