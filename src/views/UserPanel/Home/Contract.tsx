@@ -4,7 +4,7 @@ import { Text, Button, ButtonText, VStack, View } from "@gluestack-ui/themed";
 import { SimpleLineIcons } from "@expo/vector-icons";
 import { FirebaseApiCredentials } from "../../../../api.config";
 import { useRoute } from "@react-navigation/native";
-import storeRouteCredentials from "../../../functions/storeRouteCredentials";
+import storeRouteCredentials from "../../../functions/StoreRouteCredentials";
 interface Contract {
 	assignedDriverUserKey: string;
 	assignedClientUserKey: string;

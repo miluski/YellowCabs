@@ -1,10 +1,10 @@
-import React, { useState } from "react";
 import styles from "./styles";
 import { useRoute } from "@react-navigation/native";
-import { View, Text, Image } from "@gluestack-ui/themed";
-import { Ionicons, AntDesign, FontAwesome, Octicons } from "@expo/vector-icons";
 import { TouchableWithoutFeedback } from "react-native";
 import { FirebaseApiCredentials } from "../../../../../api.config";
+import React, { useState } from "react";
+import { View, Text, Image } from "@gluestack-ui/themed";
+import { Ionicons, AntDesign, FontAwesome, Octicons } from "@expo/vector-icons";
 interface RouteParams {
 	rank?: string;
 	userKey?: string;
@@ -17,34 +17,30 @@ export default function UserProfile(props: { navigation: any }) {
 	const [name, setName] = useState("");
 	const [surname, setSurname] = useState("");
 	const [phone, setPhone] = useState("");
-	const { rank, userKey, avatarLink, vibrations, notifications } =
-		route.params as RouteParams;
+	const routedParams = route.params as RouteParams;
 	let finalRank = "Pasażer";
-	if (rank == "driver") finalRank = "Kierowca";
-	SetUserData(userKey, setName, setSurname, setPhone);
+	if (routedParams.rank == "driver") finalRank = "Kierowca";
+	const userProps = {
+		userKey: routedParams.userKey,
+		avatarLink: routedParams.avatarLink,
+		vibrations: routedParams.vibrations,
+		notifications: routedParams.notifications,
+		rank: routedParams.rank,
+		finalRank: finalRank,
+		name: name,
+		surname: surname,
+		phone: phone,
+		navigation: props.navigation,
+	};
+	setUserData(routedParams.userKey, setName, setSurname, setPhone);
 	return (
 		<View style={styles.mainPanelView}>
-			<ProfileInfoView
-				name={name}
-				surname={surname}
-				rank={finalRank}
-				avatarLink={avatarLink}
-			/>
-			<MenuOptionView
-				navigation={props.navigation}
-				phone={phone}
-				name={name}
-				surname={surname}
-				userKey={userKey}
-				avatarLink={avatarLink}
-				vibrations={vibrations}
-				notifications={notifications}
-				rank={rank}
-			/>
+			<ProfileInfoView {...userProps} />
+			<MenuOptionView {...userProps} />
 		</View>
 	);
 }
-async function SetUserData(
+async function setUserData(
 	userKey: string | undefined,
 	setName: Function,
 	setSurname: Function,
@@ -60,19 +56,14 @@ async function SetUserData(
 		setPhone(String(userData.phone));
 	} else return "";
 }
-const ProfileInfoView = (props: {
-	name: string | undefined;
-	surname: string | undefined;
-	rank: string | undefined;
-	avatarLink: string | undefined;
-}) => {
+const ProfileInfoView = (props: any) => {
 	return (
 		<View style={styles.profileInfoView}>
 			<View style={styles.nameSurnameRankView}>
 				<Text style={styles.nameSurnameText}>
 					{props.name} {props.surname}
 				</Text>
-				<Text style={styles.rankText}>{props.rank}</Text>
+				<Text style={styles.rankText}>{props.finalRank}</Text>
 			</View>
 			<View>
 				<Image
@@ -86,53 +77,22 @@ const ProfileInfoView = (props: {
 		</View>
 	);
 };
-const MenuOptionView = (props: {
-	navigation: any;
-	phone: string | undefined;
-	name: string | undefined;
-	surname: string | undefined;
-	userKey: string | undefined;
-	avatarLink: string | undefined;
-	vibrations: string | undefined;
-	notifications: string | undefined;
-	rank: string | undefined;
-}) => {
+const MenuOptionView = (props: any) => {
 	return (
 		<View style={styles.menuOptionsView}>
-			<MyRatingsView
-				navigation={props.navigation}
-				rank={props.rank}
-				name={props.name}
-				avatarLink={props.avatarLink}
-				surname={props.surname}
-			/>
-			<SettingsView
-				navigation={props.navigation}
-				phone={props.phone}
-				name={props.name}
-				surname={props.surname}
-				userKey={props.userKey}
-				avatarLink={props.avatarLink}
-				vibrations={props.vibrations}
-				notifications={props.notifications}
-			/>
+			<MyRatingsView {...props} />
+			<SettingsView {...props} />
 			<TravelHistoryView navigation={props.navigation} />
 			<LogoutView navigation={props.navigation} />
 		</View>
 	);
 };
-const MyRatingsView = (props: {
-	navigation: any;
-	rank: string | undefined;
-	name: string | undefined;
-	surname: string | undefined;
-	avatarLink: string | undefined;
-}) => {
+const MyRatingsView = (props: any) => {
 	return (
 		<TouchableWithoutFeedback
 			style={styles.menuOptionView}
 			onPress={() => {
-				handleMyRatings(props.navigation, props.rank, props.name, props.surname, props.avatarLink);
+				handleMyRatings({ ...props });
 			}}>
 			<View style={styles.menuOptionView}>
 				<View style={styles.leftIconView}>
@@ -145,41 +105,17 @@ const MyRatingsView = (props: {
 				<View>
 					<Text style={styles.menuOptionText}>Moje Oceny</Text>
 				</View>
-				<View>
-					<FontAwesome
-						name='angle-right'
-						size={45}
-						color='black'
-					/>
-				</View>
+				<AngleRightIcon />
 			</View>
 		</TouchableWithoutFeedback>
 	);
 };
-const SettingsView = (props: {
-	navigation: any;
-	phone: string | undefined;
-	name: string | undefined;
-	surname: string | undefined;
-	userKey: string | undefined;
-	avatarLink: string | undefined;
-	vibrations: string | undefined;
-	notifications: string | undefined;
-}) => {
+const SettingsView = (props: any) => {
 	return (
 		<TouchableWithoutFeedback
 			style={styles.menuOptionView}
 			onPress={() => {
-				handleSettings(
-					props.navigation,
-					props.phone,
-					props.name,
-					props.surname,
-					props.userKey,
-					props.avatarLink,
-					props.vibrations,
-					props.notifications
-				);
+				handleSettings({ ...props });
 			}}>
 			<View style={styles.menuOptionView}>
 				<View style={styles.leftIconView}>
@@ -192,13 +128,7 @@ const SettingsView = (props: {
 				<View>
 					<Text style={styles.menuSettingsOptionText}>Ustawienia</Text>
 				</View>
-				<View>
-					<FontAwesome
-						name='angle-right'
-						size={45}
-						color='black'
-					/>
-				</View>
+				<AngleRightIcon />
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -221,13 +151,7 @@ const TravelHistoryView = (props: { navigation: any }) => {
 				<View>
 					<Text style={styles.menuOptionBottomText}>Historia Podróży</Text>
 				</View>
-				<View>
-					<FontAwesome
-						name='angle-right'
-						size={45}
-						color='black'
-					/>
-				</View>
+				<AngleRightIcon />
 			</View>
 		</TouchableWithoutFeedback>
 	);
@@ -254,38 +178,34 @@ const LogoutView = (props: { navigation: any }) => {
 		</TouchableWithoutFeedback>
 	);
 };
-function handleMyRatings(
-	navigation: any,
-	rank: string | undefined,
-	name: string | undefined,
-	surname: string | undefined,
-	avatarLink: string | undefined,
-) {
-	navigation.navigate("RatingsView", {
-		rank: rank,
-		name: name,
-		surname: surname,
-		avatarLink: avatarLink
+const AngleRightIcon = () => {
+	return (
+		<View>
+			<FontAwesome
+				name='angle-right'
+				size={45}
+				color='black'
+			/>
+		</View>
+	);
+};
+function handleMyRatings(props: any) {
+	props.navigation.navigate("RatingsView", {
+		rank: props.rank,
+		name: props.name,
+		surname: props.surname,
+		avatarLink: props.avatarLink,
 	});
 }
-function handleSettings(
-	navigation: any,
-	phone: string | undefined,
-	name: string | undefined,
-	surname: string | undefined,
-	userKey: string | undefined,
-	avatarLink: string | undefined,
-	vibrations: string | undefined,
-	notifications: string | undefined
-) {
-	navigation.navigate("SettingsView", {
-		phoneNumber: phone,
-		name: name,
-		surname: surname,
-		userKey: userKey,
-		avatarLink: avatarLink,
-		vibrations: vibrations,
-		notifications: notifications,
+function handleSettings(props: any) {
+	props.navigation.navigate("SettingsView", {
+		phoneNumber: props.phone,
+		name: props.name,
+		surname: props.surname,
+		userKey: props.userKey,
+		avatarLink: props.avatarLink,
+		vibrations: props.vibrations,
+		notifications: props.notifications,
 	});
 }
 function handleTravelHistory(navigation: any) {

@@ -1,10 +1,10 @@
 import styles from "./styles";
-import { View, Image, Button, ButtonText, Text } from "@gluestack-ui/themed";
-import { AirbnbRating } from "react-native-ratings";
 import { TextInput } from "react-native";
-import React, { useEffect, useState } from "react";
+import { AirbnbRating } from "react-native-ratings";
 import { useRoute } from "@react-navigation/native";
 import { FirebaseApiCredentials } from "../../../../../api.config";
+import React, { useEffect, useState } from "react";
+import { View, Image, Button, ButtonText, Text } from "@gluestack-ui/themed";
 interface RouteParams {
 	userKey?: string;
 	name?: string;
@@ -53,14 +53,9 @@ export default function DriversRatings() {
 								</View>
 							</View>
 							<RatingButtonsView
+								driver={driver}
+								routedParams={routedParams}
 								nodeKey={nodeKey}
-								opinion={driver.opinion}
-								numberOfStars={driver.numberOfStars}
-								driverUserKey={driver.driverUserKey}
-								userKey={routedParams.userKey}
-								userName={routedParams.name}
-								userSurname={routedParams.surname}
-								avatarLink={routedParams.avatarLink}
 								setDriverRatings={setDriversRatings}
 							/>
 							<YourOpinionView
@@ -174,14 +169,9 @@ const YourOpinionView = (props: {
 };
 const RatingButtonsView = (props: {
 	nodeKey: string;
-	numberOfStars: number;
-	opinion: string;
-	driverUserKey: string;
-	userKey: string | undefined;
-	userName: string | undefined;
-	userSurname: string | undefined;
-	avatarLink: string | undefined;
 	setDriverRatings: Function;
+	driver: any;
+	routedParams: any;
 }) => {
 	return (
 		<View style={styles.buttonsRatingContainer}>
@@ -215,7 +205,7 @@ async function getDriversRatings(userKey: any) {
 	return null;
 }
 async function handleSkipOpinion(props: any) {
-	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/ratings/${props.userKey}/${props.nodeKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/ratings/${props.routedParams.userKey}/${props.nodeKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
 		await fetch(endpointUrl, {
 			method: "DELETE",
@@ -223,7 +213,9 @@ async function handleSkipOpinion(props: any) {
 				"Content-type": "application/json",
 			},
 		});
-		const retrievedDriversRatings = await getDriversRatings(props.userKey);
+		const retrievedDriversRatings = await getDriversRatings(
+			props.routedParams.userKey
+		);
 		if (retrievedDriversRatings)
 			props.setDriverRatings(retrievedDriversRatings);
 		else props.setDriverRatings({});
@@ -232,7 +224,7 @@ async function handleSkipOpinion(props: any) {
 	}
 }
 async function handleAcceptOpinion(props: any) {
-	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/ratings/${props.driverUserKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/ratings/${props.driver.driverUserKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
 		await fetch(endpointUrl, {
 			method: "POST",
@@ -240,14 +232,16 @@ async function handleAcceptOpinion(props: any) {
 				"Content-type": "application/json",
 			},
 			body: JSON.stringify({
-				name: props.userName,
-				surname: props.userSurname,
-				opinion: props.opinion,
-				rating: props.numberOfStars,
-				avatarLink: props.avatarLink,
+				name: props.routedParams.name,
+				surname: props.routedParams.surname,
+				opinion: props.driver.opinion,
+				rating: props.driver.numberOfStars,
+				avatarLink: props.routedParams.avatarLink,
 			}),
 		});
-		const retrievedDriversRatings = await getDriversRatings(props.userKey);
+		const retrievedDriversRatings = await getDriversRatings(
+			props.routedParams.userKey
+		);
 		if (retrievedDriversRatings)
 			props.setDriverRatings(retrievedDriversRatings);
 		else props.setDriverRatings({});

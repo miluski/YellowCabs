@@ -79,15 +79,6 @@ const styles = StyleSheet.create({
 		fontFamily: "DejaVuSans",
 		fontSize: 12,
 	},
-	formInputControlLabelText: {
-		paddingTop: 10,
-		fontFamily: "DejaVuSans",
-		fontSize: 18,
-	},
-	formInputErrorLabelText: {
-		fontFamily: "DejaVuSans",
-		fontSize: 15,
-	},
 	registerButton: {
 		borderRadius: 20,
 		borderColor: "black",

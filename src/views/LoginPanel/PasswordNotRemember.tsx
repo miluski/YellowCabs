@@ -1,23 +1,28 @@
 import * as Font from "expo-font";
 import styles from "./styles";
+import showAlert from "../../functions/ShowAlert";
+import getGeneratedSecret from "../../functions/GetGeneratedSecred";
+import validatePhone from "../../functions/ValidatePhone";
+import validateRepeatedPassword from "../../functions/ValidateRepeatedPassword";
+import validatePassword from "../../functions/ValidatePassword";
+import { View } from "react-native";
+import { PasswordInput } from "../../components/PasswordInput";
+import { PhoneInput } from "../../components/PhoneInput";
+import { FirebaseApiCredentials } from "../../../api.config";
 import React, { useState } from "react";
-import { config } from "@gluestack-ui/config";
-import { View, Vibration, Alert } from "react-native";
-import { GluestackUIProvider, Text, Input } from "@gluestack-ui/themed";
 import {
+	Text,
+	Input,
 	Box,
 	FormControl,
 	FormControlError,
 	FormControlErrorText,
-} from "@gluestack-ui/themed";
-import {
 	Button,
 	FormControlLabel,
 	FormControlLabelText,
 	InputField,
 	ButtonText,
 } from "@gluestack-ui/themed";
-import { FirebaseApiCredentials } from "../../../api.config";
 export default function PasswordNotRemember({
 	navigation,
 }: {
@@ -38,16 +43,14 @@ export default function PasswordNotRemember({
 		return null;
 	} else {
 		return (
-			<GluestackUIProvider config={config}>
-				<View style={styles.panelMainView}>
-					<Text style={styles.recoverPasswordText}>Przywracanie hasła</Text>
-					<View style={styles.dataInputView}>
-						<Box>
-							<DataForm navigation={navigation} />
-						</Box>
-					</View>
+			<View style={styles.panelMainView}>
+				<Text style={styles.recoverPasswordText}>Przywracanie hasła</Text>
+				<View style={styles.dataInputView}>
+					<Box>
+						<DataForm navigation={navigation} />
+					</Box>
 				</View>
-			</GluestackUIProvider>
+			</View>
 		);
 	}
 }
@@ -67,6 +70,8 @@ const DataForm = (props: { navigation: any }) => {
 				phoneNumber={phoneNumber}
 				isInvalid={isInvalidPhone}
 				setPhoneNumber={setPhoneNumber}
+				errorMessage={"Wprowadzony telefon jest nieprawidłowy!"}
+				value={undefined}
 			/>
 			<SecretPasswordInput
 				secretPassword={secretPassword}
@@ -78,12 +83,14 @@ const DataForm = (props: { navigation: any }) => {
 				hintText={"Nowe Hasło"}
 				isInvalid={isInvalidPassword}
 				setPassword={setPassword}
+				errorText={"Wprowadzone hasło jest nieprawidłowe!"}
 			/>
 			<PasswordInput
 				password={repeatedPassword}
 				hintText={"Powtórz nowe Hasło"}
 				isInvalid={isInvalidRepeatedPassword}
 				setPassword={setRepeatedPassword}
+				errorText={"Wprowadzone hasło jest nieprawidłowe!"}
 			/>
 			<RecoverPasswordButton
 				onPress={async () => {
@@ -106,7 +113,7 @@ const DataForm = (props: { navigation: any }) => {
 						isValidPassword &&
 						isValidRepeatedPassword
 					)
-						await HandlePasswordRecovery(
+						await handlePasswordRecovery(
 							parseInt(phoneNumber),
 							password,
 							props.navigation
@@ -114,53 +121,6 @@ const DataForm = (props: { navigation: any }) => {
 				}}
 			/>
 		</Box>
-	);
-};
-const PhoneInput = (props: {
-	phoneNumber: string | undefined;
-	isInvalid: boolean | undefined;
-	setPhoneNumber: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isInvalid={props.isInvalid}
-			isReadOnly={false}
-			isRequired={false}>
-			<PhoneLabel />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.phoneNumber}
-					placeholder='123123123'
-					onChangeText={(actualPhoneNumber) => {
-						props.setPhoneNumber(actualPhoneNumber);
-					}}
-					selectionColor={"black"}
-					keyboardType='numeric'
-				/>
-			</Input>
-			<PhoneBadInput />
-		</FormControl>
-	);
-};
-const PhoneLabel = () => {
-	return (
-		<FormControlLabel mb='$1'>
-			<FormControlLabelText style={styles.formInputControlLabelText}>
-				Numer telefonu
-			</FormControlLabelText>
-		</FormControlLabel>
-	);
-};
-const PhoneBadInput = () => {
-	return (
-		<FormControlError>
-			<FormControlErrorText style={styles.formInputErrorLabelText}>
-				Wprowadzony telefon jest nieprawidłowy!
-			</FormControlErrorText>
-		</FormControlError>
 	);
 };
 const SecretPasswordInput = (props: {
@@ -209,53 +169,6 @@ const SecretPasswordBadInput = () => {
 		</FormControlError>
 	);
 };
-const PasswordInput = (props: {
-	password: string | undefined;
-	isInvalid: boolean | undefined;
-	hintText: string;
-	setPassword: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isInvalid={props.isInvalid}
-			isReadOnly={false}
-			isRequired={false}>
-			<PasswordLabel hintText={props.hintText} />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='password'
-					placeholder='********'
-					value={props.password}
-					onChangeText={(actualPassword) => {
-						props.setPassword(actualPassword);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-			<PasswordBadInput />
-		</FormControl>
-	);
-};
-const PasswordLabel = (props: { hintText: string }) => {
-	return (
-		<FormControlLabel mb='$1'>
-			<FormControlLabelText style={styles.formInputControlLabelText}>
-				<Text>{props.hintText}</Text>
-			</FormControlLabelText>
-		</FormControlLabel>
-	);
-};
-const PasswordBadInput = () => {
-	return (
-		<FormControlError>
-			<FormControlErrorText style={styles.formInputErrorLabelText}>
-				Wprowadzone hasło jest nieprawidłowe!
-			</FormControlErrorText>
-		</FormControlError>
-	);
-};
 const RecoverPasswordButton = (props: any) => {
 	return (
 		<Button
@@ -266,16 +179,6 @@ const RecoverPasswordButton = (props: any) => {
 		</Button>
 	);
 };
-async function validatePhone(phone: string) {
-	try {
-		let dataArray: string[] = [phone, ""];
-		const result = await getDataFromDatabase("phone", dataArray);
-		return phone.length == 9 && result;
-	} catch (error) {
-		console.error(error);
-		return false;
-	}
-}
 async function validateSecretPassword(secretPassword: string, phone: string) {
 	try {
 		let dataArray: string[] = [secretPassword, phone];
@@ -286,101 +189,83 @@ async function validateSecretPassword(secretPassword: string, phone: string) {
 		return false;
 	}
 }
-function validatePassword(password: string) {
-	var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-	return password.length >= 8 && passPattern.test(password);
-}
-function validateRepeatedPassword(password: string, repeatedPassword: string) {
-	return repeatedPassword === password;
-}
 async function getDataFromDatabase(dataType: any, providedData: any[]) {
-	const getRequestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
+	const getendpointUrl = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
-		const response = await fetch(getRequestURL);
+		const response = await fetch(getendpointUrl);
 		const data = await response.json();
-		return HandleRetrievedData(data, providedData, dataType);
+		return handleRetrievedData(data, providedData, dataType);
 	} catch (error) {
 		console.error(error);
 		return false;
 	}
 }
-async function HandlePasswordRecovery(
+async function handlePasswordRecovery(
 	phone: number,
 	newPassword: string,
 	navigation: any
 ) {
-	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
-	const generatedSecret = getSecret(8);
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
 	let dataArray: number[] = [phone, 0];
 	try {
-		const response = await fetch(requestURL);
+		const response = await fetch(endpointUrl);
 		const data = await response.json();
-		const userKey = HandleRetrievedData(data, dataArray, "userKey");
+		const userKey = handleRetrievedData(data, dataArray, "userKey") as string;
 		data[userKey].password = newPassword;
-		data[userKey].secretPassword = generatedSecret;
-		const putResponse = await fetch(requestURL, {
-			method: "PUT",
+		data[userKey].secretPassword = getGeneratedSecret(8);
+		actualizeUserPassword({
+			...data[userKey],
+			navigation: navigation,
+			userKey: userKey,
+		});
+	} catch (error) {
+		console.error(error);
+		return false;
+	}
+}
+async function actualizeUserPassword(props: any) {
+	const data = {
+		password: props.password,
+		secretPassword: props.secretPassword,
+	};
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const putResponse = await fetch(endpointUrl, {
+			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
 			},
 			body: JSON.stringify(data),
 		});
 		if (putResponse.ok) {
-			ShowAlert(
+			showAlert(
 				"Sukces",
 				"Pomyślnie odzyskano hasło!\nTwój nowy sekret to: " +
-					generatedSecret +
-					"\nZapisz go w bezpiecznym miejscu!"
+					props.secretPassword +
+					"\nZapisz go w bezpiecznym miejscu!",
+				props.vibrations
 			);
-			navigation.navigate("LoginPanel");
-		} else ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+			props.navigation.navigate("LoginPanel");
+		} else showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", props.vibrations);
 	} catch (error) {
 		console.error(error);
 		return false;
 	}
 }
-function HandleRetrievedData(
-	data: any,
-	providedData: any[],
-	dataType: string
-): any {
-	let isValid = false;
+function handleRetrievedData(data: any, providedData: any[], dataType: string) {
+	let isUserFounded = false;
 	for (const userKey in data) {
 		const user = data[userKey];
 		switch (dataType) {
 			case "phone":
-				isValid = parseInt(providedData[0]) == user.phone;
-				if (isValid) return isValid;
-				break;
+				parseInt(providedData[0]) == user.phone ? (isUserFounded = true) : null;
 			case "secretPassword":
-				isValid =
-					providedData[0] == user.secretPassword &&
-					parseInt(providedData[1]) == user.phone;
-				if (isValid) return isValid;
-				break;
+				if (user.phone == providedData[1]) {
+					return providedData[0] == user.secretPassword;
+				}
 			case "userKey":
-				isValid = parseInt(providedData[0]) == user.phone;
-				if (isValid) return userKey;
-				break;
+				if (parseInt(providedData[0]) == user.phone) return userKey;
 		}
 	}
-	return isValid;
-}
-function getSecret(length: number) {
-	let result = "";
-	const characters =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	const charactersLength = characters.length;
-	for (let i = 0; i < length; i++)
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	return result;
-}
-function ShowAlert(title: string, message: string) {
-	Vibration.vibrate(500);
-	Alert.alert(title, message, [
-		{
-			text: "Ok",
-			style: "cancel",
-		},
-	]);
+	return isUserFounded;
 }

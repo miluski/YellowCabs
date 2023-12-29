@@ -1,15 +1,18 @@
-import React, { useState, useEffect } from "react";
-import { Alert, Text, Vibration, View } from "react-native";
-import { BarCodeScanner } from "expo-barcode-scanner";
-import { Ionicons } from "@expo/vector-icons";
 import styles from "./styles";
+import showAlert from "../../../functions/ShowAlert";
+import { Ionicons } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
+import { BarCodeScanner } from "expo-barcode-scanner";
 import { FirebaseApiCredentials } from "../../../../api.config";
+import { Text, View } from "react-native";
+import React, { useState, useEffect } from "react";
 interface RouteParams {
-	userKey: string;
-	accountBilance: number;
+	userKey?: string;
+	accountBilance?: number;
+	vibrations?: string;
+	notifications?: string;
 }
-export default function App({ navigation }: { navigation: any }) {
+export default function CameraView({ navigation }: { navigation: any }) {
 	const route = useRoute();
 	const routedParams = route.params as RouteParams;
 	const [hasPermission, setHasPermission] = useState(false);
@@ -20,6 +23,15 @@ export default function App({ navigation }: { navigation: any }) {
 			setHasPermission(status === "granted");
 		})();
 	}, []);
+	const cameraViewPropsObject = {
+		userKey: routedParams.userKey,
+		accountBilance: routedParams.accountBilance,
+		vibrations: routedParams.vibrations,
+		notifications: routedParams.notifications,
+		isScanned: isScanned,
+		setIsScanned: setIsScanned,
+		navigation: navigation,
+	};
 	return (
 		<>
 			{hasPermission === null || hasPermission === false ? (
@@ -27,16 +39,12 @@ export default function App({ navigation }: { navigation: any }) {
 			) : (
 				<View style={styles.cameraContainer}>
 					<BarCodeScanner
-						onBarCodeScanned={(qrCode) => {
+						onBarCodeScanned={(qrCode: any) => {
 							if (!isScanned) {
-								handleBarCodeScanned(
-									qrCode,
-									routedParams.userKey,
-									routedParams.accountBilance,
-									isScanned,
-									setIsScanned,
-									navigation
-								);
+								handleBarCodeScanned({
+									...cameraViewPropsObject,
+									qrCode: qrCode,
+								});
 								setIsScanned(true);
 							}
 						}}
@@ -53,37 +61,38 @@ export default function App({ navigation }: { navigation: any }) {
 		</>
 	);
 }
-const handleBarCodeScanned = (
-	qrCode: any,
-	userKey: string,
-	accountBilance: number,
-	isScanned: boolean,
-	setIsScanned: Function,
-	navigation: any
-) => {
-	if (isScanned) {
+const handleBarCodeScanned = (props: any) => {
+	if (props.isScanned) {
 		return;
 	} else {
-		const parts = qrCode.data.split("-");
+		const parts = props.qrCode.data.split("-");
 		(async () => {
-			const isValidQrCode = await isQrCodeValid(parts, qrCode.data);
-			if (isValidQrCode && !isScanned) {
-				const finalAccountBilance = Number(accountBilance) + Number(parts[2]);
-				await addFundsToUserWallet(userKey, finalAccountBilance);
+			const isValidQrCode = await isQrCodeValid(parts, props.qrCode.data);
+			if (isValidQrCode && !props.isScanned) {
+				const finalAccountBilance =
+					Number(props.accountBilance) + Number(parts[2]);
+				await addFundsToUserWallet(props.userKey, finalAccountBilance);
 				await addUserTransaction({
-					userKey: userKey,
+					userKey: props.userKey,
 					addedFunds: parts[2],
 				});
-				await addExpiredQrCode(qrCode.data);
-				navigation.navigate("Główna");
-				ShowAlert(
-					"Sukces",
-					"Zasilono konto środkami o wartości " + parts[2] + " zł!"
-				);
+				await addExpiredQrCode(props.qrCode.data);
+				props.notifications === "yes"
+					? showAlert(
+							"Sukces",
+							"Zasilono konto środkami o wartości " + parts[2] + " zł!",
+							props.vibrations
+					  )
+					: null;
+				props.navigation.navigate("Główna");
 			} else {
-				ShowAlert("Błąd", "Zeskanowany kod QR jest nieprawidłowy!");
+				showAlert(
+					"Błąd",
+					"Zeskanowany kod QR jest nieprawidłowy!",
+					props.vibrations
+				);
 				setTimeout(() => {
-					setIsScanned(false);
+					props.setIsScanned(false);
 				}, 2000);
 			}
 		})();
@@ -146,7 +155,7 @@ async function checkIfQrCodeIsUsedInThePast(qrCode: any) {
 	return false;
 }
 async function addFundsToUserWallet(
-	userKey: string,
+	userKey: string | undefined,
 	finalAccountBilance: number
 ) {
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
@@ -169,11 +178,7 @@ async function addUserTransaction(props: any) {
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/transactions/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	const actualMonth = actualDate.getMonth() + 1;
 	const formattedDate =
-		actualDate.getDate() +
-		"-" +
-		actualMonth +
-		"-" +
-		actualDate.getFullYear();
+		actualDate.getDate() + "-" + actualMonth + "-" + actualDate.getFullYear();
 	const userTransactionObject = {
 		date: formattedDate,
 		cost: props.addedFunds,
@@ -206,13 +211,4 @@ async function addExpiredQrCode(qrCode: any) {
 	} catch (error) {
 		console.error(error);
 	}
-}
-function ShowAlert(title: string, message: string) {
-	Vibration.vibrate(500);
-	Alert.alert(title, message, [
-		{
-			text: "Ok",
-			style: "cancel",
-		},
-	]);
 }

@@ -15,18 +15,18 @@ interface RouteParams {
 	notifications?: string;
 	destination?: any;
 	isRouteStarted?: boolean;
-	userLocation? : any;
-	myLocalizationMarkerVisible? : boolean;
+	userLocation?: any;
+	myLocalizationMarkerVisible?: boolean;
 }
+const screenOptions = {
+	headerShown: false,
+};
 export default function UserTabsStackNavigation() {
 	const route = useRoute();
-	const routedParams =
-		route.params as RouteParams;
+	const routedParams = route.params as RouteParams;
 	return (
 		<Stack.Navigator
-			screenOptions={{
-				headerShown: false,
-			}}
+			screenOptions={screenOptions}
 			initialRouteName='Account'>
 			<Stack.Screen
 				name='Account'

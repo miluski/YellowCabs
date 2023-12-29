@@ -9,15 +9,16 @@ import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { useRoute } from "@react-navigation/native";
 const Stack = createStackNavigator();
-
+const screenOptions = {
+	headerShown: false,
+};
 interface RouteParams {
 	previousScreenName?: string;
 }
-
 export default function AppNavigation() {
 	return (
 		<NavigationContainer>
-			<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Navigator screenOptions={screenOptions}>
 				<Stack.Screen
 					name='LoginPanel'
 					component={LoginPanel}
@@ -46,3 +47,4 @@ export default function AppNavigation() {
 		</NavigationContainer>
 	);
 }
+  

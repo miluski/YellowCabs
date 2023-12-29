@@ -1,9 +1,9 @@
 import styles from "./styles";
-import { View, Image, Text } from "@gluestack-ui/themed";
-import { AirbnbRating } from "react-native-ratings";
 import { useRoute } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { AirbnbRating } from "react-native-ratings";
 import { FirebaseApiCredentials } from "../../../../../api.config";
+import React, { useEffect, useState } from "react";
+import { View, Image, Text } from "@gluestack-ui/themed";
 interface RouteParams {
 	userKey?: string;
 }
@@ -36,7 +36,7 @@ export default function DriverOpinions() {
 					<View key={index}>
 						<View style={styles.singleRatingContainerViewOnly}>
 							<View style={styles.allInfoRating}>
-							<DriverAvatarView {...driver} />
+								<DriverAvatarView {...driver} />
 								<View>
 									<NameSurnameView {...driver} />
 									<StarsRatingView {...driver} />

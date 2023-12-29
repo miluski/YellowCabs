@@ -1,36 +1,34 @@
 import styles from "./styles";
 import * as ImagePicker from "expo-image-picker";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import showAlert from "../../../../functions/ShowAlert";
+import validatePassword from "../../../../functions/ValidatePassword";
+import validatePhone from "../../../../functions/ValidatePhone";
+import validateRepeatedPassword from "../../../../functions/ValidateRepeatedPassword";
+import validateName from "../../../../functions/ValidateName";
+import validateSurname from "../../../../functions/ValidateSurname";
 import { useRoute } from "@react-navigation/native";
-import { Feather } from "@expo/vector-icons";
-import { isEnabled } from "react-native/Libraries/Performance/Systrace";
-import { Alert, Vibration } from "react-native";
 import { initializeApp } from "firebase/app";
+import { Feather } from "@expo/vector-icons";
+import { NameInput } from "../../../../components/NameInput";
+import { PasswordInput } from "../../../../components/PasswordInput";
+import { PhoneInput } from "../../../../components/PhoneInput";
+import { SurnameInput } from "../../../../components/SurnameInput";
+import { FirebaseApiCredentials } from "../../../../../api.config";
+import { isEnabled } from "react-native/Libraries/Performance/Systrace";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
 import {
 	Button,
 	Text,
 	Box,
-	FormControl,
-	FormControlError,
 	Switch,
-} from "@gluestack-ui/themed";
-import {
-	FormControlErrorText,
-	FormControlLabel,
-	FormControlLabelText,
-	Input,
-} from "@gluestack-ui/themed";
-import {
-	InputField,
 	ButtonText,
 	ScrollView,
 	View,
 	Image,
 } from "@gluestack-ui/themed";
-import { FirebaseApiCredentials } from "../../../../../api.config";
 interface RouteParams {
-	phoneNumber?: string;
+	phoneNumber: string;
 	rank?: string;
 	name?: string;
 	surname?: string;
@@ -39,25 +37,17 @@ interface RouteParams {
 	notifications?: string;
 }
 export default function SettingsView({ navigation }: any) {
-	const route = useRoute();
-	const {
-		rank,
-		name,
-		surname,
-		phoneNumber,
-		avatarLink,
-		vibrations,
-		notifications,
-	} = route.params as RouteParams;
 	let finalRank = "Pasażer";
-	if (rank == "driver") finalRank = "Kierowca";
 	let finalVibrations = false;
 	let finalNotifications = false;
-	if (vibrations == "yes") finalVibrations = true;
-	if (notifications == "yes") finalNotifications = true;
-	const [phone, setPhone] = useState(phoneNumber);
-	const [newName, setName] = useState(name);
-	const [newSurname, setSurname] = useState(surname);
+	const route = useRoute();
+	const routedParams = route.params as RouteParams;
+	if (routedParams.rank == "driver") finalRank = "Kierowca";
+	if (routedParams.vibrations == "yes") finalVibrations = true;
+	if (routedParams.notifications == "yes") finalNotifications = true;
+	const [phone, setPhone] = useState(routedParams.phoneNumber);
+	const [newName, setName] = useState(routedParams.name);
+	const [newSurname, setSurname] = useState(routedParams.surname);
 	const [password, setPassword] = useState("");
 	const [repeatedPassword, setRepeatedPassword] = useState("");
 	const [actualizePersonalData, setActualizePersonalData] = useState(false);
@@ -65,75 +55,66 @@ export default function SettingsView({ navigation }: any) {
 		useState(finalVibrations);
 	const [isNotificationsSwitchChecked, setIsNotificationsSwitchChecked] =
 		useState(finalNotifications);
-	return (
-		<ScrollView style={styles.settingsScrollView}>
-			<Text style={styles.accountSettingsText}>Ustawienia konta</Text>
-			<View style={styles.mainPanelView}>
-				<TextAndAvatarView
-					name={newName}
-					surname={newSurname}
-					finalRank={finalRank}
-					avatarLink={avatarLink}
-				/>
-				<NotificationsSwitchOption
-					setIsChecked={setIsNotificationsSwitchChecked}
-					isChecked={isNotificationsSwitchChecked}
-				/>
-				<VibrationsSwitchOption
-					setIsChecked={setIsVibrationSwitchChecked}
-					isChecked={isVibrationSwitchChecked}
-				/>
-				{isNotificationsSwitchChecked != finalNotifications ||
-				isVibrationSwitchChecked != finalVibrations ? (
-					<ConfirmButton
-						onPress={() => {
-							HandleChangeAppSettings(
-								String(isVibrationSwitchChecked),
-								String(isNotificationsSwitchChecked),
-								phoneNumber,
-								navigation
-							);
-						}}
-					/>
-				) : (
-					<></>
-				)}
-				<ChangeProfilePhotoButton
-					oldPhone={phoneNumber}
-					navigation={navigation}
-				/>
-				<ActualizePersonalDataSwitchButton
-					actualizePersonalData={actualizePersonalData}
-					setActualizePersonalData={setActualizePersonalData}
-				/>
-				{actualizePersonalData ? (
-					<DataForm
-						name={newName}
-						surname={newSurname}
-						phone={phone}
-						oldPhone={phoneNumber}
-						password={password}
-						repeatedPassword={repeatedPassword}
-						setName={setName}
-						setSurname={setSurname}
-						setPhone={setPhone}
-						setPassword={setPassword}
-						setRepeatedPassword={setRepeatedPassword}
-						navigation={navigation}
-					/>
-				) : (
-					<></>
-				)}
-			</View>
-		</ScrollView>
-	);
+	const [userKey, setUserKey] = useState("");
+	useEffect(()=>{
+		(async() => {
+			const retrievedUserKey = await getUserKey(routedParams.phoneNumber);
+			setUserKey(retrievedUserKey);
+		})();
+	},[]);
+	if (userKey != null) {
+		const settingsUserObject = {
+			userKey: userKey,
+			name: newName,
+			surname: newSurname,
+			finalRank: finalRank,
+			avatarLink: routedParams.avatarLink,
+			oldPhoneNumber: routedParams.phoneNumber,
+			notifications: routedParams.notifications,
+			vibrations: routedParams.vibrations,
+			phoneNumber: phone,
+			password: password,
+			repeatedPassword: repeatedPassword,
+			isNotificationsSwitchChecked: isNotificationsSwitchChecked,
+			isVibrationSwitchChecked: isVibrationSwitchChecked,
+			actualizePersonalData: actualizePersonalData,
+			setIsNotificationsSwitchChecked: setIsNotificationsSwitchChecked,
+			setIsVibrationSwitchChecked: setIsVibrationSwitchChecked,
+			setActualizePersonalData: setActualizePersonalData,
+			setName: setName,
+			setSurname: setSurname,
+			setPhone: setPhone,
+			setPassword: setPassword,
+			setRepeatedPassword: setRepeatedPassword,
+			navigation: navigation,
+		};
+		return (
+			<ScrollView style={styles.settingsScrollView}>
+				<Text style={styles.accountSettingsText}>Ustawienia konta</Text>
+				<View style={styles.mainPanelView}>
+					<TextAndAvatarView {...settingsUserObject} />
+					<NotificationsSwitchOption {...settingsUserObject} />
+					<VibrationsSwitchOption {...settingsUserObject} />
+					{isNotificationsSwitchChecked != finalNotifications ||
+					isVibrationSwitchChecked != finalVibrations ? (
+						<ConfirmButton
+							onPress={() => {
+								handleChangeAppSettings({ ...settingsUserObject });
+							}}
+						/>
+					) : (
+						<></>
+					)}
+					<ChangeProfilePhotoButton {...settingsUserObject} />
+					<ActualizePersonalDataSwitchButton {...settingsUserObject} />
+					{actualizePersonalData ? <DataForm {...settingsUserObject} /> : <></>}
+				</View>
+			</ScrollView>
+		);
+	}
+	else return <></>;
 }
-const TextAndAvatarView = (props: {
-	name: string | undefined;
-	surname: string | undefined;
-	finalRank: string | undefined;
-	avatarLink: string | undefined;
-}) => {
+const TextAndAvatarView = (props: any) => {
 	return (
 		<View style={styles.textAndAvatarView}>
 			<Text style={styles.nameSurnameText}>
@@ -153,10 +134,7 @@ const TextAndAvatarView = (props: {
 		</View>
 	);
 };
-const NotificationsSwitchOption = (props: {
-	setIsChecked: any;
-	isChecked: any;
-}) => {
+const NotificationsSwitchOption = (props: any) => {
 	return (
 		<View style={styles.switchOptionView}>
 			<Text>Powiadomienia</Text>
@@ -168,19 +146,18 @@ const NotificationsSwitchOption = (props: {
 				}}
 				thumbColor={isEnabled() ? "#f5dd4b" : "#f4f3f4"}
 				isDisabled={false}
-				value={props.isChecked}
+				value={props.isNotificationsSwitchChecked}
 				size='md'
 				onChange={() => {
-					props.setIsChecked(!props.isChecked);
+					props.setIsNotificationsSwitchChecked(
+						!props.isNotificationsSwitchChecked
+					);
 				}}
 			/>
 		</View>
 	);
 };
-const VibrationsSwitchOption = (props: {
-	setIsChecked: any;
-	isChecked: any;
-}) => {
+const VibrationsSwitchOption = (props: any) => {
 	return (
 		<View style={styles.switchOptionView}>
 			<Text>Wibracje</Text>
@@ -192,19 +169,16 @@ const VibrationsSwitchOption = (props: {
 				}}
 				thumbColor={isEnabled() ? "#f5dd4b" : "#f4f3f4"}
 				isDisabled={false}
-				value={props.isChecked}
+				value={props.isVibrationSwitchChecked}
 				size='md'
 				onChange={() => {
-					props.setIsChecked(!props.isChecked);
+					props.setIsVibrationSwitchChecked(!props.isVibrationSwitchChecked);
 				}}
 			/>
 		</View>
 	);
 };
-const ChangeProfilePhotoButton = (props: {
-	oldPhone: any;
-	navigation: any;
-}) => {
+const ChangeProfilePhotoButton = (props: any) => {
 	return (
 		<Button
 			style={styles.actionButtons}
@@ -222,10 +196,7 @@ const ChangeProfilePhotoButton = (props: {
 		</Button>
 	);
 };
-const ActualizePersonalDataSwitchButton = (props: {
-	actualizePersonalData: boolean;
-	setActualizePersonalData: any;
-}) => {
+const ActualizePersonalDataSwitchButton = (props: any) => {
 	return (
 		<View style={styles.switchOptionView}>
 			<Text>Zaktualizuj dane osobowe</Text>
@@ -246,195 +217,73 @@ const ActualizePersonalDataSwitchButton = (props: {
 		</View>
 	);
 };
-const DataForm = (props: {
-	name: string | undefined;
-	surname: string | undefined;
-	phone: string | undefined;
-	oldPhone: string | undefined;
-	password: string | undefined;
-	repeatedPassword: string;
-	setName: any | undefined;
-	setSurname: any | undefined;
-	setPhone: any | undefined;
-	setPassword: any | undefined;
-	setRepeatedPassword: any | undefined;
-	navigation: any;
-}) => {
-	const dataToUpdate = {
-		name: props.name,
-		surname: props.surname,
-		phone: props.phone,
-		password: props.password,
-		repeatedPassword: props.repeatedPassword,
-	};
+const DataForm = (props: any) => {
 	return (
 		<Box style={styles.inputDataBox}>
 			<NameInput
 				name={props.name}
 				setName={props.setName}
+				isInvalid={undefined}
 			/>
 			<SurnameInput
 				surname={props.surname}
 				setSurname={props.setSurname}
+				isInvalid={undefined}
 			/>
 			<PhoneInput
 				phoneNumber={props.phone}
 				setPhoneNumber={props.setPhone}
+				value={props.oldPhoneNumber}
+				errorMessage={undefined}
+				isInvalid={undefined}
 			/>
 			<PasswordInput
 				password={props.password}
 				hintText={"Hasło"}
 				setPassword={props.setPassword}
+				errorText={undefined}
+				isInvalid={undefined}
 			/>
 			<PasswordInput
 				password={props.repeatedPassword}
 				hintText={"Powtórz hasło"}
 				setPassword={props.setRepeatedPassword}
+				errorText={undefined}
+				isInvalid={undefined}
 			/>
 			<ConfirmButton
 				onPress={() => {
 					if (
-						(dataToUpdate.password || dataToUpdate.repeatedPassword) &&
-						validatePassword(dataToUpdate.password) &&
-						validatePassword(dataToUpdate.repeatedPassword) &&
-						validateRepeatedPassword(
-							dataToUpdate.password,
-							dataToUpdate.repeatedPassword
-						) &&
-						validateData(dataToUpdate.name) &&
-						validateData(dataToUpdate.surname) &&
-						validatePhone(dataToUpdate.phone)
+						(props.password || props.repeatedPassword) &&
+						validatePassword(props.password) &&
+						validatePassword(props.repeatedPassword) &&
+						validateRepeatedPassword(props.password, props.repeatedPassword) &&
+						validateName(props.name) &&
+						validateSurname(props.surname) &&
+						validatePhone(props.phoneNumber)
 					) {
-						HandleEditData(
-							dataToUpdate,
-							props.oldPhone,
-							true,
-							props.navigation
-						);
+						handleEditData({ ...props, hasPassword: true });
+
 					} else if (
-						!dataToUpdate.password &&
-						!dataToUpdate.repeatedPassword &&
-						validateData(dataToUpdate.name) &&
-						validateData(dataToUpdate.surname) &&
-						validatePhone(dataToUpdate.phone)
+						!props.password &&
+						!props.repeatedPassword &&
+						validateName(props.name) &&
+						validateSurname(props.surname) &&
+						validatePhone(props.phoneNumber)
 					) {
-						HandleEditData(
-							dataToUpdate,
-							props.oldPhone,
-							false,
-							props.navigation
+						handleEditData({ ...props, hasPassword: false });
+					} else
+						showAlert(
+							"Błąd",
+							"Wypełnij poprawnie wszystkie pola",
+							props.vibrations
 						);
-					} else ShowAlert("Błąd", "Wypełnij poprawnie wszystkie pola");
 				}}
 			/>
 		</Box>
 	);
 };
-const NameInput = (props: {
-	name: string | undefined;
-	setName: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText='Imię' />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.name}
-					placeholder='Adam'
-					onChangeText={(actualName) => {
-						props.setName(actualName);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-			<BadInput hintText='Wprowadzone imię jest nieprawidłowe!' />
-		</FormControl>
-	);
-};
-const SurnameInput = (props: {
-	surname: string | undefined;
-	setSurname: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText='Nazwisko' />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.surname}
-					placeholder='Kielecki'
-					onChangeText={(actualSurname) => {
-						props.setSurname(actualSurname);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-			<BadInput hintText='Wprowadzone nazwisko jest nieprawidłowe!' />
-		</FormControl>
-	);
-};
-const PhoneInput = (props: {
-	phoneNumber: string | undefined;
-	setPhoneNumber: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText='Numer telefonu' />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.phoneNumber}
-					placeholder='123123123'
-					onChangeText={(actualPhoneNumber) => {
-						props.setPhoneNumber(String(actualPhoneNumber));
-					}}
-					selectionColor={"black"}
-					keyboardType='numeric'
-				/>
-			</Input>
-		</FormControl>
-	);
-};
-const PasswordInput = (props: {
-	password: string | undefined;
-	hintText: string;
-	setPassword: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText={props.hintText} />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='password'
-					placeholder='********'
-					value={props.password}
-					onChangeText={(actualPassword) => {
-						props.setPassword(actualPassword);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-		</FormControl>
-	);
-};
-const ConfirmButton = (props: any | undefined) => {
+const ConfirmButton = (props: any) => {
 	return (
 		<Button
 			bgColor='#FFB700'
@@ -444,49 +293,7 @@ const ConfirmButton = (props: any | undefined) => {
 		</Button>
 	);
 };
-const Label = (props: { hintText: string }) => {
-	return (
-		<FormControlLabel mb='$1'>
-			<FormControlLabelText style={styles.formInputControlLabelText}>
-				<Text>{props.hintText}</Text>
-			</FormControlLabelText>
-		</FormControlLabel>
-	);
-};
-const BadInput = (props: { hintText: string | undefined }) => {
-	return (
-		<FormControlError>
-			<FormControlErrorText style={styles.formInputErrorLabelText}>
-				{props.hintText}
-			</FormControlErrorText>
-		</FormControlError>
-	);
-};
-function validateData(data: string | undefined) {
-	return data && data.length >= 3;
-}
-function validatePhone(phone: string | undefined) {
-	var phonePattern = /^[0-9]{9}$/;
-	return phone && phone.length == 9 && phonePattern.test(phone);
-}
-function validatePassword(password: string | undefined) {
-	var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-	return password && password.length >= 8 && passPattern.test(password);
-}
-function validateRepeatedPassword(
-	password: string | undefined,
-	repeatedPassword: string | undefined
-) {
-	return repeatedPassword === password;
-}
-async function handleChangeProfilePhoto(props: {
-	oldPhone: any;
-	navigation: any;
-}) {
-	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
-	const response = await fetch(requestURL);
-	const data = await response.json();
-	const userKey = GetUserKey(props.oldPhone, data);
+async function handleChangeProfilePhoto(props: any) {
 	let result = await ImagePicker.launchImageLibraryAsync({
 		mediaTypes: ImagePicker.MediaTypeOptions.All,
 		allowsEditing: true,
@@ -498,43 +305,36 @@ async function handleChangeProfilePhoto(props: {
 		const response = await fetch(result.assets[0].uri);
 		const blob = await response.blob();
 		const storage = getStorage();
-		const storageRef = ref(storage, `images/${userKey}/avatar.jpg`);
+		const storageRef = ref(storage, `images/${props.userKey}/avatar.jpg`);
 		const metadata = {
 			contentType: "image/jpeg",
 		};
 		uploadBytes(storageRef, blob, metadata);
-		ShowAlert(
-			"Sukces",
-			"Pomyślnio zmieniono zdjęcie profilowe! \nNastąpi wylogowanie celem zaktualizowania ustawień!"
-		);
+		if (props.notifications === "yes") {
+			showAlert(
+				"Sukces",
+				"Pomyślnio zmieniono zdjęcie profilowe! \nNastąpi wylogowanie celem zaktualizowania ustawień!",
+				props.vibrations
+			);
+		}
 		props.navigation.navigate("LoginPanel");
 	}
 }
-async function HandleEditData(
-	dataToUpdate: any | undefined,
-	oldPhone: string | undefined,
-	hasPassword: boolean | undefined,
-	navigation: any
-) {
+async function handleEditData(props: any) {
 	try {
-		const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
-		const response = await fetch(requestURL);
-		const data = await response.json();
-		const userKey = GetUserKey(oldPhone, data);
-		if (userKey !== null) {
+		if (props.userKey !== null) {
 			const updatedUserData = {
-				...(hasPassword
+				...(props.hasPassword
 					? {
-							password: dataToUpdate.password,
-							repeatedPassword: dataToUpdate.repeatedPassword,
+							password: props.password
 					  }
 					: {}),
-				name: dataToUpdate.name,
-				surname: dataToUpdate.surname,
-				phone: dataToUpdate.phone,
+				name: props.name,
+				surname: props.surname,
+				phone: props.phoneNumber,
 			};
-			const url = `${FirebaseApiCredentials.databaseURL}/users/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
-			const putResponse = await fetch(url, {
+			const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+			const putResponse = await fetch(endpointUrl, {
 				method: "PATCH",
 				headers: {
 					"Content-Type": "application/json",
@@ -542,44 +342,41 @@ async function HandleEditData(
 				body: JSON.stringify(updatedUserData),
 			});
 			if (putResponse.ok) {
-				ShowAlert("Sukces", "Wybrane dane zostały zaktualizowane pomyślnie!");
-				navigation.navigate("Główna", {
-					name: dataToUpdate.name,
-					surname: dataToUpdate.surname,
-					phone: dataToUpdate.phone,
+				if (props.notifications === "yes") {
+					showAlert(
+						"Sukces",
+						"Wybrane dane zostały zaktualizowane pomyślnie!",
+						props.vibrations
+					);
+				}
+				props.navigation.navigate("Główna", {
+					name: props.name,
+					surname: props.surname,
+					phone: props.phoneNumber,
 				});
 			} else {
-				ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+				showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", props.vibrations);
 			}
 		} else {
-			ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+			showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", props.vibrations);
 		}
 	} catch (error) {
 		console.error(error);
 		return false;
 	}
 }
-async function HandleChangeAppSettings(
-	vibration: string | undefined,
-	notifications: string | undefined,
-	oldPhone: string | undefined,
-	navigation: any
-) {
-	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
-	const response = await fetch(requestURL);
-	const data = await response.json();
-	const userKey = GetUserKey(String(oldPhone), data);
+async function handleChangeAppSettings(props: any) {
 	let finalNotifications = "no";
 	let finalVibrations = "no";
-	if (notifications == "true") finalNotifications = "yes";
-	if (vibration == "true") finalVibrations = "yes";
-	if (userKey !== null) {
+	if (props.isNotificationsSwitchChecked == true) finalNotifications = "yes";
+	if (props.isVibrationSwitchChecked == true) finalVibrations = "yes";
+	if (props.userKey !== null) {
 		const updatedUserData = {
 			vibrations: finalVibrations,
 			notifications: finalNotifications,
 		};
-		const url = `${FirebaseApiCredentials.databaseURL}/users/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
-		const putResponse = await fetch(url, {
+		const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+		const putResponse = await fetch(endpointUrl, {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
@@ -587,33 +384,34 @@ async function HandleChangeAppSettings(
 			body: JSON.stringify(updatedUserData),
 		});
 		if (putResponse.ok) {
-			ShowAlert(
-				"Sukces",
-				"Wybrane dane zostały zaktualizowane pomyślnie! \nNastąpi wylogowanie celem zaktualizowania ustawień!"
-			);
-			navigation.navigate("LoginPanel");
+			if (finalNotifications === "yes") {
+				showAlert(
+					"Sukces",
+					"Wybrane dane zostały zaktualizowane pomyślnie! \nNastąpi wylogowanie celem zaktualizowania ustawień!",
+					finalVibrations
+				);
+			}
+			props.navigation.navigate("LoginPanel");
 		} else {
-			ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+			showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", finalVibrations);
 		}
 	} else {
-		ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+		showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", finalVibrations);
 	}
 }
-function GetUserKey(phone: string | undefined, data: any) {
-	for (const userKey in data) {
-		const user = data[userKey];
-		if (user.phone == phone) {
-			return userKey;
+async function getUserKey(phone: string) {
+	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const response = await fetch(endpointUrl);
+		const data = await response.json();
+		for (const userKey in data) {
+			const user = data[userKey];
+			if (user.phone == phone) {
+				return userKey;
+			}
 		}
+	} catch (error) {
+		console.error(error);
 	}
 	return "";
-}
-function ShowAlert(title: string, message: string) {
-	Vibration.vibrate(500);
-	Alert.alert(title, message, [
-		{
-			text: "Ok",
-			style: "cancel",
-		},
-	]);
 }

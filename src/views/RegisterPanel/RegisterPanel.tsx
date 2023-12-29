@@ -1,24 +1,30 @@
 import * as Font from "expo-font";
 import styles from "./styles";
-import React, { useState } from "react";
+import showAlert from "../../functions/ShowAlert";
+import validatePhone from "../../functions/ValidatePhone";
+import validateName from "../../functions/ValidateName";
+import validatePassword from "../../functions/ValidatePassword";
+import validateSurname from "../../functions/ValidateSurname";
+import getGeneratedSecret from "../../functions/GetGeneratedSecred";
+import validateRepeatedPassword from "../../functions/ValidateRepeatedPassword";
 import { config } from "@gluestack-ui/config";
-import { Alert, TouchableWithoutFeedback, Vibration, View } from "react-native";
+import { FirebaseApiCredentials } from "../../../api.config";
+import { BadInput } from "../../components/BadInput";
+import { Label } from "../../components/Label";
+import { PasswordInput } from "../../components/PasswordInput";
+import { NameInput } from "../../components/NameInput";
+import { PhoneInput } from "../../components/PhoneInput";
+import { SurnameInput } from "../../components/SurnameInput";
+import React, { useState } from "react";
+import { TouchableWithoutFeedback, View } from "react-native";
 import {
 	Button,
 	GluestackUIProvider,
 	Text,
 	Box,
 	FormControl,
-	FormControlError,
 	ButtonGroup,
-} from "@gluestack-ui/themed";
-import {
-	FormControlErrorText,
-	FormControlLabel,
-	FormControlLabelText,
 	Input,
-} from "@gluestack-ui/themed";
-import {
 	InputField,
 	ButtonText,
 	RadioGroup,
@@ -30,7 +36,6 @@ import {
 	ScrollView,
 	HStack,
 } from "@gluestack-ui/themed";
-import { FirebaseApiCredentials } from "../../../api.config";
 export default function RegisterPanel({ navigation }: { navigation: any }) {
 	const [isLoaded, setIsLoaded] = useState(false);
 	const loadCustomFont = async () => {
@@ -91,9 +96,6 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 	const [phoneErrorMessage, setPhoneErrorMessage] = useState(
 		"Wprowadzony numer telefonu jest nieprawidłowy!"
 	);
-	const [passwordErrorMessage, setPasswordErrorMessage] = useState(
-		"Wprowadzone hasło jest nieprawidłowe!"
-	);
 	const [repeatedPassword, setRepeatedPassword] = useState("");
 	const [isInvalidName, setIsInvalidName] = useState(false);
 	const [isInvalidSurname, setIsInvalidSurname] = useState(false);
@@ -122,6 +124,7 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 				errorMessage={phoneErrorMessage}
 				isInvalid={isInvalidPhone}
 				setPhoneNumber={setPhoneNumber}
+				value={undefined}
 			/>
 			<VoivodeshipInput
 				voivodeship={voivodeship}
@@ -144,14 +147,14 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 			)}
 			<PasswordInput
 				password={password}
-				errorText={passwordErrorMessage}
+				errorText={"Wprowadzone hasło jest nieprawidłowe!"}
 				hintText={"Hasło"}
 				isInvalid={isInvalidPassword}
 				setPassword={setPassword}
 			/>
 			<PasswordInput
 				password={repeatedPassword}
-				errorText={passwordErrorMessage}
+				errorText={"Wprowadzone hasło jest nieprawidłowe!"}
 				hintText={"Powtórz hasło"}
 				isInvalid={isInvalidRepeatedPassword}
 				setPassword={setRepeatedPassword}
@@ -163,13 +166,13 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 			<CreateAccountButton
 				onPress={async () => {
 					let isValidPhone = validatePhone(phoneNumber);
-					const isPhoneExists = await getUserKeyWhenUserExists(parseInt(phoneNumber));
+					const isPhoneExists = await getIsUserExists(parseInt(phoneNumber));
 					if (isPhoneExists) {
 						setPhoneErrorMessage("Podany numer telefonu już posiada konto!");
 						isValidPhone = false;
 					}
-					const isValidName = validateData(name);
-					const isValidSurname = validateData(surname);
+					const isValidName = validateName(name);
+					const isValidSurname = validateSurname(surname);
 					const isValidVoivodeship = validateVoivodeship(voivodeship);
 					const isValidDriverLicense = validateDriverLicense(driverlicense);
 					const isValidCardid = validateCardId(cardid);
@@ -177,26 +180,15 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 					const isValidRepeatedPassword =
 						validateRepeatedPassword(password, repeatedPassword) &&
 						validatePassword(repeatedPassword);
-					const isPasswordSecure = validateSecureOfPassword(password);
-					const generatedSecret = getSecret(8);
-					if (!isPasswordSecure && isValidPassword)
-						setPasswordErrorMessage(
-							"Hasło musi mieć 1 znak specjalny\ncyfrę i dużą literę!"
-						);
-					if (!isValidRepeatedPassword && isValidPassword)
-						setPasswordErrorMessage(
-							"Wprowadzone hasło różni się od oryginału!"
-						);
+					const generatedSecret = getGeneratedSecret(8);
 					setIsInvalidName(!isValidName);
 					setIsInvalidSurname(!isValidSurname);
 					setIsInvalidPhone(!isValidPhone);
 					setIsInvalidVoivodeship(!isValidVoivodeship);
 					setIsInvalidDriverlicense(!isValidDriverLicense);
 					setIsInvalidCardid(!isValidCardid);
-					setIsInvalidPassword(!isValidPassword || !isPasswordSecure);
-					setIsInvalidRepeatedPassword(
-						!isValidRepeatedPassword || !isPasswordSecure
-					);
+					setIsInvalidPassword(!isValidPassword);
+					setIsInvalidRepeatedPassword(!isValidRepeatedPassword);
 					if (
 						!isPhoneExists &&
 						isValidName &&
@@ -207,7 +199,6 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 						isValidCardid &&
 						isValidPassword &&
 						isValidRepeatedPassword &&
-						isPasswordSecure &&
 						!isAgreementNotChecked &&
 						props.isDriver
 					) {
@@ -222,7 +213,9 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 							agreement: !isAgreementNotChecked,
 							role: "driver",
 							secretPassword: generatedSecret,
-							accountBilance: 0.000,
+							vibrations: "yes",
+							notifications: "yes",
+							accountBilance: 0.0,
 						};
 						await registerUser(dataObject, props.navigation, generatedSecret);
 					} else if (
@@ -233,7 +226,6 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 						isValidVoivodeship &&
 						isValidPassword &&
 						isValidRepeatedPassword &&
-						isPasswordSecure &&
 						!isAgreementNotChecked &&
 						!props.isDriver
 					) {
@@ -292,92 +284,6 @@ const SwitchableButtons = (props: {
 				<ButtonText style={styles.buttonText}>Kierowca</ButtonText>
 			</Button>
 		</ButtonGroup>
-	);
-};
-const NameInput = (props: {
-	name: string | undefined;
-	isInvalid: boolean | undefined;
-	setName: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isInvalid={props.isInvalid}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText='Imię' />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.name}
-					placeholder='Adam'
-					onChangeText={(actualName) => {
-						props.setName(actualName);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-			<BadInput hintText='Wprowadzone imię jest nieprawidłowe!' />
-		</FormControl>
-	);
-};
-const SurnameInput = (props: {
-	surname: string | undefined;
-	isInvalid: boolean | undefined;
-	setSurname: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isInvalid={props.isInvalid}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText='Nazwisko' />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.surname}
-					placeholder='Kielecki'
-					onChangeText={(actualSurname) => {
-						props.setSurname(actualSurname);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-			<BadInput hintText='Wprowadzone nazwisko jest nieprawidłowe!' />
-		</FormControl>
-	);
-};
-const PhoneInput = (props: {
-	phoneNumber: string | undefined;
-	errorMessage: string | undefined;
-	isInvalid: boolean | undefined;
-	setPhoneNumber: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isInvalid={props.isInvalid}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText='Numer telefonu' />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='text'
-					value={props.phoneNumber}
-					placeholder='123123123'
-					onChangeText={(actualPhoneNumber) => {
-						props.setPhoneNumber(actualPhoneNumber);
-					}}
-					selectionColor={"black"}
-					keyboardType='numeric'
-				/>
-			</Input>
-			<BadInput hintText={props.errorMessage} />
-		</FormControl>
 	);
 };
 const VoivodeshipInput = (props: {
@@ -461,36 +367,6 @@ const CardIdInput = (props: {
 				/>
 			</Input>
 			<BadInput hintText='Wprowadzony dowód osobisty jest nieprawidłowy!' />
-		</FormControl>
-	);
-};
-const PasswordInput = (props: {
-	password: string | undefined;
-	errorText: string | undefined;
-	isInvalid: boolean | undefined;
-	hintText: string;
-	setPassword: (arg0: string) => void;
-}) => {
-	return (
-		<FormControl
-			size='lg'
-			isDisabled={false}
-			isInvalid={props.isInvalid}
-			isReadOnly={false}
-			isRequired={false}>
-			<Label hintText={props.hintText} />
-			<Input style={styles.inputFields}>
-				<InputField
-					type='password'
-					placeholder='********'
-					value={props.password}
-					onChangeText={(actualPassword) => {
-						props.setPassword(actualPassword);
-					}}
-					selectionColor={"black"}
-				/>
-			</Input>
-			<BadInput hintText={props.errorText} />
 		</FormControl>
 	);
 };
@@ -592,32 +468,14 @@ const PrivacyPolicyButton = (props: { navigation: any }) => {
 		</TouchableWithoutFeedback>
 	);
 };
-const Label = (props: { hintText: string }) => {
-	return (
-		<FormControlLabel mb='$1'>
-			<FormControlLabelText style={styles.formInputControlLabelText}>
-				<Text>{props.hintText}</Text>
-			</FormControlLabelText>
-		</FormControlLabel>
-	);
-};
-const BadInput = (props: { hintText: string | undefined }) => {
-	return (
-		<FormControlError>
-			<FormControlErrorText style={styles.formInputErrorLabelText}>
-				{props.hintText}
-			</FormControlErrorText>
-		</FormControlError>
-	);
-};
-async function getUserKeyWhenUserExists(phone: number) {
+async function getIsUserExists(phone: number) {
 	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
 		const response = await fetch(requestURL);
 		const data = await response.json();
 		for (const userKey in data) {
 			const user = data[userKey];
-			if (user.phone === phone) return userKey;
+			if (user.phone == phone) return true;
 		}
 		return false;
 	} catch (error) {
@@ -636,38 +494,23 @@ async function registerUser(data: any, navigation: any, secret: string) {
 			body: JSON.stringify(data),
 		});
 		if (postResponse.ok) {
-			ShowAlert(
+			showAlert(
 				"Sukces",
 				"Pomyślnie zarejestrowano konto!\nTwój sekret to: " +
 					secret +
-					"\nZapisz go w bezpiecznym miejscu!"
+					"\nZapisz go w bezpiecznym miejscu!",
+				"yes"
 			);
 			navigation.navigate("PrivacyPolicy", {
 				previousScreenName: "RegisterPanel",
 			});
 		} else {
-			ShowAlert("Błąd", "Wystąpił nieoczekiwany błąd!");
+			showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", "yes");
 		}
 	} catch (error) {
 		console.error(error);
 		return false;
 	}
-}
-function getSecret(length: number) {
-	let result = "";
-	const characters =
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-	const charactersLength = characters.length;
-	for (let i = 0; i < length; i++)
-		result += characters.charAt(Math.floor(Math.random() * charactersLength));
-	return result;
-}
-function validateData(data: string) {
-	return data.length >= 3;
-}
-function validatePhone(phone: string) {
-	var phonePattern = /^[0-9]{9}$/;
-	return phone.length == 9 && phonePattern.test(phone);
 }
 function validateVoivodeship(voivodeship: string) {
 	let voivodeships: string[] = [
@@ -692,16 +535,6 @@ function validateVoivodeship(voivodeship: string) {
 		if (voivodeships[i] == voivodeship.toLowerCase()) return true;
 	return false;
 }
-function validatePassword(password: string) {
-	return password.length >= 8;
-}
-function validateRepeatedPassword(password: string, repeatedPassword: string) {
-	return repeatedPassword === password;
-}
-function validateSecureOfPassword(password: string) {
-	var passPattern = /^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
-	return passPattern.test(password);
-}
 function validateDriverLicense(driverLicense: string) {
 	const driverLicensePattern = /^[a-zA-Z]{1}\d{7}$/;
 	return driverLicense.length === 8 && driverLicensePattern.test(driverLicense);
@@ -709,13 +542,4 @@ function validateDriverLicense(driverLicense: string) {
 function validateCardId(cardId: string) {
 	const cardIdPattern = /^[a-zA-Z]{3}\s\d{6}$/;
 	return cardId.length === 10 && cardIdPattern.test(cardId);
-}
-function ShowAlert(title: string, message: string) {
-	Vibration.vibrate(500);
-	Alert.alert(title, message, [
-		{
-			text: "Ok",
-			style: "cancel",
-		},
-	]);
 }
