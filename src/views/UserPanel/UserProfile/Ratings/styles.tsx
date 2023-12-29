@@ -48,13 +48,17 @@ const styles = StyleSheet.create({
 	},
 	yourOpinion: {
 		fontSize: 13,
-		marginLeft: 20,
+		marginLeft: 20
 	},
 	ratingTextInput: {
 		borderWidth: 1,
 		marginLeft: 20,
 		marginRight: 20,
 		height: 40,
+		width: "90%",
+		marginBottom: 10,
+		borderRadius: 10,
+		textAlign: 'center'
 	},
 	buttonsRatingContainer: {
 		flex: 1,
@@ -81,6 +85,16 @@ const styles = StyleSheet.create({
 		borderWidth: 2,
 		justifyContent: "center",
 		alignItems: "center",
+	},
+	nameSurnameText: {
+		fontSize: 20,
+		marginLeft: 10,
+	},
+	ratingsButtonsText: {
+		color: "black",
+	},
+	paddingBottomView: {
+		height: 75,
 	},
 });
 export default styles;

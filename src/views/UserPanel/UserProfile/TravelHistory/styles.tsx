@@ -51,19 +51,21 @@ const styles = StyleSheet.create({
 	tripDestinationTextDest: {
 		marginLeft: 12,
 		fontSize: 13,
+		flexGrow: 1,
 	},
 	tripTextDate: {
 		marginLeft: 12,
 		fontSize: 13,
-		marginBottom: 12
+		marginBottom: 12,
+		flexGrow: 1
 	},
 	paddingBottomView: {
 		height: 75,
 	},
 	textContainerView: {
 		flexWrap: 'wrap',
-		flexDirection: 'row',
-		width: "85%",
+		flexDirection: "row",
+		width: "65%"
 	}
 });
 export default styles;

@@ -3,9 +3,9 @@ import React, { useEffect, useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { View } from "@gluestack-ui/themed";
 import MapViewComponent from "../../../components/MapViewComponent";
-import setActualUserLocation from "../../../functions/setActualUserLocation";
 import SearchBarView from "../../../components/SearchBarViewComponent";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import setActualUserLocation from "../../../functions/setActualUserLocation";
 interface RouteParams {
 	rank?: string;
 	destination?: any;
