@@ -1,5 +1,8 @@
 import * as Font from "expo-font";
 import styles from "./styles";
+import showAlert from "../../functions/ShowAlert";
+import { useRoute } from "@react-navigation/native";
+import { FirebaseApiCredentials } from "../../../api.config";
 import React, { useState } from "react";
 import {
 	View,
@@ -8,12 +11,16 @@ import {
 	ScrollView,
 	ButtonText,
 } from "@gluestack-ui/themed";
-import { useRoute } from "@react-navigation/native";
 interface RouteParams {
 	previousScreenName?: string;
+	data?: string;
+	secret?: string;
 }
-
-export default function TermsAndConditions({navigation,}: {navigation: any;}) {
+export default function TermsAndConditions({
+	navigation,
+}: {
+	navigation: any;
+}) {
 	const [isLoaded, setIsLoaded] = useState(false);
 	const route = useRoute();
 	const routedParams = route.params as RouteParams;
@@ -264,15 +271,57 @@ export default function TermsAndConditions({navigation,}: {navigation: any;}) {
 						<Button
 							style={styles.termsAndPrivacyBackButtons}
 							onPress={() => {
-								navigation.navigate("RegisterPanel", routedParams.previousScreenName === "PrivacyPolicy" ? { previousScreenName: "TermsAndConditions" } : undefined);
+								navigation.navigate(
+									"RegisterPanel",
+									routedParams.previousScreenName === "PrivacyPolicy"
+										? { previousScreenName: "TermsAndConditions" }
+										: undefined
+								);
+								routedParams.previousScreenName === "PrivacyPolicy"
+									? (async () => {
+											await registerUser(
+												routedParams.data,
+												routedParams.secret
+											);
+											navigation.navigate("LoginPanel");
+									  })()
+									: null;
 							}}>
 							<ButtonText style={styles.termsAndPrivacyBackButtonsText}>
-								Powrót
+								{routedParams.previousScreenName === "PrivacyPolicy"
+									? "Zrozumiano!"
+									: "Powrót"}
 							</ButtonText>
 						</Button>
 					</View>
 				</ScrollView>
 			</View>
 		);
+	}
+}
+async function registerUser(data: any, secret: string | undefined) {
+	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
+	try {
+		const postResponse = await fetch(requestURL, {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+		if (postResponse.ok) {
+			showAlert(
+				"Sukces",
+				"Pomyślnie zarejestrowano konto!\nTwój sekret to: " +
+					secret +
+					"\nZapisz go w bezpiecznym miejscu!",
+				"yes"
+			);
+		} else {
+			showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", "yes");
+		}
+	} catch (error) {
+		console.error(error);
+		return false;
 	}
 }

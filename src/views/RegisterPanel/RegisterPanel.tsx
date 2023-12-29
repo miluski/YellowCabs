@@ -217,7 +217,7 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 							notifications: "yes",
 							accountBilance: 0.0,
 						};
-						await registerUser(dataObject, props.navigation, generatedSecret);
+						registerUser(dataObject, props.navigation, generatedSecret);
 					} else if (
 						!isPhoneExists &&
 						isValidName &&
@@ -242,7 +242,7 @@ const DataForm = (props: { navigation: any; isDriver: boolean }) => {
 							notifications: "yes",
 							accountBilance: 0.0,
 						};
-						await registerUser(dataObject, props.navigation, generatedSecret);
+						registerUser(dataObject, props.navigation, generatedSecret);
 					}
 				}}
 			/>
@@ -440,7 +440,11 @@ const TermAndConditionsButton = (props: { navigation: any }) => {
 				isDisabled={false}
 				style={styles.policyPrivacyTermsAndConditionsButtons}
 				onPress={() => {
-					props.navigation.navigate("TermsAndConditions");
+					props.navigation.navigate("TermsAndConditions", {
+						previousScreenName: "RegisterPanelNotRegistration",
+						data: null,
+						secret: null,
+					});
 				}}>
 				<ButtonText style={styles.rulesAndTermsButtonText}>
 					Zasady & Warunki
@@ -459,7 +463,11 @@ const PrivacyPolicyButton = (props: { navigation: any }) => {
 				isDisabled={false}
 				style={styles.policyPrivacyTermsAndConditionsButtons}
 				onPress={() => {
-					props.navigation.navigate("PrivacyPolicy");
+					props.navigation.navigate("PrivacyPolicy", {
+						previousScreenName: "RegisterPanelNotRegistration",
+						data: null,
+						secret: null,
+					});
 				}}>
 				<ButtonText style={styles.privacyPolicyButtonText}>
 					Polityka prywatności
@@ -483,34 +491,12 @@ async function getIsUserExists(phone: number) {
 		return false;
 	}
 }
-async function registerUser(data: any, navigation: any, secret: string) {
-	const requestURL = `${FirebaseApiCredentials.databaseURL}/users.json?key=${FirebaseApiCredentials.apiKey}`;
-	try {
-		const postResponse = await fetch(requestURL, {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-		if (postResponse.ok) {
-			showAlert(
-				"Sukces",
-				"Pomyślnie zarejestrowano konto!\nTwój sekret to: " +
-					secret +
-					"\nZapisz go w bezpiecznym miejscu!",
-				"yes"
-			);
-			navigation.navigate("PrivacyPolicy", {
-				previousScreenName: "RegisterPanel",
-			});
-		} else {
-			showAlert("Błąd", "Wystąpił nieoczekiwany błąd!", "yes");
-		}
-	} catch (error) {
-		console.error(error);
-		return false;
-	}
+function registerUser(data: any, navigation: any, secret: string) {
+	navigation.navigate("PrivacyPolicy", {
+		previousScreenName: "RegisterPanel",
+		data: data,
+		secret: secret,
+	});
 }
 function validateVoivodeship(voivodeship: string) {
 	let voivodeships: string[] = [

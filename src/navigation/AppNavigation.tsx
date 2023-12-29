@@ -7,14 +7,10 @@ import PrivacyPolicy from "../views/RegisterPanel/PrivacyPolicy";
 import UserTabsStackNavigation from "./UserTabsStackNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { useRoute } from "@react-navigation/native";
 const Stack = createStackNavigator();
 const screenOptions = {
 	headerShown: false,
 };
-interface RouteParams {
-	previousScreenName?: string;
-}
 export default function AppNavigation() {
 	return (
 		<NavigationContainer>

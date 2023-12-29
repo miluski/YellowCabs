@@ -1,32 +1,91 @@
-This is a [Next.js](https://github.com/expo/expo) + [Gluestack-ui](https://ui.gluestack.io/) project template bootstrapped with [`create-expo-app`](https://docs.expo.dev/get-started/create-a-project/).
+# YellowCabs
 
-## Getting Started
+YellowCabs is an mobile application which is simulating an real mobile app to ride as a taxi driver or booking an taxi courses as passenger. 
 
-First, run the development server:
+## Installation
+
+Clone the project into your local machine using following command: 
 
 ```bash
-# For web
-yarn web
-# For ios
-yarn ios
-# For android
-yarn android
+https://github.com/miluski/YellowCabs.git
 ```
 
-You can start editing the page by modifying `App.tsx`. The page auto-updates as you edit the file.
+Then, in terminal, provide this command to install node_modules packages:
 
-This project uses [`@gluestack-ui`](https://ui.gluestack.io/docs/overview/introduction) library that provides optionally styled and accessible components. These components are designed for easy integration into applications developed with React and React Native.
+```bash
+npm install
+```
 
+You will need also a file named api.config.js in root directory of the project and provide to it above informations:
 
-## Learn More
+```javascript
+export const FirebaseApiCredentials = {
+    apiKey: "YOUR_FIREBASE_API_KEY",
+    appId: "YOUR_FIREBASE_APP_ID", 
+    projectId: "YOUR_FIREBASE_PROJECT_ID",
+    databaseURL: "YOUR_FIREBASE_DATABASE_URL",
+    storageBucket: "YOUR_FIREBASE_STORAGE_URL"
+}
+export const GoogleApiCredentials = {
+    apiKey: "YOUR_GOOGLE_API_KEY"
+}
+```
 
-To learn more about Expo + Gluestack UI template, take a look at the following resources:
+Used google apis: Places API, Directions API, Distance Matrix API, Geocoding API. Your google api key must have access to mentioned apis.
 
-- [Expo Documentation](https://github.com/expo/expo) - learn about Expo features and API.
-- [Gluestack UI Documenatation](https://ui.gluestack.io/docs/overview/introduction) - learn about core concepts and architecture of gluestack-ui.
-- [Gluestack Style Documentaion](https://style.gluestack.io/docs/overview/introduction) - learn about the universal styling library that is used in Gluestack-ui
+## Usage
 
-You can check out:
-- [the gluestack-ui GitHub repository](https://github.com/gluestack/gluestack-ui)
-- [the gluestack-style GitHub repository](https://github.com/gluestack/gluestack-style)
-Your feedback and contributions are welcome!
+To use this app you will need expo go app installed on your phone or emulated phone. You can run the app via expo, but first you need to run a metro bundler using this command in terminal:
+
+```bash
+npx expo --go --tunnel
+```
+
+or if you want use it only in LAN:
+
+```bash
+npx expo --go
+```
+
+## Screenshoots
+
+![Alt Text](./img/Screenshot_20231229_210221_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210413_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210420_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210427_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210433_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210440_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210545_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210647_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210722_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210729_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210750_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210759_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210804_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210811_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210839_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210850_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210856_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210934_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210948_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_210954_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211014_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211033_Media.jpg)
+![Alt Text](./img/Screenshot_20231229_211047_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211122_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211153_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211158_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211235_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211247_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211254_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211311_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211319_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211346_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211355_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211419_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211453_Expo_Go.jpg)
+![Alt Text](./img/Screenshot_20231229_211507_Expo_Go.jpg)
+
+## License
+
+[MIT](https://choosealicense.com/licenses/mit/)
