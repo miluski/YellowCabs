@@ -301,9 +301,11 @@ async function HandleRetrievedData(
 	setPassword: any
 ) {
 	const parsedPhone = parseInt(providedData.phone);
+	let foundedUserPhone = false;
 	for (const userKey in data) {
 		const user = data[userKey];
-		if (IsUserFounded(user.phone, parsedPhone)) {
+		if (isUserFounded(user.phone, parsedPhone)) {
+			foundedUserPhone = true;
 			if (checkPassword(user.password, providedData.password)) {
 				initializeApp(FirebaseApiCredentials);
 				const storage = getStorage();
@@ -329,11 +331,15 @@ async function HandleRetrievedData(
 					},
 					isRouteStarted: false,
 				});
-			} else ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
+				return;
+			} else if (foundedUserPhone)
+				ShowAlert("Błąd", "Wprowadzono nieprawidłowe dane!");
 		}
 	}
+	if (!foundedUserPhone)
+		ShowAlert("Błąd", "Konto o podanym numerze telefonu nie istnieje!");
 }
-function IsUserFounded(phone: number, providedPhone: number) {
+function isUserFounded(phone: number, providedPhone: number) {
 	return phone == providedPhone;
 }
 function checkPassword(password: string, providedPassword: string) {
