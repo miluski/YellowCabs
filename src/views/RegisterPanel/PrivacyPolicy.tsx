@@ -1,5 +1,6 @@
 import * as Font from "expo-font";
 import styles from "./styles";
+import { useRoute } from "@react-navigation/native";
 import React, { useState } from "react";
 import {
 	View,
@@ -8,11 +9,11 @@ import {
 	ScrollView,
 	ButtonText,
 } from "@gluestack-ui/themed";
-import { useRoute } from "@react-navigation/native";
 interface RouteParams {
 	previousScreenName?: string;
+	data?: any;
+	secret?: string;
 }
-
 export default function PrivacyPolicy({ navigation }: { navigation: any }) {
 	const route = useRoute();
 	const routedParams = route.params as RouteParams;
@@ -328,12 +329,22 @@ export default function PrivacyPolicy({ navigation }: { navigation: any }) {
 							style={styles.termsAndPrivacyBackButtons}
 							onPress={() => {
 								navigation.navigate(
-									routedParams.previousScreenName === "RegisterPanel" ? "TermsAndConditions" : "RegisterPanel",
-									routedParams.previousScreenName === "RegisterPanel" ? { previousScreenName: "PrivacyPolicy" } : undefined
+									routedParams.previousScreenName === "RegisterPanel"
+										? "TermsAndConditions"
+										: "RegisterPanel",
+									routedParams.previousScreenName === "RegisterPanel"
+										? {
+												previousScreenName: "PrivacyPolicy",
+												data: routedParams.data,
+												secret: routedParams.secret,
+										  }
+										: undefined
 								);
 							}}>
 							<ButtonText style={styles.termsAndPrivacyBackButtonsText}>
-								Powrót
+								{routedParams.previousScreenName === "RegisterPanel"
+									? "Dalej"
+									: "Powrót"}
 							</ButtonText>
 						</Button>
 					</View>
