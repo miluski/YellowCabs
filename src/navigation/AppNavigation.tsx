@@ -8,10 +8,13 @@ import UserTabsStackNavigation from "./UserTabsStackNavigation";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 const Stack = createStackNavigator();
+const screenOptions = {
+	headerShown: false,
+};
 export default function AppNavigation() {
 	return (
 		<NavigationContainer>
-			<Stack.Navigator screenOptions={{ headerShown: false }}>
+			<Stack.Navigator screenOptions={screenOptions}>
 				<Stack.Screen
 					name='LoginPanel'
 					component={LoginPanel}

@@ -1,14 +1,21 @@
-import React, { useEffect, useState } from "react";
 import styles from "./styles";
-import {
-	Alert,
-	TouchableOpacity,
-	TouchableWithoutFeedback,
-	Vibration,
-} from "react-native";
-import { useRoute } from "@react-navigation/native";
+import MapViewComponent from "../../../components/MapView";
+import SearchBarView from "../../../components/SearchBarView";
+import showAlert from "../../../functions/ShowAlert";
+import getActualAccountBilance from "../../../functions/GetActualAccountBilance";
+import storeRouteCredentials from "../../../functions/StoreRouteCredentials";
+import setActualUserLocation from "../../../functions/SetActualUserLocation";
 import { Contract } from "./Contract";
+import { initializeApp } from "firebase/app";
+import { useRoute } from "@react-navigation/native";
 import { Entypo, Feather } from "@expo/vector-icons";
+import { TouchableOpacity, TouchableWithoutFeedback } from "react-native";
+import {
+	FirebaseApiCredentials,
+	GoogleApiCredentials,
+} from "../../../../api.config";
+import React, { useEffect, useState } from "react";
+import { getStorage, ref, getDownloadURL } from "firebase/storage";
 import {
 	Button,
 	Input,
@@ -20,17 +27,6 @@ import {
 	ButtonText,
 	FlatList,
 } from "@gluestack-ui/themed";
-import SearchBarView from "../../../components/SearchBarViewComponent";
-import MapViewComponent from "../../../components/MapViewComponent";
-import {
-	FirebaseApiCredentials,
-	GoogleApiCredentials,
-} from "../../../../api.config";
-import { initializeApp } from "firebase/app";
-import { getStorage, ref, getDownloadURL } from "firebase/storage";
-import getActualAccountBilance from "../../../functions/getActualAccountBilance";
-import storeRouteCredentials from "../../../functions/storeRouteCredentials";
-import setActualUserLocation from "../../../functions/setActualUserLocation";
 interface RouteParams {
 	rank?: string;
 	destination?: any;
@@ -38,6 +34,8 @@ interface RouteParams {
 	myLocalizationMarkerVisible?: boolean;
 	userLocation?: any;
 	userKey?: string;
+	vibrations?: string;
+	notifications?: string;
 }
 export default function Home({ navigation }: { navigation: any }) {
 	const route = useRoute();
@@ -80,74 +78,57 @@ const PassengerHome = (props: any) => {
 		setHasToCheckIsOrderRefusedByDriver,
 	] = useState(false);
 	const [coursePrice, setCoursePrice] = useState(0.0);
-	if (hasToCheckIsOrderRefusedByDriver) {
-		setHasToCheckIsOrderRefusedByDriver(false);
-		setTimeout(() => {
-			setHasToCheckIsOrderRefusedByDriver(true);
-		}, 2000);
-		(async () => {
-			await handleCheckIsOrderRefused({
-				...props,
-				setIsRouteStarted: setIsRouteStarted,
-			});
-		})();
-	}
-	useEffect(() => {
-		(async () => {
-			const isRideAlreadyStarted = await checkIfRideIsAlreadyStarted({
-				userKey: props.userKey,
-				setUserLocation: setUserLocation,
-				setUserLocationDescription: setUserLocationDescription,
-				setDestination: setDestination,
-				setDestinationDescription: setDestinationDescription,
-				setIsRouteStarted: setIsRouteStarted,
-				setIsRetrieved: setIsRetrieved,
-				setHasToCheckIsOrderRefusedByDriver:
-					setHasToCheckIsOrderRefusedByDriver,
-				hasToCheckIsOrderRefusedByDriver: hasToCheckIsOrderRefusedByDriver,
-				rank: props.rank,
-				setCoursePrice: setCoursePrice,
-			});
-			if (!isRideAlreadyStarted)
-				await setActualUserLocation({
-					setUserLocation,
-					setIsRetrieved,
-					setUserLocationDescription,
-				});
-		})();
-	}, []);
-	const passengerMapViewProps = {
+	const passengerHomeProps = {
 		myLocalizationMarkerVisible: true,
-		userLocation: userLocation,
-		setUserLocation: setUserLocation,
-		destination: destination,
-		setDestination: setDestination,
-		isRouteStarted: isRouteStarted,
-		setIsRouteStarted: setIsRouteStarted,
+		userLocation,
+		userLocationDescription,
+		destination,
+		destinationDescription,
+		isRouteStarted,
+		coursePrice,
 		mapScreenName: "HomeScreen",
 		userKey: props.userKey,
 		navigation: props.navigation,
 		accountBilance: props.accountBilance,
 		rank: props.rank,
-		setUserLocationDescription: setUserLocationDescription,
-		setDestinationDescription: setDestinationDescription,
-		destinationDescription: destinationDescription,
-		userLocationDescription: userLocationDescription,
-		setHasToCheckIsOrderRefusedByDriver: setHasToCheckIsOrderRefusedByDriver,
-		setCoursePrice: setCoursePrice,
-		coursePrice: coursePrice,
+		setCoursePrice,
+		setIsRetrieved,
+		setUserLocation,
+		setDestination,
+		setIsRouteStarted,
+		setUserLocationDescription,
+		setDestinationDescription,
+		setHasToCheckIsOrderRefusedByDriver,
 	};
-	return (
-		<>
-			{isRetrieved ? (
-				<View style={styles.mapTabView}>
-					<PassengerMapView {...passengerMapViewProps} />
-				</View>
-			) : (
-				<></>
-			)}
-		</>
-	);
+	useEffect(() => {
+		if (hasToCheckIsOrderRefusedByDriver) {
+			startOrderRefusedCheckTimer({ ...passengerHomeProps });
+			checkIsOrderRefused({ ...passengerHomeProps });
+		}
+	}, [hasToCheckIsOrderRefusedByDriver]);
+	useEffect(() => {
+		fetchData({ ...passengerHomeProps });
+	}, []);
+	return isRetrieved ? (
+		<View style={styles.mapTabView}>
+			<PassengerMapView {...passengerHomeProps} />
+		</View>
+	) : null;
+};
+const startOrderRefusedCheckTimer = (props: any) => {
+	props.setHasToCheckIsOrderRefusedByDriver(false);
+	setTimeout(() => {
+		props.setHasToCheckIsOrderRefusedByDriver(true);
+	}, 2000);
+};
+const checkIsOrderRefused = async (props: any) => {
+	await handleCheckIsOrderRefused({ ...props });
+};
+const fetchData = async (props: any) => {
+	const isRideAlreadyStarted = await checkIfRideIsAlreadyStarted({ ...props });
+	if (!isRideAlreadyStarted) {
+		await setActualUserLocation({ ...props });
+	}
 };
 const PassengerMapView = (props: any) => {
 	return (
@@ -571,18 +552,24 @@ const OrderTaxiButton = (props: any) => {
 							props.setIsRouteStarted(true);
 							props.setHasToCheckIsOrderRefusedByDriver(true);
 						} else {
-							ShowAlert("Błąd", "Nie masz wystarczających środków na koncie!");
+							showAlert(
+								"Błąd",
+								"Nie masz wystarczających środków na koncie!",
+								props.vibrations
+							);
 						}
 					} else {
-						ShowAlert(
+						showAlert(
 							"Błąd",
-							"Nie można wytyczyć trasy do miejsca docelowego!"
+							"Nie można wytyczyć trasy do miejsca docelowego!",
+							props.vibrations
 						);
 					}
 				} else {
-					ShowAlert(
+					showAlert(
 						"Błąd",
-						"Proszę uzupełnić miejsce docelowe/startowe podróży!"
+						"Proszę uzupełnić miejsce docelowe/startowe podróży!",
+						props.vibrations
 					);
 				}
 			}}>
@@ -679,10 +666,10 @@ async function handleCancelTaxiButtonPress(props: any) {
 					type: "inflow",
 				});
 				await addTravelToUserTravelHistory({ ...props });
-				await addTravelToUserTravelHistory({ 
+				await addTravelToUserTravelHistory({
 					userKey: data[orderKey].assignedDriverUserKey,
 					fromDescription: props.fromDescription,
-					toDescription: props.toDescription
+					toDescription: props.toDescription,
 				});
 				await addPassengerRating({
 					userKey: props.userKey,
@@ -782,13 +769,17 @@ async function addUserTransaction(props: any) {
 async function addTravelToUserTravelHistory(props: any) {
 	const actualDate = new Date();
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/travelhistories/${props.userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
+	let actualHour = actualDate.getHours().toString();
+	actualHour === "0" ? (actualHour = "00") : null;
+	let actualMinutes = actualDate.getMinutes().toString();
+	Number(actualMinutes) < 10 ? (actualMinutes = "0" + actualMinutes) : null;
 	const userTravelHistoryObject = {
 		from: props.fromDescription,
 		to: props.toDescription,
 		day: actualDate.getDate(),
 		month: actualDate.getMonth() + 1,
 		year: actualDate.getFullYear(),
-		hourAndMinute: actualDate.getHours() + ":" + actualDate.getMinutes(),
+		hourAndMinute: actualHour + ":" + actualMinutes,
 	};
 	try {
 		await fetch(endpointUrl, {
@@ -869,13 +860,4 @@ async function checkIsOrderRefusedByDriver(userKey: any) {
 		console.error(error);
 	}
 	return true;
-}
-function ShowAlert(title: string, message: string) {
-	Vibration.vibrate(500);
-	Alert.alert(title, message, [
-		{
-			text: "Ok",
-			style: "cancel",
-		},
-	]);
 }

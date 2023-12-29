@@ -75,27 +75,8 @@ export default function Travel() {
 							<View
 								key={index}
 								style={styles.singleTrip}>
-								<View style={styles.travelPin}>
-									<Feather
-										name='map-pin'
-										size={24}
-										color='black'
-									/>
-								</View>
-								<View style={styles.textContainerView}>
-									<Text
-										style={styles.tripTextDest}>
-										Z: {travel.from}
-									</Text>
-									<Text
-										style={styles.tripDestinationTextDest}>
-										Do: {travel.to}
-									</Text>
-									<Text style={styles.tripTextDate}>
-										{travel.day}.{travel.month}.{travel.year}{" "}
-										{travel.hourAndMinute}
-									</Text>
-								</View>
+								<TravelPinView />
+								<TextContainerView {...travel} />
 							</View>
 						))}
 				</View>
@@ -103,10 +84,6 @@ export default function Travel() {
 		</>
 	);
 }
-const parseTime = (timeString: string) => {
-	const [hour, minute] = timeString.split(":").map(Number);
-	return { hour, minute };
-};
 async function getTravelsData(userKey: string) {
 	const endpointUrl = `${FirebaseApiCredentials.databaseURL}/travelhistories/${userKey}.json?key=${FirebaseApiCredentials.apiKey}`;
 	try {
@@ -118,3 +95,29 @@ async function getTravelsData(userKey: string) {
 	}
 	return null;
 }
+const parseTime = (timeString: string) => {
+	const [hour, minute] = timeString.split(":").map(Number);
+	return { hour, minute };
+};
+const TravelPinView = () => {
+	return (
+		<View style={styles.travelPin}>
+			<Feather
+				name='map-pin'
+				size={24}
+				color='black'
+			/>
+		</View>
+	);
+};
+const TextContainerView = (travel: any) => {
+	return (
+		<View style={styles.textContainerView}>
+			<Text style={styles.tripTextDest}>Z: {travel.from}</Text>
+			<Text style={styles.tripDestinationTextDest}>Do: {travel.to}</Text>
+			<Text style={styles.tripTextDate}>
+				{travel.day}.{travel.month}.{travel.year} {travel.hourAndMinute}
+			</Text>
+		</View>
+	);
+};

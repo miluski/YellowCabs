@@ -4,8 +4,8 @@ import Home from "../views/UserPanel/Home/Home";
 import Wallet from "../views/UserPanel/Wallet/Wallet";
 import Map from "../views/UserPanel/Map/Map";
 import UserProfile from "../views/UserPanel/UserProfile/UserProfile/UserProfile";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { useRoute } from "@react-navigation/native";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
 	AntDesign,
 	FontAwesome5,
@@ -21,36 +21,30 @@ interface RouteParams {
 	notifications?: string;
 	destination?: any;
 	isRouteStarted?: boolean;
-	userLocation? : any;
-	myLocalizationMarkerVisible? : boolean;
+	userLocation?: any;
+	myLocalizationMarkerVisible?: boolean;
 }
+const tabNavigatorScreenOptions = {
+	tabBarHideOnKeyboard: true,
+	tabBarStyle: styles.tabBarStyle,
+	tabBarLabelStyle: styles.tabBarLabelStyle,
+	tabBarIconStyle: styles.tabBarIconStyle,
+	headerShown: false,
+	tabBarActiveTintColor: "#FFB700",
+	tabBarInactiveTintColor: "black",
+};
 export default function BottomTabs() {
 	const route = useRoute();
-	const routedParams =
-		route.params as RouteParams;
+	const routedParams = route.params as RouteParams;
 	return (
 		<Tab.Navigator
 			initialRouteName='Główna'
-			screenOptions={{
-				tabBarHideOnKeyboard: true,
-				tabBarStyle: styles.tabBarStyle,
-				tabBarLabelStyle: styles.tabBarLabelStyle,
-				tabBarIconStyle: styles.tabBarIconStyle,
-				headerShown: false,
-				tabBarActiveTintColor: "#FFB700",
-				tabBarInactiveTintColor: "black",
-			}}>
+			screenOptions={tabNavigatorScreenOptions}>
 			<Tab.Screen
 				name='Główna'
 				component={Home}
 				options={{
-					tabBarIcon: ({ color }) => (
-						<AntDesign
-							name='home'
-							color={color}
-							size={35}
-						/>
-					),
+					tabBarIcon: ({ color }) => <HomeIcon color={color} />,
 					unmountOnBlur: true,
 				}}
 				initialParams={routedParams}
@@ -59,14 +53,8 @@ export default function BottomTabs() {
 				name='Portfel'
 				component={Wallet}
 				options={{
-					tabBarIcon: ({ color }) => (
-						<Fontisto
-							name='wallet'
-							color={color}
-							size={35}
-						/>
-					),
-					unmountOnBlur: true
+					tabBarIcon: ({ color }) => <WalletIcon color={color} />,
+					unmountOnBlur: true,
 				}}
 				initialParams={routedParams}
 			/>
@@ -74,14 +62,8 @@ export default function BottomTabs() {
 				name='Mapa'
 				component={Map}
 				options={{
-					tabBarIcon: ({ color }) => (
-						<FontAwesome5
-							name='map-marked-alt'
-							color={color}
-							size={35}
-						/>
-					),
-					unmountOnBlur: true
+					tabBarIcon: ({ color }) => <MapIcon color={color} />,
+					unmountOnBlur: true,
 				}}
 				initialParams={routedParams}
 			/>
@@ -89,16 +71,46 @@ export default function BottomTabs() {
 				name='Konto'
 				component={UserProfile}
 				options={{
-					tabBarIcon: ({ color }) => (
-						<FontAwesome
-							name='user'
-							color={color}
-							size={35}
-						/>
-					),
+					tabBarIcon: ({ color }) => <AccountIcon color={color} />,
 				}}
 				initialParams={routedParams}
 			/>
 		</Tab.Navigator>
 	);
 }
+const HomeIcon = ({ color }: any) => {
+	return (
+		<AntDesign
+			name='home'
+			color={color}
+			size={35}
+		/>
+	);
+};
+const WalletIcon = ({ color }: any) => {
+	return (
+		<Fontisto
+			name='wallet'
+			color={color}
+			size={35}
+		/>
+	);
+};
+const MapIcon = ({ color }: any) => {
+	return (
+		<FontAwesome5
+			name='map-marked-alt'
+			color={color}
+			size={35}
+		/>
+	);
+};
+const AccountIcon = ({ color }: any) => {
+	return (
+		<FontAwesome
+			name='user'
+			color={color}
+			size={35}
+		/>
+	);
+};

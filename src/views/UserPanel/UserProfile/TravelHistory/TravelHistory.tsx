@@ -1,8 +1,8 @@
 import React from "react";
 import styles from "./styles";
 import Travel from "./Travel";
-import { View, ScrollView, Text } from "@gluestack-ui/themed";
 import { useRoute } from "@react-navigation/native";
+import { View, ScrollView, Text } from "@gluestack-ui/themed";
 interface RouteParams {
 	userKey: string;
 }

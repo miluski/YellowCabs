@@ -1,23 +1,25 @@
-import React, { useEffect, useState } from "react";
 import styles from "./styles";
 import Operations from "./Operations";
-import { Text, View, ScrollView } from "@gluestack-ui/themed";
-import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
+import getActualAccountBilance from "../../../functions/GetActualAccountBilance";
 import { useRoute } from "@react-navigation/native";
 import { TouchableWithoutFeedback } from "react-native";
-import getActualAccountBilance from "../../../functions/getActualAccountBilance";
+import React, { useEffect, useState } from "react";
+import { Text, View, ScrollView } from "@gluestack-ui/themed";
+import { Ionicons, AntDesign, FontAwesome } from "@expo/vector-icons";
 interface RouteParams {
 	userKey: string;
+	vibrations: string;
+	notifications: string;
 }
 export default function Wallet({ navigation }: { navigation: any }) {
 	const route = useRoute();
 	const routedParams = route.params as RouteParams;
 	const [accountBilance, setAccountBilance] = useState(0.0);
 	useEffect(() => {
-		(async() => {
+		(async () => {
 			setAccountBilance(await getActualAccountBilance(routedParams.userKey));
 		})();
-	},[]);
+	}, []);
 	return (
 		<ScrollView>
 			<Text style={styles.yourWalletText}>Twój portfel</Text>
@@ -25,6 +27,8 @@ export default function Wallet({ navigation }: { navigation: any }) {
 			<TopUpAccountView
 				navigation={navigation}
 				userKey={routedParams.userKey}
+				vibrations={routedParams.vibrations}
+				notifications={routedParams.notifications}
 				accountBilance={accountBilance}
 			/>
 			<View style={styles.operationsView}>
@@ -59,6 +63,8 @@ const TopUpAccountView = (props: {
 	navigation: any;
 	userKey: string;
 	accountBilance: any;
+	vibrations: string;
+	notifications: string;
 }) => {
 	return (
 		<View style={styles.topUpAccountView}>
@@ -89,6 +95,8 @@ const ScanQrCodeTextView = (props: any) => {
 				props.navigation.navigate("CameraView", {
 					userKey: props.userKey,
 					accountBilance: props.accountBilance,
+					vibrations: props.vibrations,
+					notifications: props.notifications,
 				});
 			}}>
 			<Text style={styles.scanQrCodeText}>Skanuj kod QR</Text>
@@ -102,6 +110,8 @@ const AngleIconView = (props: any) => {
 				props.navigation.navigate("CameraView", {
 					userKey: props.userKey,
 					accountBilance: props.accountBilance,
+					vibrations: props.vibrations,
+					notifications: props.notifications,
 				});
 			}}>
 			<FontAwesome

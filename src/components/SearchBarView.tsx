@@ -1,10 +1,10 @@
-import { View } from "@gluestack-ui/themed";
 import React from "react";
-import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
-import { GoogleApiCredentials } from "../../api.config";
-import searchLocationBarStyles from "../views/UserPanel/Map/searchLocationBarStyles";
 import styles from "./styles";
+import searchLocationBarStyles from "../views/UserPanel/Map/searchLocationBarStyles";
+import { View } from "@gluestack-ui/themed";
 import { EvilIcons } from "@expo/vector-icons";
+import { GoogleApiCredentials } from "../../api.config";
+import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 export default function SearchBarView({ setUserLocation }: any) {
 	return (
 		<View style={styles.searchInputComponentsView}>

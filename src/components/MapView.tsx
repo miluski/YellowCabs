@@ -1,9 +1,9 @@
-import MapViewDirections from "react-native-maps-directions";
-import MapView, { Callout, Marker } from "react-native-maps";
-import React from "react";
-import { View, Text } from "@gluestack-ui/themed";
-import { GoogleApiCredentials } from "../../api.config";
 import styles from "./styles";
+import React from "react";
+import MapViewDirections from "react-native-maps-directions";
+import { GoogleApiCredentials } from "../../api.config";
+import { View, Text } from "@gluestack-ui/themed";
+import MapView, { Callout, Marker } from "react-native-maps";
 export default function MapViewComponent(props: {
 	myLocalizationMarkerVisible: boolean;
 	isRouteStarted: boolean | undefined;
