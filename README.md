@@ -33,6 +33,18 @@ export const GoogleApiCredentials = {
 
 Used google apis: Places API, Directions API, Distance Matrix API, Geocoding API. Your google api key must have access to mentioned apis.
 
+## Technologies
+
+- React native 0.72.6
+- TypeScript ^5.1.3
+- Expo ^49.0.13
+- Firebase
+- gluestack.ui
+- Google Places API
+- Google Directions API
+- Google Distance Matrix API
+- Google Geocoding API
+
 ## Usage
 
 To use this app you will need expo go app installed on your phone or emulated phone. You can run the app via expo, but first you need to run a metro bundler using this command in terminal:
