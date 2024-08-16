@@ -2,6 +2,12 @@
 
 YellowCabs is an mobile application which is simulating an real mobile app to ride as a taxi driver or booking an taxi courses as passenger. 
 
+## Tech Stack
+
+**Frontend:** TypeScript, Expo Go, Gluestack
+
+**Backend:** Firebase, Google Places, Directions, Distance Matrix, Geocoding API's
+
 ## Installation
 
 Clone the project into your local machine using following command: 
@@ -32,18 +38,6 @@ export const GoogleApiCredentials = {
 ```
 
 Used google apis: Places API, Directions API, Distance Matrix API, Geocoding API. Your google api key must have access to mentioned apis.
-
-## Technologies
-
-- React native 0.72.6
-- TypeScript ^5.1.3
-- Expo ^49.0.13
-- Firebase
-- gluestack.ui
-- Google Places API
-- Google Directions API
-- Google Distance Matrix API
-- Google Geocoding API
 
 ## Usage
 
@@ -98,6 +92,7 @@ npx expo --go
 ![Alt Text](./img/Screenshot_20231229_211453_Expo_Go.jpg)
 ![Alt Text](./img/Screenshot_20231229_211507_Expo_Go.jpg)
 
-## License
+## Authors
 
-[MIT](https://choosealicense.com/licenses/mit/)
+- [@miluski](https://www.github.com/miluski)
+- [@JacobJS7](https://www.github.com/JacobJS7)
